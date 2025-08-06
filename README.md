@@ -29,7 +29,7 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/restoHack.git
+git clone https://github.com/Critlist/restoHack.git
 cd restoHack
 
 # Build with CMake
