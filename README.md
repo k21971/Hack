@@ -155,7 +155,7 @@ And yes, it’s meant to be that way.
 
 ### Gameplay Status
 
-## Fully Playable and Stable**
+## Fully Playable and Stable
 
 * Start as any character class → Explore procedural dungeons → Fight monsters → Collect treasure → Save and resume → Die gloriously in authentic ASCII
 * Thoroughly tested. Rock-solid stability.
