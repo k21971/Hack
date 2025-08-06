@@ -54,7 +54,7 @@ cmake .. && cmake --build .
 **"Game in progress" error?**
 
 ```bash
-rm -f hackdir/mjh.* hackdir/save/*  # Replace 'mjh' with your username
+rm -f hackdir/<username>.* hackdir/save/*  
 ./hack
 ```
 
@@ -162,18 +162,6 @@ And yes, it’s meant to be that way.
 * 100% Authentic. Complete original 1982 code preserved, only syntax modernized.
 * Performance optimized. Efficient execution on modern hardware.
 
-### Release Status: Ready for Distribution
-
-* Perfect build system. Compiles cleanly on all platforms using CMake.
-* Complete documentation. Guides, notes, and usage instructions.
-* Historical preservation achieved. 100% authentic 1982 experience.
-* All K&R conversion completed. Entire codebase modernized.
-* Cross-platform testing completed. Verified on Linux, BSD, macOS.
-* AUR packaging and source release prepared.
-
-**Final Result:** A fully restored, perfectly playable 1982 Hack game running on modern systems with 100% authenticity and zero compromises. The restoration is complete and public-ready.
-
----
 
 ## Contributing
 
