@@ -71,6 +71,8 @@ set(HACK_SOURCES
     src/hack.shknam.c  
     src/hack.options.c 
     src/hack.timeout.c
+    src/hack.track.c
+    src/hack.u_init.c
     src/hack.version.c   
     src/rnd.c           
     
