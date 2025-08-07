@@ -8,14 +8,14 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ## Features & Highlights
 
-* Modern Build System. CMake replaces crusty Makefiles. Works clean on modern Linux, macOS, and BSD with automated setup.
-* Zero External Dependencies. POSIX-only. Bring a compiler, we're good.
-* 100% Authentic Systems. Over a dozen real systems integrated from original source. No rewrites, just restorations.
-* Complete K\&R Modernization. Entire codebase modernized; approx. 230–260 functions updated (I'll have to verify). **Completed Aug 6, 2025**
-* Fixed Unix/Linux Compatibility. Resolved hardcoded BSD paths and file system issues for modern systems.
-* Playable 314KB Executable. Tiny, tight, and true to the original with full save/load functionality.
-* Clean Git History. Every commit tells a story: K\&R conversion, stub removal, polish phase, final build.
-* Package-Ready Layout. Clean separation of code, data, and build logic. Easy to package and distribute.
+* **Modern Build System.** CMake replaces crusty Makefiles. Works clean on modern Linux, macOS, and BSD with automated setup.
+* **Zero External Dependencies.** POSIX-only. Bring a compiler, we're good.
+* **100% Authentic Systems.** Over a dozen real systems integrated from original source. No rewrites, just restorations.
+* **Complete K\&R Modernization.** Entire codebase modernized; approx. 230–260 functions updated. **Completed Aug 6, 2025**
+* **Fixed Unix/Linux Compatibility.** Resolved hardcoded BSD paths and file system issues for modern systems.
+* **Playable 314KB Executable.** Tiny, tight, and true to the original with full save/load functionality.
+* **Clean Git History.** Every commit tells a story: K\&R conversion, stub removal, polish phase, final build.
+* **Package-Ready Layout.** Clean separation of code, data, and build logic. Easy to package and distribute.
 
 > **Note:** Currently only tested on Arch Linux. While CMake enables portability, cross-platform build behavior has not yet been verified on macOS or BSD. Feedback and patches welcome.
 
@@ -97,23 +97,42 @@ cmake --build .
 
 ---
 
-## Known Issues
+## Known Issues & Planned Fixes
 
-### Lock File and Permission Quirks
+### Savefile and Lockfile Issues
+
+* **Issue:** The game relies on legacy savefile locking via a `perm` file and symbolic links. This can break if:
+
+  * `./hackdir/record` or `perm` don’t exist at runtime
+  * You're using a filesystem or OS that handles symlinks differently
+* **Fix (Planned):** Migrate from `link("safelock", "perm")` behavior to [`flock()`](https://man7.org/linux/man-pages/man2/flock.2.html) for more robust and portable locking. This will preserve intended behavior while reducing segfaults and file corruption on modern systems.
+
+### First-Run Runtime Failures
+
+* **Issue:** If the `hackdir` directory or its files are missing, the game may fail silently or segfault.
+* **Fix (Planned):** Add logic to auto-create necessary runtime files (`record`, `perm`, `save`) if they don't exist, without altering file format or structure.
+
+### Segfaults on Class Select (Rare)
+
+* **Issue:** A segfault may occur after character creation if certain files are missing or in an unexpected state.
+* **Cause (Under Investigation):** Possibly due to reading uninitialized save state or corrupt `perm` file.
+* **Workaround:** Manually ensure `./hackdir/record` and `perm` exist and are writable before launch. A patch is in progress.
+
+---
+
+## Preservation Philosophy
+
+While restoHack is committed to historical accuracy, the project now has a growing userbase, many of whom are trying this game for the first time. The plan is to implement fail-safes and modern behaviors where they reduce frustration but without altering gameplay, balance, or structure. Expect minor QOL improvments in the coming days.
 
 Due to the original design and save system logic, lock and save file handling can behave inconsistently under certain edge cases—especially when the terminal is force-closed (SIGKILL) or the game is killed ungracefully. This can result in persistent "game in progress" messages or dangling lock files.
 
 There is currently **no complete fix** that preserves the original structure and logic without compromising the spirit of the restoration. Manual cleanup (`rm hackdir/*`) is the recommended workaround.
 
-Future releases may include an optional override flag or sandboxed mode to mitigate this, but purists may prefer the authentic fragility.
-
-If you have ideas for resolving this without breaking the original save/lock logic, suggestions from other developers are welcome — especially if they preserve the spirit of the project.
-
 ---
 
-## Gameplay (What Is This?)
+## Gameplay
 
-Hack is a classic terminal roguelike. You’re the `@`, out to snatch the Amulet of Yendor from the Mazes of Menace. Expect monsters, magic, inventory micromanagement, and permadeath. Movement is `hjkl`, commands are arcane, and survival is unlikely.
+Hack is a classic terminal roguelike. You’re the `@`, out to snatch the Amulet of Yendor from the Mazes of Menace. Expect monsters, magic, inventory micromanagement, and permadeath. Movement is `hjkl` (Vi), commands are arcane, and survival is unlikely.
 
 And yes, it’s meant to be that way.
 
@@ -146,22 +165,20 @@ And yes, it’s meant to be that way.
 ### Technical Achievements (100% Complete)
 
 * Complete K\&R to ANSI C conversion (entire codebase modernized; approx. 230–260 functions updated)
-
 * Perfect build system with CMake replacing vintage Makefiles
-
 * Modern signal handling for common Unix window environments (Hyprland, Wayland, X11). Note: no known issues here, but see the lock file section for edge-case process death behavior.
-
-* Memory safety with proper cleanup routines. Lock file management remains an unresolved legacy issue tied to the original game's design. See "Known Issues" for details on edge-case failures and suggested workarounds.
+* Memory safety with proper cleanup routines Issues" for details on edge-case failures and suggested workarounds.
 
 ### Gameplay Status
 
-## Fully Playable and Stable
+**Fully Playable and Stable**
 
 * Start as any character class → Explore procedural dungeons → Fight monsters → Collect treasure → Save and resume → Die gloriously in authentic ASCII
 * Thoroughly tested. Rock-solid stability.
 * 100% Authentic. Complete original 1984 code preserved, only syntax modernized.
 * Performance optimized. Efficient execution on modern hardware.
 
+---
 
 ## Contributing
 
