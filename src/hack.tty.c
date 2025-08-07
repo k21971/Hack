@@ -57,7 +57,7 @@ static const char rcsid[] =
 /**
  * MODERN ADDITION (2025): POSIX terminal interface compatibility
  * 
- * WHY: Original 1982 code supported only BSD (sgttyb) and SYSV (termio) interfaces.
+ * WHY: Original 1984 code supported only BSD (sgttyb) and SYSV (termio) interfaces.
  * Modern Unix-like systems use POSIX termios interface, which is more standardized
  * and portable across different platforms (Linux, macOS, BSD variants).
  * 
@@ -174,7 +174,7 @@ gettty(void){
 		/**
 		 * MODERN ADDITION (2025): Terminal compatibility for modern systems
 		 * 
-		 * WHY: Original 1982 code assumed working terminal I/O control (ioctl).
+		 * WHY: Original 1984 code assumed working terminal I/O control (ioctl).
 		 * Modern terminals/emulators may not support all classic ioctl operations,
 		 * causing the game to exit rather than gracefully handle the failure.
 		 * 
@@ -220,7 +220,7 @@ settty(char *s) {
 		/**
 		 * MODERN ADDITION (2025): Terminal restoration compatibility
 		 * 
-		 * WHY: Original 1982 code assumed terminal settings could always be restored.
+		 * WHY: Original 1984 code assumed terminal settings could always be restored.
 		 * Modern terminals may not support restoration of all settings, but game
 		 * should exit gracefully rather than crash on ioctl failure.
 		 * 

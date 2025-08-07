@@ -1,6 +1,6 @@
-# restoHack: Bringing 1982 Hack Back from the Dead
+# restoHack: Bringing 1984 Hack Back from the Dead
 
-**restoHack** is a modern resurrection of *Hack*, the legendary 1982 roguelike that paved the way for *NetHack*. This isn’t a reimagining. This is preservation with a blowtorch and a scalpel. The goal: get the original code compiling, running, and dungeon-crawling like it did back when floppy disks were king, but on a 2025 toolchain.
+**restoHack** is a modern resurrection of *Hack*, the legendary 1984 roguelike that paved the way for *NetHack*. This isn't a reimagining. This is preservation with a blowtorch and a scalpel. The goal: get the original code compiling, running, and dungeon-crawling like it did back when floppy disks were king, but on a 2025 toolchain.
 
 Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, modernized, and ready to play in 2025.
 
@@ -159,7 +159,7 @@ And yes, it’s meant to be that way.
 
 * Start as any character class → Explore procedural dungeons → Fight monsters → Collect treasure → Save and resume → Die gloriously in authentic ASCII
 * Thoroughly tested. Rock-solid stability.
-* 100% Authentic. Complete original 1982 code preserved, only syntax modernized.
+* 100% Authentic. Complete original 1984 code preserved, only syntax modernized.
 * Performance optimized. Efficient execution on modern hardware.
 
 

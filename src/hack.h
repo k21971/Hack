@@ -91,7 +91,7 @@ extern int rn1(int x, int y);
 extern void fracture_rock(struct obj *obj);
 
 /* PLAYER SYSTEM PROTOTYPES - from studying hack.u_init.c */
-/* K&R OBJECT CREATION SYSTEM - Forward declarations for authentic 1982 functions */
+/* K&R OBJECT CREATION SYSTEM - Forward declarations for authentic 1984 functions */
 extern struct obj *mkobj(int let);        /* Create object by symbol */
 extern struct obj *mksobj(int otyp);      /* Create object by type */
 extern struct obj *mkobj_at(int let, int x, int y);  /* Create object at position */

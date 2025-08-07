@@ -38,7 +38,7 @@
 /**
  * MODERN ADDITION (2025): Local development path for hackdir
  * 
- * WHY: Original 1982 path was "/usr/games/lib/hackdir" requiring system installation.
+ * WHY: Original 1984 path was "/usr/games/lib/hackdir" requiring system installation.
  * For development and educational use, we need a local directory that can be created
  * and managed without root privileges or system-wide installation.
  * 

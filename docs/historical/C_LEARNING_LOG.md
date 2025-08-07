@@ -1,6 +1,6 @@
-# C Restoration Project: Hack (1982) - Learning Log
+# C Restoration Project: Hack (1984) - Learning Log
 
-This log documents the process of modernizing and integrating key systems from the original 1982 Hack source code. The goal is not just to make the code compile, but to understand the evolution of C and reinforce fundamental programming concepts by studying this classic codebase.
+This log documents the process of modernizing and integrating key systems from the original 1984 Hack source code. The goal is not just to make the code compile, but to understand the evolution of C and reinforce fundamental programming concepts by studying this classic codebase.
 
 ---
 
@@ -136,10 +136,10 @@ This represents the complete transformation from "source code" to "working progr
 
 ## 6. Authentic System Integration: Phase 0F (July 2025)
 
-This phase involved replacing stub implementations with authentic 1982 code while preserving all original game logic and behavior.
+This phase involved replacing stub implementations with authentic 1984 code while preserving all original game logic and behavior.
 
 *   **Preservation Percentage:** 100%
-    *   All original 1982 logic preserved perfectly - only K&R to ANSI C syntax modernized for modern compiler compatibility.
+    *   All original 1984 logic preserved perfectly - only K&R to ANSI C syntax modernized for modern compiler compatibility.
 
 *   **Authentic Systems Integrated:**
     1.  **hack.objnam.c (548 lines):** Real object naming system with complex item descriptions
@@ -147,7 +147,7 @@ This phase involved replacing stub implementations with authentic 1982 code whil
         - Complex grammar handling: "a +1 elven cloak (being worn)" vs generic "object#42"
     2.  **hack.o_init.c (156 lines):** Object initialization and probability system  
         - Functions: `init_objects()`, `probtype()`, `letindex()`, `oinit()`, `dodiscovered()`
-        - Authentic 1982 object distribution and discovery mechanics
+        - Authentic 1984 object distribution and discovery mechanics
     3.  **hack.pager.c (418 lines):** Paged text display and scrolling system
         - Functions: `cornline()`, `page_more()`, `set_pager()`, `page_line()`, `dohelp()`
         - Real "More--" prompts and text pagination
@@ -176,13 +176,13 @@ This phase involved replacing stub implementations with authentic 1982 code whil
     *   **Terminal Programming:** Cross-platform terminal I/O and control sequences
 
 *   **Educational Value:**
-    *   **Authentic Code Study:** Direct exposure to professional 1982 C code patterns and techniques
+    *   **Authentic Code Study:** Direct exposure to professional 1984 C code patterns and techniques
     *   **Legacy Modernization:** Real-world experience updating old C code for modern compilers
     *   **System Integration:** Understanding how complex systems work together in practice
     *   **Debugging Skills:** Resolving compilation errors, linking failures, and symbol conflicts
     *   **Code Archaeology:** Reading and understanding undocumented historical code
 
-*   **Final Achievement:** **FULLY PLAYABLE 1982 HACK GAME RESTORATION**
+*   **Final Achievement:** **FULLY PLAYABLE 1984 HACK GAME RESTORATION**
     *   Game Status: **262KB fully playable executable** with complete core gameplay
     *   Total Code: **21,153 lines** of original Hack source code preserved
     *   Build System: **CMake managing 32 source files** with perfect C99 compatibility
@@ -192,7 +192,7 @@ This phase involved replacing stub implementations with authentic 1982 code whil
 
 ## 🏆 **FINAL PHASE: FULLY PLAYABLE GAME ACHIEVEMENT**
 
-### **🎉 Mission Accomplished: Complete 1982 Hack Restoration**
+### **🎉 Mission Accomplished: Complete 1984 Hack Restoration**
 - ✅ **hack.lev.c Integration** - Resolved all function prototype conflicts through header modernization
 - ✅ **Critical Stub Fixes** - Implemented minimal stub logic to eliminate segfaults and spam  
 - ✅ **Build Perfection** - Achieved clean 262KB executable with 32 authentic source files
@@ -212,13 +212,13 @@ This phase involved replacing stub implementations with authentic 1982 code whil
 - **initrack()** - Silenced tracking initialization for clean game output
 
 **Educational Value:**
-This final phase demonstrated the critical skill of **minimal intervention debugging** - identifying and fixing only the essential blockers while preserving maximum authenticity. The result: a fully playable, historically accurate 1982 Hack game.
+This final phase demonstrated the critical skill of **minimal intervention debugging** - identifying and fixing only the essential blockers while preserving maximum authenticity. The result: a fully playable, historically accurate 1984 Hack game.
 
 ---
 
 ## 🧹 **POLISH PHASE: CLEAN AUTHENTIC EXPERIENCE (Phase 0H - July 29, 2025)**
 
-### **🎯 Goal: Remove Console Noise for Authentic 1982 Feel**
+### **🎯 Goal: Remove Console Noise for Authentic 1984 Feel**
 
 **User Experience Issues Identified:**
 - Excessive stub messages disrupting gameplay immersion
@@ -237,7 +237,7 @@ This final phase demonstrated the critical skill of **minimal intervention debug
 - **Message Flow Control** - Selective stub output to maintain immersion
 - **Preservation vs. Polish** - Maintaining authenticity while improving usability
 
-**Result:** Clean, authentic 1982 terminal experience with minimal modern noise
+**Result:** Clean, authentic 1984 terminal experience with minimal modern noise
 
 ---
 
@@ -441,9 +441,9 @@ This phase demonstrated advanced C concepts including function pointer types, he
 - **Flavor text** - `outrumor()`, `outrip()`
 
 **Implementation Philosophy:**
-- **Clean Code** - Removed excessive documentation from authentic 1982 features
+- **Clean Code** - Removed excessive documentation from authentic 1984 features
 - **Functional Focus** - Each stub provides meaningful gameplay interaction
-- **Authentic Feel** - Maintains 1982 Hack atmosphere and mechanics
+- **Authentic Feel** - Maintains 1984 Hack atmosphere and mechanics
 - **Modern Compatibility** - Safe implementations that prevent crashes
 
 **Final Statistics:**
@@ -453,7 +453,7 @@ This phase demonstrated advanced C concepts including function pointer types, he
 - **Zero console spam** - Professional user experience with authentic messages
 
 **Educational Value:**
-This comprehensive stub implementation demonstrated real-world software development practices: prioritizing by criticality, maintaining code cleanliness, balancing authenticity with functionality, and systematic approach to large-scale refactoring. The result is a fully playable game that preserves 1982 authenticity while providing modern reliability.
+This comprehensive stub implementation demonstrated real-world software development practices: prioritizing by criticality, maintaining code cleanliness, balancing authenticity with functionality, and systematic approach to large-scale refactoring. The result is a fully playable game that preserves 1984 authenticity while providing modern reliability.
 
 ---
 
@@ -504,7 +504,7 @@ This comprehensive stub implementation demonstrated real-world software developm
 - **Build Systems** - Modern CMake dependency management for complex projects
 
 **Preservation Achievement:**
-- **100% Logic Preservation** - Zero changes to original 1982 game behavior
+- **100% Logic Preservation** - Zero changes to original 1984 game behavior
 - **Syntax Only Changes** - Pure K&R to ANSI C modernization
 - **Build Compatibility** - Code now compiles cleanly on modern C99/C11 compilers
 - **Authentic Experience** - All original game mechanics and feel preserved
@@ -514,7 +514,7 @@ This comprehensive stub implementation demonstrated real-world software developm
 - **Complete Shop System** - Full shopkeeper AI, billing, inventory management
 - **Complete Pet System** - Dog AI, following, taming, companion mechanics  
 - **Complete Apply System** - Tool usage, digging, camera, ice box, whistles
-- **Zero Rewrites** - Maintained commitment to authentic 1982 code preservation
+- **Zero Rewrites** - Maintained commitment to authentic 1984 code preservation
 
 This phase demonstrated advanced C programming skills: legacy code modernization, build system integration, and systematic refactoring while maintaining 100% functional compatibility with historical source code.
 
@@ -559,7 +559,7 @@ This phase demonstrated advanced C programming skills: legacy code modernization
 
 ### **🏆 Final Achievement: 100% K&R Conversion Success**
 - **100+ K&R Functions Converted** - Complete systematic modernization across 15+ major files
-- **Zero Logic Changes** - All original 1982 game behavior preserved perfectly
+- **Zero Logic Changes** - All original 1984 game behavior preserved perfectly
 - **Clean Build** - Compiles without warnings on modern GCC/Clang compilers
 - **Full Compatibility** - Works on all modern Unix/Linux systems
 - **Educational Success** - Complete mastery of K&R to ANSI C conversion techniques
@@ -571,7 +571,7 @@ This phase demonstrated advanced C programming skills: legacy code modernization
 - **Cross-Platform Compatibility** - BSD, Linux, macOS support
 - **Code Archaeology** - Successfully modernized 40+ year old codebase
 
-This represents the complete transformation of a vintage 1982 K&R C codebase into modern ANSI C while preserving 100% of the original game's authentic behavior and feel.
+This represents the complete transformation of a vintage 1984 K&R C codebase into modern ANSI C while preserving 100% of the original game's authentic behavior and feel.
 
 ---
 
@@ -604,7 +604,7 @@ This represents the complete transformation of a vintage 1982 K&R C codebase int
 **Achievement:**
 - **Runtime Compatibility** - Game now starts on all modern Unix/Linux systems
 - **Zero Manual Setup** - Automated build process handles all file creation
-- **Authentic Preservation** - Original 1982 code logic completely intact
+- **Authentic Preservation** - Original 1984 code logic completely intact
 - **Educational Value** - Demonstrated real-world legacy code maintenance challenges
 
-This fix resolved the final barrier to running authentic 1982 Hack on modern systems, completing the preservation project's core mission.
+This fix resolved the final barrier to running authentic 1984 Hack on modern systems, completing the preservation project's core mission.

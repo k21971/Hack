@@ -3,7 +3,7 @@
 //  * 
 //  * THIS FILE SHOULD BE REMOVED IN FINAL RELEASE
 //  * 
-//  * The original 1982 Hack had NO stub functions. All remaining functions
+//  * The original 1984 Hack had NO stub functions. All remaining functions
 //  * in this file are either:
 //  * 1. Non-original additions that should not exist
 //  * 2. Functions that have authentic implementations elsewhere
@@ -20,7 +20,7 @@
 // #include <time.h>
 
 // /* =================================================================== */
-// /* FUNCTIONS THAT EXIST IN ORIGINAL 1982 SOURCE - STUBS NOT NEEDED */
+// /* FUNCTIONS THAT EXIST IN ORIGINAL 1984 SOURCE - STUBS NOT NEEDED */
 // /* =================================================================== */
 
 // /* dlevelp() - This function has authentic implementation using level_exists[] array */
@@ -45,7 +45,7 @@
 // }
 
 // /* =================================================================== */
-// /* NON-ORIGINAL FUNCTIONS - THESE SHOULD NOT EXIST IN 1982 HACK */
+// /* NON-ORIGINAL FUNCTIONS - THESE SHOULD NOT EXIST IN 1984 HACK */
 // /* =================================================================== */
 
 // /* doquit() - DOES NOT EXIST IN ORIGINAL
@@ -76,7 +76,7 @@
 // /* RECOMMENDATION: DELETE THIS ENTIRE FILE
 // /* 
 // /* All functions in this file either:
-// /* 1. Have authentic implementations in original 1982 source files
+// /* 1. Have authentic implementations in original 1984 source files
 // /* 2. Are non-original additions that violate authentic preservation
 // /* 
 // /* For 100% authentic restoration, this file should not exist.

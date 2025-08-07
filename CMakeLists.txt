@@ -93,7 +93,7 @@ add_custom_command(
     COMMAND makedefs ${CMAKE_CURRENT_SOURCE_DIR}/src/def.objects.h > ${CMAKE_CURRENT_BINARY_DIR}/hack.onames.h
     DEPENDS makedefs ${CMAKE_CURRENT_SOURCE_DIR}/src/def.objects.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating hack.onames.h with authentic 1982 object definitions"
+    COMMENT "Generating hack.onames.h with authentic 1984 object definitions"
 )
 
 # Main hack executable
@@ -243,8 +243,8 @@ install(FILES man/hack.6 DESTINATION share/man/man6)
 # Modern CMake: CPack configuration for professional distribution
 set(CPACK_PACKAGE_NAME "restohack")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Authentic 1982 Hack game restoration - modernized for contemporary systems")
-set(CPACK_PACKAGE_DESCRIPTION "restoHack brings the legendary 1982 Hack game back from the dead with 94.2% authentic code preservation. This isn't a reimagining - it's historical software preservation with modern compatibility. Features complete K&R to ANSI C conversion, cross-platform builds, and 100% authentic 1982 gameplay experience.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Authentic 1984 Hack game restoration - modernized for contemporary systems")
+set(CPACK_PACKAGE_DESCRIPTION "restoHack brings the legendary 1984 Hack game back from the dead with 94.2% authentic code preservation. This isn't a reimagining - it's historical software preservation with modern compatibility. Features complete K&R to ANSI C conversion, cross-platform builds, and 100% authentic 1984 gameplay experience.")
 
 set(CPACK_PACKAGE_VENDOR "restoHack Project")
 set(CPACK_PACKAGE_CONTACT "https://github.com/Critlist/restoHack.git")
@@ -269,7 +269,7 @@ set(CPACK_SOURCE_IGNORE_FILES
 if(WIN32)
     # Windows NSIS installer
     set(CPACK_GENERATOR "NSIS;ZIP")
-    set(CPACK_NSIS_DISPLAY_NAME "restoHack - Authentic 1982 Hack Game")
+    set(CPACK_NSIS_DISPLAY_NAME "restoHack - Authentic 1984 Hack Game")
     set(CPACK_NSIS_HELP_LINK "https://github.com/Critlist/restoHack.git")
     set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/Critlist/restoHack.git")
 elseif(APPLE)

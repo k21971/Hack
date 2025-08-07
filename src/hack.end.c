@@ -255,7 +255,7 @@ void topten(void){
 	/**
 	 * MODERN ADDITION (2025): Stale lock detection and cleanup
 	 * 
-	 * WHY: Original 1982 code could leave stale record_lock files if the game
+	 * WHY: Original 1984 code could leave stale record_lock files if the game
 	 * crashed or was killed before proper cleanup, causing infinite loops in
 	 * subsequent runs waiting for lock release.
 	 * 
@@ -526,7 +526,7 @@ int x;
 /**
  * MODERN ADDITION (2025): Enhanced signal handling for window manager compatibility
  * 
- * WHY: Original 1982 code only handled SIGHUP (terminal disconnect).
+ * WHY: Original 1984 code only handled SIGHUP (terminal disconnect).
  * Modern window managers like Hyprland/Wayland send SIGTERM when forcibly closing
  * terminal windows, leaving stale lock files that cause infinite waits on next game start.
  * 
@@ -534,7 +534,7 @@ int x;
  * lock file cleanup regardless of how the process terminates. Uses existing
  * clearlocks() mechanism to maintain compatibility with original game logic.
  * 
- * PRESERVES: Original 1982 save-on-hangup vs no-save behavior via NOSAVEONHANGUP
+ * PRESERVES: Original 1984 save-on-hangup vs no-save behavior via NOSAVEONHANGUP
  * ADDS: Modern signal compatibility while maintaining authentic game experience
  */
 void modern_cleanup_handler(int sig)
@@ -544,7 +544,7 @@ void modern_cleanup_handler(int sig)
 	(void) signal(SIGTERM, SIG_IGN);
 	(void) signal(SIGQUIT, SIG_IGN);
 	
-	/* Use existing 1982 cleanup mechanism */
+	/* Use existing 1984 cleanup mechanism */
 	clearlocks();
 	
 	/* Exit with appropriate code based on signal */
