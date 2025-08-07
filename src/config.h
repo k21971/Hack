@@ -39,6 +39,9 @@
 #define	HLOCK	"perm"	/* an empty file used for locking purposes */
 #define LLOCK	"safelock"	/* link to previous */
 
+/* MODERN ADDITION (2025): Enable modern flock()-based locking */
+#define ENABLE_MODERN_LOCKING	1
+
 #ifdef UNIX
 /*
  * Define DEF_PAGER as your default pager, e.g. "/bin/cat" or "/usr/ucb/more"

@@ -197,6 +197,15 @@ getlock(void)
 	(void) fflush(stdout);
 
 	/* we ignore QUIT and INT at this point */
+	
+#ifdef ENABLE_MODERN_LOCKING
+	/* MODERN ADDITION (2025): Use flock()-based locking for reliability */
+	if (!modern_lock_game()) {
+		getret();
+		error("");
+	}
+#else
+	/* Original 1984 link()-based locking preserved as fallback */
 	if (link(HLOCK, LLOCK) == -1) {
 		int errnosv = errno;
 
@@ -217,8 +226,8 @@ getlock(void)
 		}
 		getret();
 		error("");
-		/*NOTREACHED*/
 	}
+#endif
 
 	regularize(lock);
 	glo(0);
@@ -230,7 +239,11 @@ getlock(void)
 		if((fd = open(lock, 0)) == -1) {
 			if(errno == ENOENT) goto gotlock;    /* no such file */
 			perror(lock);
+#ifdef ENABLE_MODERN_LOCKING
+			modern_unlock_game();
+#else
 			(void) unlink(LLOCK);
+#endif
 			error("Cannot open %s", lock);
 		}
 
@@ -239,13 +252,21 @@ getlock(void)
 		(void) close(fd);
 	} while(i < locknum);
 
+#ifdef ENABLE_MODERN_LOCKING
+	modern_unlock_game();
+#else
 	(void) unlink(LLOCK);
+#endif
 	error(locknum ? "Too many hacks running now."
 		      : "There is a game in progress under your name.");
 gotlock:
 	fd = creat(lock, FMASK);
+#ifdef ENABLE_MODERN_LOCKING
+	/* Modern locking doesn't need LLOCK cleanup */
+#else
 	if(unlink(LLOCK) == -1)
 		error("Cannot unlink %s.", LLOCK);
+#endif
 	if(fd == -1) {
 		error("cannot creat lock file.");
 	} else {

@@ -7,7 +7,9 @@
 
 extern char plname[];
 
-static char *rip[] = {
+/* MODERN ADDITION (2025): Made tombstone strings writable to prevent segfaults */
+/* Original 1984 code used read-only string literals which crash on modern systems */
+static char rip[][60] = {
 "                       ----------",
 "                      /          \\",
 "                     /    REST    \\",
@@ -22,11 +24,11 @@ static char *rip[] = {
 "                  |       1001       |",
 "                 *|     *  *  *      | *",
 "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______\n",
-0
+""
 };
 
 void outrip(void){
-	char **dp = rip;
+	int dp = 0;  /* Index into rip array */
 	char *dpx;
 	char buf[BUFSZ];
 	int x,y;
@@ -56,9 +58,9 @@ void outrip(void){
 	center(9, buf);
 	(void) sprintf(buf, "%4d", getyear());
 	center(11, buf);
-	for(y=8; *dp; y++,dp++){
+	for(y=8; rip[dp][0]; y++,dp++){
 		x = 0;
-		dpx = *dp;
+		dpx = rip[dp];
 		while(dpx[x]) {
 			while(dpx[x] == ' ') x++;
 			curs(x,y);
@@ -76,7 +78,21 @@ void outrip(void){
 
 void center(int line, char *text) {
 char *ip,*op;
+int offset, max_len, text_len;
 	ip = text;
-	op = &rip[line][28 - ((strlen(text)+1)/2)];
-	while(*ip) *op++ = *ip++;
+	text_len = strlen(text);
+	
+	/* MODERN ADDITION (2025): Bounds checking to prevent buffer overflow */
+	/* Now safe with writable 2D array */
+	offset = 28 - ((text_len+1)/2);
+	if (offset < 0) offset = 0;
+	if (offset + text_len >= 60) {  /* Array width is 60 */
+		max_len = 60 - offset - 1;
+		if (max_len <= 0) return;
+	} else {
+		max_len = text_len;
+	}
+	
+	op = &rip[line][offset];
+	while(*ip && max_len-- > 0) *op++ = *ip++;
 }

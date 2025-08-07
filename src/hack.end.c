@@ -267,6 +267,11 @@ void topten(void){
 	 * ADDS: Defensive programming against stale resources
 	 */
 	struct stat lockstat;
+#ifdef ENABLE_MODERN_LOCKING
+	/* Modern locking: flock() automatically releases on process death */
+	/* No stale locks to clean up */
+#else
+	/* Original 1984 system: Clean up stale record locks */
 	if(stat(reclock, &lockstat) == 0) {
 		time_t now = time(NULL);
 		if(now - lockstat.st_mtime > 300) { /* 5 minutes */
@@ -275,7 +280,16 @@ void topten(void){
 			(void) unlink(reclock);
 		}
 	}
+#endif
 	
+#ifdef ENABLE_MODERN_LOCKING
+	/* MODERN ADDITION (2025): Use flock()-based record locking */
+	if (!modern_lock_record()) {
+		HUP puts("Cannot access record file!");
+		return;
+	}
+#else
+	/* Original 1984 link()-based record locking */
 	while(link(recfile, reclock) == -1) {
 		HUP perror(reclock);
 		if(!sleepct--) {
@@ -288,6 +302,7 @@ void topten(void){
 		HUP (void) fflush(stdout);
 		sleep(1);
 	}
+#endif
 	if(!(rfile = fopen(recfile,"r"))){
 		HUP puts("Cannot open record file!");
 		goto unlock;
@@ -418,7 +433,11 @@ void topten(void){
 		(void) outentry(0, t0, 1);
 	(void) fclose(rfile);
 unlock:
+#ifdef ENABLE_MODERN_LOCKING
+	modern_unlock_record();
+#else
 	(void) unlink(reclock);
+#endif
 }
 
 void outheader(void) {
@@ -438,7 +457,7 @@ boolean quit = FALSE, killed = FALSE, starv = FALSE;
 char linebuf[BUFSZ];
 	linebuf[0] = 0;
 	if(rank) Sprintf(eos(linebuf), "%3d", rank);
-		else Sprintf(eos(linebuf), "   ");
+	else Sprintf(eos(linebuf), "   ");
 	Sprintf(eos(linebuf), " %6ld %8s", t1->points, t1->name);
 	if(t1->plchar == 'X') Sprintf(eos(linebuf), " ");
 	else Sprintf(eos(linebuf), "-%c ", t1->plchar);
@@ -517,6 +536,13 @@ int d = n%10;
 void clearlocks(void){
 int x;
 	(void) signal(SIGHUP,SIG_IGN);
+	
+#ifdef ENABLE_MODERN_LOCKING
+	/* MODERN ADDITION (2025): Clean up flock()-based locks */
+	modern_unlock_game();
+	modern_unlock_record();
+#endif
+	
 	for(x = maxdlevel; x >= 0; x--) {
 		glo(x);
 		(void) unlink(lock);	/* not all levels need be present */

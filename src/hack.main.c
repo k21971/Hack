@@ -216,6 +216,10 @@ int main(int argc, char *argv[])
 		(void) signal(SIGINT,SIG_IGN);
 		if(!locknum)
 			(void) strcpy(lock,plname);
+#ifdef ENABLE_MODERN_LOCKING
+		/* MODERN ADDITION (2025): Clean up any stale locks on startup */
+		modern_cleanup_locks();
+#endif
 		getlock();	/* sets lock if locknum != 0 */
 #ifdef WIZARD
 	} else {

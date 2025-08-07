@@ -97,36 +97,28 @@ cmake --build .
 
 ---
 
-## Known Issues & Planned Fixes
+## Recent Fixes & Improvements
 
-### Savefile and Lockfile Issues
+### ✅ **Modern Locking System (v1.0.4)**
 
-* **Issue:** The game relies on legacy savefile locking via a `perm` file and symbolic links. This can break if:
+* **Fixed:** Replaced unreliable 1984 `link()`-based locking with modern [`flock()`](https://man7.org/linux/man-pages/man2/flock.2.html) system
+* **Result:** Eliminates stale lock files, "game in progress" hangs, and filesystem compatibility issues
+* **Benefit:** Automatic cleanup on process death - no more manual `rm hackdir/*` needed
+* **Compatibility:** Preserves 100% authentic 1984 gameplay while providing modern reliability
 
-  * `./hackdir/record` or `perm` don’t exist at runtime
-  * You're using a filesystem or OS that handles symlinks differently
-* **Fix (Planned):** Migrate from `link("safelock", "perm")` behavior to [`flock()`](https://man7.org/linux/man-pages/man2/flock.2.html) for more robust and portable locking. This will preserve intended behavior while reducing segfaults and file corruption on modern systems.
+### ✅ **Tombstone Display Fix**
 
-### First-Run Runtime Failures
-
-* **Issue:** If the `hackdir` directory or its files are missing, the game may fail silently or segfault.
-* **Fix (Planned):** Add logic to auto-create necessary runtime files (`record`, `perm`, `save`) if they don't exist, without altering file format or structure.
-
-### Segfaults on Class Select (Rare)
-
-* **Issue:** A segfault may occur after character creation if certain files are missing or in an unexpected state.
-* **Cause (Under Investigation):** Possibly due to reading uninitialized save state or corrupt `perm` file.
-* **Workaround:** Manually ensure `./hackdir/record` and `perm` exist and are writable before launch. A patch is in progress.
+* **Fixed:** Segfault in death screen (`hack.rip.c`) caused by buffer overflow in name centering
+* **Result:** RIP screen now displays properly on all systems with any username length
+* **Technical:** Updated read-only string literals to writable arrays for modern compiler compatibility
 
 ---
 
 ## Preservation Philosophy
 
-While restoHack is committed to historical accuracy, the project now has a growing userbase, many of whom are trying this game for the first time. The plan is to implement fail-safes and modern behaviors where they reduce frustration but without altering gameplay, balance, or structure. Expect minor QOL improvments in the coming days.
+restoHack balances historical authenticity with modern reliability. While committed to preserving the authentic 1984 gameplay experience, the project implements targeted fixes for issues that would prevent modern users from enjoying the game.
 
-Due to the original design and save system logic, lock and save file handling can behave inconsistently under certain edge cases—especially when the terminal is force-closed (SIGKILL) or the game is killed ungracefully. This can result in persistent "game in progress" messages or dangling lock files.
-
-There is currently **no complete fix** that preserves the original structure and logic without compromising the spirit of the restoration. Manual cleanup (`rm hackdir/*`) is the recommended workaround.
+**Philosophy:** Fix what breaks, preserve what works. All modern additions are clearly documented and maintain 100% compatibility with original game mechanics, balance, and feel. No modern game features have been added - only infrastructure improvements for contemporary systems.
 
 ---
 

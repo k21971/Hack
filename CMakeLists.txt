@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(restoHack VERSION 1.0.3 LANGUAGES C)
+project(restoHack VERSION 1.0.1 LANGUAGES C)
 
 # Set C standard
 set(CMAKE_C_STANDARD 99)
@@ -30,6 +30,7 @@ set(HACK_SOURCES
     src/hack.main.c    
     src/hack.mkobj.c   
     src/hack.invent.c  
+    src/hack.lock.c    
     src/hack.worn.c    
     src/hack.mklev.c   
     src/hack.lev.c     

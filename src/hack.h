@@ -342,6 +342,14 @@ extern void glibr(void);
 extern void timeout(void);
 extern void stoned_dialogue(void);
 extern void done(char *how);
+
+/* MODERN LOCKING SYSTEM - hack.lock.c */
+extern int modern_lock_game(void);
+extern void modern_unlock_game(void);
+extern int modern_lock_record(void);
+extern void modern_unlock_record(void);
+extern void modern_cleanup_locks(void);
+extern int modern_locking_available(void);
 extern void tele(void);
 extern int init_uhunger(void);
 extern int inv_weight(void);
