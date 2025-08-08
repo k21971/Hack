@@ -25,14 +25,29 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ### Download Pre-built Release (Recommended)
 
-1. **Download** the latest `restoHack-static-*.tar.gz` from [GitHub Releases](https://github.com/Critlist/restoHack/releases)
+**Running the Static Binary (Linux)**
 
-2. **Extract and run:**
-   ```bash
-   mkdir ~/hack-game && cd ~/hack-game
-   tar -xzf ~/Downloads/restoHack-static-*.tar.gz
-   ./run-hack.sh
-   ```
+A prebuilt static binary is available for Linux x86_64.
+
+**1. Download the release tarball:**
+[restoHack-static-20250808-linux-x86_64.tar.gz](https://github.com/Critlist/restoHack/releases/download/v1.0.2/restoHack-static-20250808-linux-x86_64.tar.gz)
+
+**2. Move the tarball to a clean folder (recommended):**
+```bash
+mkdir -p ~/Games/restoHack
+mv ~/Downloads/restoHack-static-20250808-linux-x86_64.tar.gz ~/Games/restoHack/
+cd ~/Games/restoHack
+```
+
+**3. Extract the tarball:**
+```bash
+tar -xzf restoHack-static-20250808-linux-x86_64.tar.gz
+```
+
+**4. Run the Game:**
+```bash
+./run-hack.sh
+```
 
 The static binary runs on any Linux system without dependencies - no need to install ncurses or other libraries!
 
