@@ -99,14 +99,14 @@ cmake --build .
 
 ## Recent Fixes & Improvements
 
-### ✅ **Modern Locking System (v1.0.4)**
+### **Modern Locking System (v1.0.1)**
 
 * **Fixed:** Replaced unreliable 1984 `link()`-based locking with modern [`flock()`](https://man7.org/linux/man-pages/man2/flock.2.html) system
 * **Result:** Eliminates stale lock files, "game in progress" hangs, and filesystem compatibility issues
 * **Benefit:** Automatic cleanup on process death - no more manual `rm hackdir/*` needed
 * **Compatibility:** Preserves 100% authentic 1984 gameplay while providing modern reliability
 
-### ✅ **Tombstone Display Fix**
+### **Tombstone Display Fix**
 
 * **Fixed:** Segfault in death screen (`hack.rip.c`) caused by buffer overflow in name centering
 * **Result:** RIP screen now displays properly on all systems with any username length
