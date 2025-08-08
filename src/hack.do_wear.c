@@ -67,7 +67,7 @@ int doremring(void) {
 	/* NOTREACHED */
 #ifdef lint
 	return(0);
-#endif lint
+#endif /* lint */
 }
 
 int dorr(struct obj *otmp) {

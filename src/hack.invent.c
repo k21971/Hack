@@ -15,7 +15,7 @@ static char *xprname(struct obj *obj, char let);
 #ifndef NOWORM
 #include	"def.wseg.h"
 extern struct wseg *wsegs[32];
-#endif NOWORM
+#endif /* NOWORM */
 
 #define	NOINVSYM	'#'
 
@@ -183,7 +183,7 @@ m_at(int x, int y)
 	struct monst *mtmp;
 #ifndef NOWORM
 	struct wseg *wtmp;
-#endif NOWORM
+#endif /* NOWORM */
 
 	m_atseg = 0;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon){
@@ -197,7 +197,7 @@ m_at(int x, int y)
 			return(mtmp);
 		    }
 		}
-#endif NOWORM
+#endif /* NOWORM */
 	}
 	return(0);
 }

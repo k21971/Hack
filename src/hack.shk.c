@@ -24,7 +24,7 @@ int shk_move(void){ return(0); }
 void replshk(struct monst *mtmp, struct monst *mtmp2) {}
 char *shkname(void){ return(""); }
 
-#else QUEST
+#else /* QUEST */
 #include	"hack.mfndpos.h"
 #include	"def.eshk.h"
 #include	<stdio.h>
@@ -709,7 +709,7 @@ int tmp, ac;
 #ifdef MAIL
 		if(obj->otyp == SCR_MAIL)
 			tmp = rnd(5);
-#endif MAIL
+#endif /* MAIL */
 		break;
 	case POTION_SYM:
 		tmp = 10*rnd(50);
@@ -896,7 +896,7 @@ int shk_move(struct monst *shkp)
 #ifdef STUPID
 		    /* cater for stupid compilers */
 		    int zz;
-#endif STUPID
+#endif /* STUPID */
 		    if(uondoor && (ib = sobj_at(ICE_BOX, nx, ny))) {
 			nix = nx; niy = ny; chi = i; break;
 		    }
@@ -907,7 +907,7 @@ int shk_move(struct monst *shkp)
 			(appr && (zz = GDIST(nix,niy)) && zz > GDIST(nx,ny))
 #else
 			(appr && GDIST(nx,ny) < GDIST(nix,niy))
-#endif STUPID
+#endif /* STUPID */
 			) {
 			    nix = nx;
 			    niy = ny;
@@ -960,7 +960,7 @@ void shopdig(int fall)
 	}
     }
 }
-#endif QUEST
+#endif /* QUEST */
 
 int online(int x, int y) {
 	return(x==u.ux || y==u.uy ||
@@ -973,6 +973,6 @@ int follower(struct monst *mtmp)
 	return( mtmp->mtame || index("1TVWZi&, ", mtmp->data->mlet)
 #ifndef QUEST
 		|| (mtmp->isshk && ESHK(mtmp)->following)
-#endif QUEST
+#endif /* QUEST */
 		);
 }

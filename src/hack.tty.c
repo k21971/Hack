@@ -83,7 +83,7 @@ static const char rcsid[] =
  */
 #ifndef BSD
 #define	NR_OF_EOFS	20
-#endif BSD
+#endif /* BSD */
 
 
 #ifdef MODERN_TERMIOS
@@ -400,7 +400,7 @@ parse(void)
 		inputline[1] = getchar();
 #ifdef QUEST
 		if(inputline[1] == foo) inputline[2] = getchar(); else
-#endif QUEST
+#endif /* QUEST */
 		inputline[2] = 0;
 	}
 	if(foo == 'm' || foo == 'M'){
@@ -433,7 +433,7 @@ readchar(void) {
 	}
 #else
 		end_of_input();
-#endif NR_OF_EOFS
+#endif /* NR_OF_EOFS */
 	if(flags.toplin == 1)
 		flags.toplin = 2;
 	return((char) sym);

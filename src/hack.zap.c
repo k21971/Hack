@@ -68,7 +68,7 @@ int bhitm(struct monst *mtmp, struct obj *otmp)
 	case WAN_PROBING:
 		mstatusline(mtmp);
 		break;
-#endif WAN_PROBING
+#endif /* WAN_PROBING */
 	default:
 		impossible("What an interesting wand (%u)", otmp->otyp, 0);
 	}
@@ -114,7 +114,7 @@ int bhito(struct obj *obj, struct obj *otmp)	/* object obj was hit by the effect
 	case WAN_SPEED_MONSTER:
 #ifdef WAN_PROBING
 	case WAN_PROBING:
-#endif WAN_PROBING
+#endif /* WAN_PROBING */
 		res = FALSE;
 		break;
 	default:

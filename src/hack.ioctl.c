@@ -49,7 +49,7 @@ void getioctls(void) {
 	(void) ioctl(fileno(stdin), (int) TIOCSLTC, (char *) &ltchars0);
 #else
 	(void) ioctl(fileno(stdin), (int) TCGETA, &termio);
-#endif BSD
+#endif /* BSD */
 }
 
 void setioctls(void) {
@@ -57,7 +57,7 @@ void setioctls(void) {
 	(void) ioctl(fileno(stdin), (int) TIOCSLTC, (char *) &ltchars);
 #else
 	(void) ioctl(fileno(stdin), (int) TCSETA, &termio);
-#endif BSD
+#endif /* BSD */
 }
 
 #ifdef SUSPEND		/* implies BSD */
@@ -73,9 +73,9 @@ int dosuspend(void) {
 	} else {
 		pline("I don't think your shell has job control.");
 	}
-#else SIGTSTP
+#else /* SIGTSTP */
 	pline("Sorry, it seems we have no SIGTSTP here. Try ! or S.");
-#endif SIGTSTP
+#endif /* SIGTSTP */
 	return(0);
 }
-#endif SUSPEND
+#endif /* SUSPEND */

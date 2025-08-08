@@ -12,7 +12,7 @@ struct rm levl[COLNO][ROWNO];	/* level map */
 #ifndef QUEST
 struct mkroom rooms[MAXNROFROOMS+1];
 coord doors[DOORMAX];
-#endif QUEST
+#endif /* QUEST */
 struct monst *fmon = 0;
 struct trap *ftrap = 0;
 struct gold *fgold = 0;

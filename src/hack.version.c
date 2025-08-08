@@ -10,7 +10,7 @@ int doversion(void){
 		"Quest"
 #else
 		"Hack"
-#endif QUEST
+#endif /* QUEST */
 		), datestring);
 	return(0);
 }
