@@ -280,7 +280,7 @@ not_recovered:
 		flags.botlx = 1;
 		makedog();
 		{ struct monst *mtmp;
-		  if(mtmp == m_at(u.ux, u.uy)) mnexto(mtmp);
+		  if((mtmp = m_at(u.ux, u.uy)) != 0) mnexto(mtmp);
 		}
 		seemons();
 #ifdef NEWS

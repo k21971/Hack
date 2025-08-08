@@ -285,7 +285,7 @@ int mhitu(struct monst *mtmp)
 #ifndef NOWORM
 	case 'w':
 		if(tmp) wormhit(mtmp);
-#endif NOWORM
+#endif /* NOWORM */
 		break;
 	case 'X':
 		(void) hitu(mtmp,rnd(5));

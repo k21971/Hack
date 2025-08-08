@@ -256,4 +256,4 @@ void replgd(struct monst *mtmp, struct monst *mtmp2)
 		guard = mtmp2;
 }
 
-#endif QUEST
+#endif /* QUEST */

@@ -52,7 +52,7 @@ getyear(void)
 }
 
 char *
-getdate(void)
+getdatestr(void)
 {
 	static char datestr[7];
 	struct tm *lt = getlt();
@@ -326,7 +326,7 @@ getmailstatus(void) {
 		mailbox = 0;
 #else
 		omstat.st_mtime = 0;
-#endif PERMANENT_MAILBOX
+#endif /* PERMANENT_MAILBOX */
 	}
 }
 
@@ -335,7 +335,7 @@ ckmailstatus(void) {
 	if(!mailbox
 #ifdef MAILCKFREQ
 		    || moves < laststattime + MAILCKFREQ
-#endif MAILCKFREQ
+#endif /* MAILCKFREQ */
 							)
 		return;
 	laststattime = moves;
@@ -345,7 +345,7 @@ ckmailstatus(void) {
 		mailbox = 0;
 #else
 		nmstat.st_mtime = 0;
-#endif PERMANENT_MAILBOX
+#endif /* PERMANENT_MAILBOX */
 	} else if(nmstat.st_mtime > omstat.st_mtime) {
 		if(nmstat.st_size)
 			newmail();
@@ -446,14 +446,14 @@ readmail(void) {
 		execl(mr, mr, (char *) 0);
 		exit(1);
 	}
-#else DEF_MAILREADER
+#else /* DEF_MAILREADER */
 	(void) page_file(mailbox, FALSE);
-#endif DEF_MAILREADER
+#endif /* DEF_MAILREADER */
 	/* get new stat; not entirely correct: there is a small time
 	   window where we do not see new mail */
 	getmailstatus();
 }
-#endif MAIL
+#endif /* MAIL */
 
 void
 regularize(char *s)	/* normalize file name - we don't like ..'s or /'s */

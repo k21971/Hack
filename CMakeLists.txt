@@ -124,10 +124,17 @@ target_compile_options(hack PRIVATE
 target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=2)
 
 # Runtime path configuration - inject absolute paths to prevent hardcoded path issues
-target_compile_definitions(hack PRIVATE 
-    HACKDIR="${CMAKE_BINARY_DIR}/hackdir"
-    SAVE_VERSION="${PROJECT_VERSION}"
-)
+if(DEFINED HACKDIR_OVERRIDE)
+    target_compile_definitions(hack PRIVATE 
+        HACKDIR=${HACKDIR_OVERRIDE}
+        SAVE_VERSION="${PROJECT_VERSION}"
+    )
+else()
+    target_compile_definitions(hack PRIVATE 
+        HACKDIR="${CMAKE_BINARY_DIR}/hackdir"
+        SAVE_VERSION="${PROJECT_VERSION}"
+    )
+endif()
 
 # Struct packing control for save system consistency
 option(ENABLE_STRUCT_PACKING "Enable struct packing for save system compatibility" ON)

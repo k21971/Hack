@@ -27,7 +27,7 @@ int dosave(void){
 	}
 #ifdef lint
 	return(0);
-#endif lint
+#endif /* lint */
 }
 
 #ifndef NOSAVEONHANGUP
@@ -53,7 +53,7 @@ void modern_save_handler(int sig){
 void hangup(int sig){
 	modern_save_handler(sig);
 }
-#endif NOSAVEONHANGUP
+#endif /* NOSAVEONHANGUP */
 
 /* returns 1 if save successful */
 int dosave0(int hu) {
@@ -188,7 +188,7 @@ int dorecover(int fd)
 	}
 #ifndef QUEST
 	setsee();  /* only to recompute seelx etc. - these weren't saved */
-#endif QUEST
+#endif /* QUEST */
 	docrt();
 	restoring = FALSE;
 	return(1);
@@ -203,7 +203,7 @@ restobjchn(int fd)
 #ifdef lint
 	/* suppress "used before set" warning from lint */
 	otmp2 = 0;
-#endif lint
+#endif /* lint */
 	while(1) {
 		mread(fd, (char *) &xl, sizeof(xl));
 		if(xl == -1) break;
@@ -237,7 +237,7 @@ restmonchn(int fd)
 #ifdef lint
 	/* suppress "used before set" warning from lint */
 	mtmp2 = 0;
-#endif lint
+#endif /* lint */
 	while(1) {
 		mread(fd, (char *) &xl, sizeof(xl));
 		if(xl == -1) break;
