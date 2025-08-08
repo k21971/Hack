@@ -326,7 +326,7 @@ getmailstatus(void) {
 		mailbox = 0;
 #else
 		omstat.st_mtime = 0;
-#endif PERMANENT_MAILBOX
+#endif /* PERMANENT_MAILBOX */
 	}
 }
 

@@ -77,9 +77,9 @@
  */
 #ifdef QUEST
 #define HACKDIR _PATH_QUEST
-#else QUEST
-#define HACKDIR	_PATH_HACK
-#endif QUEST
+#else /* QUEST */
+/* #define HACKDIR	_PATH_HACK */  /* Defined by build system */
+#endif /* QUEST */
 
 /*
  * Some system administrators are stupid enough to make Hack suid root
