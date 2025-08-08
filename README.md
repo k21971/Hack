@@ -13,7 +13,7 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 * **100% Authentic Systems.** Over a dozen real systems integrated from original source. No rewrites, just restorations.
 * **Complete K\&R Modernization.** Entire codebase modernized; approx. 230–260 functions updated. **Completed Aug 6, 2025**
 * **Fixed Unix/Linux Compatibility.** Resolved hardcoded BSD paths and file system issues for modern systems.
-* **Playable 314KB Executable.** Tiny, tight, and true to the original with full save/load functionality.
+* **Playable 259KB Executable.** Tiny, tight, and true to the original with full save/load functionality.
 * **Clean Git History.** Every commit tells a story: K\&R conversion, stub removal, polish phase, final build.
 * **Package-Ready Layout.** Clean separation of code, data, and build logic. Easy to package and distribute.
 
