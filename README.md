@@ -21,6 +21,23 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ---
 
+## Installation
+
+### Download Pre-built Release (Recommended)
+
+1. **Download** the latest `restoHack-static-*.tar.gz` from [GitHub Releases](https://github.com/Critlist/restoHack/releases)
+
+2. **Extract and run:**
+   ```bash
+   mkdir ~/hack-game && cd ~/hack-game
+   tar -xzf ~/Downloads/restoHack-static-*.tar.gz
+   ./run-hack.sh
+   ```
+
+The static binary runs on any Linux system without dependencies - no need to install ncurses or other libraries!
+
+---
+
 ## Building from Source
 
 **Requirements:** `git`, `cmake`, and a C compiler (`gcc` or `clang`). Plus `ncurses` or `termcap` library.

@@ -18,7 +18,11 @@
 extern void settty(char *s);
 
 #ifdef BSD
+#ifdef __linux__
+#include	<termios.h>
+#else
 #include	<sgtty.h>
+#endif
 /* Fallback definitions for missing BSD terminal constants */
 #ifndef TIOCGLTC
 #define TIOCGLTC 0

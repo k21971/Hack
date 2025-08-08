@@ -161,3 +161,6 @@ test_results/
 *.tmp
 *.temp
 .cache/
+static-build.sh
+hackdir/game.lock
+hackdir/record.lock

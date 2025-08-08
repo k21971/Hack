@@ -249,7 +249,7 @@ void topten(void){
 	int sleepct = 300;
 	FILE *rfile;
 	int flg = 0;
-	extern char *getdate();
+	extern char *getdatestr();
 #define	HUP	if(!done_hup)
 	
 	/**
@@ -323,7 +323,7 @@ void topten(void){
 	(t0->name)[NAMSZ] = 0;
 	(void) strncpy(t0->death, killer, DTHSZ);
 	(t0->death)[DTHSZ] = 0;
-	(void) strcpy(t0->date, getdate());
+	(void) strcpy(t0->date, getdatestr());
 
 	/* assure minimum number of points */
 	if(t0->points < POINTSMIN)
@@ -485,7 +485,7 @@ char linebuf[BUFSZ];
 	    (killed || starv) ? "" : " dungeon", t1->level);
 	  if(t1->maxlvl != t1->level)
 	    Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
-	  if(quit && t1->death[4]) Sprintf(eos(linebuf), t1->death + 4);
+	  if(quit && t1->death[4]) Sprintf(eos(linebuf), "%s", t1->death + 4);
 	}
 	if(killed) Sprintf(eos(linebuf), " by %s%s",
 	  (!strncmp(t1->death, "trick", 5) || !strncmp(t1->death, "the ", 4))
@@ -497,7 +497,7 @@ char linebuf[BUFSZ];
 	  char *bp = eos(linebuf);
 	  char hpbuf[10];
 	  int hppos;
-	  Sprintf(hpbuf, (t1->hp > 0) ? itoa(t1->hp) : "-");
+	  Sprintf(hpbuf, "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");
 	  hppos = COLNO - 7 - strlen(hpbuf);
 	  if(bp <= linebuf + hppos) {
 	    while(bp < linebuf + hppos) *bp++ = ' ';
@@ -574,7 +574,7 @@ void modern_cleanup_handler(int sig)
 	clearlocks();
 	
 	/* Exit with appropriate code based on signal */
-	exit((sig == SIG_ERR) ? 2 : 1);
+	exit(1);
 }
 
 #ifdef NOSAVEONHANGUP
