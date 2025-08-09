@@ -6,16 +6,12 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ---
 
-## Screenshots
-
-_Luck and death, in that order._
-
+### Screenshots  
+_Luck and death, in that order._  
 <p align="center">
   <img src="docs/media/FullMoon.png" alt="Full moon event" width="500"/>
   <img src="docs/media/Tombstone.png" alt="Tombstone" width="500"/>
 </p>
-
----
 
 ---
 
