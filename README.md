@@ -23,7 +23,7 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ## Features & Highlights
 
-* **Modern Build System.** CMake replaces crusty Makefiles. Works clean on modern Linux, macOS, and BSD with automated setup.
+* **Modern Build System.** CMake replaces Makefiles. Works clean on modern Linux, macOS, and BSD with automated setup.
 * **100% Authentic Systems.** Over a dozen real systems integrated from original source. No rewrites, just restorations.
 * **Complete K&R Modernization** Entire codebase converted to ANSI C; ~250 functions updated and prototyped. Completed Aug, 6 2025.
 * **Fixed Unix/Linux Compatibility.** Resolved hardcoded BSD paths and file system issues for modern systems.
