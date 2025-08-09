@@ -29,8 +29,6 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 * **Complete K&R Modernization** Entire codebase converted to ANSI C; ~250 functions updated and prototyped. Completed Aug, 6 2025.
 * **Fixed Unix/Linux Compatibility.** Resolved hardcoded BSD paths and file system issues for modern systems.
 * **Playable 259KB Executable.** Tiny, tight, and true to the original with full save/load functionality.
-* **Clean Git History.** Every commit tells a story: K\&R conversion, stub removal, polish phase, final build.
-* **Package-Ready Layout.** Clean separation of code, data, and build logic. Easy to package and distribute.
 
 > **Note:** Currently only tested on Arch Linux. While CMake enables portability, cross-platform build behavior has not yet been verified on macOS or BSD. Feedback and patches welcome.
 
