@@ -6,11 +6,17 @@ Think of it as a resto-mod. The soul stays vintage. The internals? Cleaned, mode
 
 ---
 
-### Screenshots  
-_Luck and death, in that order._  
+
+<h3 align="Left">Screenshots</h3>
+<p align="center"><em>Luck and death, in that order.</em></p>
+
 <p align="center">
-  <img src="docs/media/FullMoon.png" alt="Full moon event" width="500"/>
-  <img src="docs/media/Tombstone.png" alt="Tombstone" width="500"/>
+  <a href="https://github.com/Critlist/restoHack/releases">
+    <img src="docs/media/FullMoon.png" alt="Full moon event" width="420"/>
+  </a>
+  <a href="https://github.com/Critlist/restoHack/releases">
+    <img src="docs/media/Tombstone.png" alt="Tombstone" width="420"/>
+  </a>
 </p>
 
 ---
