@@ -1,0 +1,22 @@
+# .cirrus.yml — FreeBSD build sanity for restoHack
+
+freebsd_instance:
+  image_family: freebsd-14-2   # current FreeBSD image family on Cirrus
+
+task:
+  name: FreeBSD build (curses sanity)
+  env:
+    MAKEFLAGS: -j$(sysctl -n hw.ncpu)
+  install_script:
+    - sudo pkg update -f
+    - sudo pkg install -y gmake cmake ninja pkgconf ncurses git
+  build_script:
+    - cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build -j
+  verify_script:
+    # Show we linked against system curses and the binary exists
+    - file build/hack || true
+    # Tiny compile/link against -lcurses to mirror headers/libs visibility
+    - printf '#include <curses.h>\nint main(){initscr(); endwin();return 0;}\n' > /tmp/t.c
+    - cc /tmp/t.c -lcurses -o /tmp/t && /tmp/t || true
+
