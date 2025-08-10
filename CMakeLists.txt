@@ -61,7 +61,7 @@ check_symbol_exists(delay_output "curses.h" HAVE_DELAY_OUTPUT)
 
 # Generate config.h with feature detection results
 configure_file(
-    ${CMAKE_SOURCE_DIR}/config.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
     ${CMAKE_BINARY_DIR}/generated/config.h
     @ONLY
 )
