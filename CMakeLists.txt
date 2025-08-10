@@ -254,12 +254,12 @@ set(BACKUP_SAVE_DIR "${SAVE_DIR}/backup")
 
 add_custom_target(setup_hackdir ALL
     # Copy hackdir structure and ensure write permissions on record file
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/hackdir ${CMAKE_BINARY_DIR}/hackdir
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/hackdir ${CMAKE_BINARY_DIR}/hackdir
     # Ensure all config.h defined files exist in hackdir after chdir
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/hackdir/data
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/help ${CMAKE_BINARY_DIR}/hackdir/help  
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/hh ${CMAKE_BINARY_DIR}/hackdir/hh
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/rumors ${CMAKE_BINARY_DIR}/hackdir/rumors
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/hackdir/data
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/help ${CMAKE_BINARY_DIR}/hackdir/help  
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/hh ${CMAKE_BINARY_DIR}/hackdir/hh
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/rumors ${CMAKE_BINARY_DIR}/hackdir/rumors
     # Create required directories and lock files
     COMMAND ${CMAKE_COMMAND} -E make_directory ${SAVE_DIR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${VERSIONED_SAVE_DIR}
@@ -269,10 +269,10 @@ add_custom_target(setup_hackdir ALL
     COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/hackdir/record
     # Also copy files to build root for pre-chdir access (legacy compatibility)
     COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/perm
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/data
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/help ${CMAKE_BINARY_DIR}/help
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/hh ${CMAKE_BINARY_DIR}/hh
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/rumors ${CMAKE_BINARY_DIR}/rumors
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/data
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/help ${CMAKE_BINARY_DIR}/help
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/hh ${CMAKE_BINARY_DIR}/hh
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/rumors ${CMAKE_BINARY_DIR}/rumors
     # Clean all possible lock files (HLOCK, LLOCK, record_lock in all locations)
     COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_BINARY_DIR}/record_lock ${CMAKE_BINARY_DIR}/safelock ${CMAKE_BINARY_DIR}/hackdir/record_lock ${CMAKE_BINARY_DIR}/hackdir/safelock
     COMMAND ${CMAKE_COMMAND} -E remove -f ${SAVE_DIR}/* ${VERSIONED_SAVE_DIR}/* ${BACKUP_SAVE_DIR}/*
