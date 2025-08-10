@@ -60,11 +60,15 @@ set(CMAKE_REQUIRED_INCLUDES ${CURSES_INCLUDE_DIR})
 check_symbol_exists(delay_output "curses.h" HAVE_DELAY_OUTPUT)
 
 # Generate config.h with feature detection results
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-    ${CMAKE_BINARY_DIR}/generated/config.h
-    @ONLY
-)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/config.h.in")
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+        ${CMAKE_BINARY_DIR}/generated/config.h
+        @ONLY
+    )
+else()
+    message(FATAL_ERROR "config.h.in not found at ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in")
+endif()
 
 
 set(HACK_SOURCES
