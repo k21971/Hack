@@ -167,3 +167,5 @@ hackdir/record.lock
 static-build.sh
 .gitignore
 .gitignore
+test.sh
+tools/build-matrix.sh
