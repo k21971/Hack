@@ -11,18 +11,13 @@ task:
 
   install_script:
     - sudo pkg update -f
-    - sudo pkg install -y gmake cmake ninja pkgconf ncurses git
-
-  checkout_script:
-    - git clone --depth 1 "$CIRRUS_REPO_CLONE_URL" src
-    - cd src
+    - sudo pkg install -y gmake cmake ninja pkgconf ncurses
 
   build_script:
-    - cd src
     - cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
     - cmake --build build -j
 
   verify_script:
-    - file src/build/hack || true
+    - file build/hack || true
     - printf '#include <curses.h>\nint main(){initscr();endwin();return 0;}\n' > /tmp/t.c
     - cc /tmp/t.c -lcurses -o /tmp/t && /tmp/t || true
