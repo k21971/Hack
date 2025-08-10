@@ -15,7 +15,9 @@ string(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
 # Removed global include_directories() - using target-specific includes instead
 
 # Find required libraries - modern curses detection for NetBSD/pkgsrc compatibility
-find_package(Curses REQUIRED)
+if(NOT DEFINED CURSES_FOUND)
+    find_package(Curses REQUIRED)
+endif()
 
 # Check for compat library (BSD-specific, might not exist on Linux)
 find_library(COMPAT_LIBRARY compat)
@@ -169,7 +171,7 @@ target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=2)
 # Runtime path configuration - inject absolute paths to prevent hardcoded path issues
 if(DEFINED HACKDIR_OVERRIDE)
     target_compile_definitions(hack PRIVATE 
-        HACKDIR=${HACKDIR_OVERRIDE}
+        HACKDIR="${HACKDIR_OVERRIDE}"
         SAVE_VERSION="${PROJECT_VERSION}"
     )
 else()

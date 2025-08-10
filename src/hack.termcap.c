@@ -246,7 +246,7 @@ static short tmspc10[] = {		/* from termcap */
 	0, 2000, 1333, 909, 743, 666, 500, 333, 166, 83, 55, 41, 20, 10, 5, 3, 2, 1
 };
 
-#if !HAVE_DELAY_OUTPUT
+#if !HAVE_DELAY_OUTPUT && !defined(_STATIC_BUILD)
 /**
  * MODERN ADDITION (2025): Fallback delay_output for systems without curses version
  * 

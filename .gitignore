@@ -74,6 +74,7 @@ Thumbs.db
 build/
 build-*/
 cmake-build-*/
+alp-build/
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -161,12 +162,8 @@ test_results/
 *.tmp
 *.temp
 .cache/
-<<<<<<< HEAD
 hackdir/game.lock
 hackdir/record.lock
 static-build.sh
-=======
-static-build.sh
-hackdir/game.lock
-hackdir/record.lock
->>>>>>> fix/preproc-cleanup
+.gitignore
+.gitignore
