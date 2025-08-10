@@ -131,7 +131,7 @@ void rhack(char *cmd)
 		domove();
 		return;
 	}
-	if((*cmd == 'f' && movecmd(cmd[1])) || movecmd(unctrl(*cmd))) {
+	if((*cmd == 'f' && movecmd(cmd[1])) || movecmd(hack_unctrl(*cmd))) {
 		flags.run = 2;
 		goto rush;
 	}
@@ -208,7 +208,30 @@ char lowc(char sym)
     return( (sym >= 'A' && sym <= 'Z') ? sym+'a'-'A' : sym );
 }
 
+#if 0
+/* ORIGINAL 1984 CODE - commented out due to curses library conflict */
 char unctrl(char sym)
+{
+    return( (sym >= ('A' & 037) && sym <= ('Z' & 037)) ? sym + 0140 : sym );
+}
+#endif
+
+/**
+ * MODERN ADDITION (2025): Renamed unctrl to avoid curses library conflict
+ * 
+ * WHY: curses.h declares unctrl with different signature causing compile error.
+ * Original function conflicts with standard curses unctrl function.
+ * 
+ * HOW: Renamed function from unctrl to hack_unctrl to avoid namespace collision.
+ * Updated all call sites to use new name.
+ * 
+ * PRESERVES: Original 1984 control character handling logic unchanged.
+ * Same algorithm for converting control characters to printable form.
+ * 
+ * ADDS: Namespace safety to avoid conflicts with system curses library.
+ * Allows building with curses headers without symbol conflicts.
+ */
+char hack_unctrl(char sym)
 {
     return( (sym >= ('A' & 037) && sym <= ('Z' & 037)) ? sym + 0140 : sym );
 }

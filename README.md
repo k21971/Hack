@@ -137,9 +137,11 @@ cmake --build .
 
 **Cross-platform notes:**
 
+* Curses is detected automatically via CMake - no hardcoded termcap linking
+* RNG seeding uses feature detection, preferring arc4random, srandomdev, or getentropy when available, falling back to time-based seed
 * Linux: Uses `ncurses` (auto-detected)
-* macOS: Uses system `ncurses`
-* BSD: Uses `termcap` or system equivalent
+* macOS: Uses system `ncurses`  
+* NetBSD: Uses `libcurses` with delay_output support
 * All platforms require POSIX-compatible system
 
 ---
@@ -152,6 +154,12 @@ cmake --build .
 * **Result:** Eliminates stale lock files, "game in progress" hangs, and filesystem compatibility issues
 * **Benefit:** Automatic cleanup on process death - no more manual `rm hackdir/*` needed
 * **Compatibility:** Preserves 100% authentic 1984 gameplay while providing modern reliability
+
+### **NetBSD/pkgsrc Build Compatibility (v1.0.3)**
+
+* **Fixed:** Build failures on NetBSD/pkgsrc due to curses library detection and RNG seeding
+* **Result:** Universal build compatibility across Linux, NetBSD, macOS using feature detection
+* **Technical:** Replaced OS-specific `#ifdef` with CMake feature detection, proper curses linking, resolved function name conflicts
 
 ### **Tombstone Display Fix**
 

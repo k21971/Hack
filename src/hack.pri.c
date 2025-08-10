@@ -2,9 +2,11 @@
 /* hack.pri.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+#include "generated/config.h"
 #include <stdarg.h>
-#include "hack.h"
 #include <stdio.h>
+#include <curses.h>
+#include "hack.h"
 xchar scrlx, scrhx, scrly, scrhy;	/* corners of new area on screen */
 
 extern char *hu_stat[];	/* in eat.c */

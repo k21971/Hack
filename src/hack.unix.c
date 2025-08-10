@@ -13,18 +13,28 @@
  *	- determination of what files are "very old"
  */
 
+#include "generated/config.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdint.h>
+#if defined(HAVE_GETENTROPY)
+#include <sys/random.h>
+#endif
+#if defined(HAVE_BSD_STDLIB_H)
+#include <bsd/stdlib.h>
+#endif
 #include "hack.h"	/* mainly for index() which depends on BSD */
 
 #include	<sys/types.h>		/* for time_t and stat */
 #include	<sys/stat.h>
 #include	<time.h>
 
+#if 0
+/* ORIGINAL 1984 CODE - commented out for NetBSD/pkgsrc compatibility */
 void
 setrandom(void)
 {
@@ -34,6 +44,57 @@ setrandom(void)
 #else
 	(void) srandomdev();
 #endif
+}
+#endif
+
+/**
+ * MODERN ADDITION (2025): Portable RNG seeding with feature detection
+ * 
+ * WHY: NetBSD/pkgsrc build fails with OS-specific #ifdef __linux__ checks.
+ * Original code violated portability principles by hardcoding platform names.
+ * 
+ * HOW: Uses CMake feature detection to test for arc4random, srandomdev, and
+ * getentropy at build time. Falls back to time+PID seeding if none available.
+ * 
+ * PRESERVES: Original setrandom() function name and behavior - initializes
+ * random number generator with high-quality seed when available.
+ * 
+ * ADDS: Cross-platform compatibility using feature detection instead of
+ * OS-specific conditionals. Follows project standard of avoiding platform ifdefs.
+ */
+static uint32_t
+secure_seed(void)
+{
+#if defined(HAVE_ARC4RANDOM_BUF)
+	uint32_t s;
+	arc4random_buf(&s, sizeof(s));
+	return s;
+#elif defined(HAVE_ARC4RANDOM)
+	return arc4random();
+#elif defined(HAVE_GETENTROPY)
+	uint32_t s;
+	if (getentropy(&s, sizeof(s)) == 0) return s;
+	/* fall through on error */
+#endif
+	/* last-resort fallback */
+	return (uint32_t)(time(NULL) ^ (getpid() * 0x9e3779b1u));
+}
+
+static void
+seed_prng(void)
+{
+#ifdef HAVE_SRANDOMDEV
+	srandomdev();
+#else
+	uint32_t seed = secure_seed();
+	srandom(seed);
+#endif
+}
+
+void
+setrandom(void)
+{
+	seed_prng();
 }
 
 struct tm *

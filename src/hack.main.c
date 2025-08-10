@@ -319,7 +319,7 @@ not_recovered:
 				    (void) makemon((struct permonst *) 0, 0, 0);
 			}
 			if(Glib) glibr();
-			timeout();
+			hack_timeout();
 			++moves;
 			if(flags.time) flags.botl = 1;
 			if(u.uhp < 1) {

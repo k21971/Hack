@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(restoHack VERSION 1.0.1 LANGUAGES C)
+project(restoHack VERSION 1.0.3 LANGUAGES C)
 
 # Set C standard
 set(CMAKE_C_STANDARD 99)
@@ -14,14 +14,55 @@ string(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
 # Modern CMake: Will use target_include_directories for better scoping
 # Removed global include_directories() - using target-specific includes instead
 
-# Find required libraries
-find_library(TERMCAP_LIBRARY NAMES termcap ncurses)
-if(NOT TERMCAP_LIBRARY)
-    message(FATAL_ERROR "termcap or ncurses library not found")
-endif()
+# Find required libraries - modern curses detection for NetBSD/pkgsrc compatibility
+find_package(Curses REQUIRED)
 
 # Check for compat library (BSD-specific, might not exist on Linux)
 find_library(COMPAT_LIBRARY compat)
+
+# Feature detection for portable RNG seeding and delay_output
+include(CheckIncludeFile)
+include(CheckSymbolExists)
+include(CheckLibraryExists)
+
+# Check for BSD-style headers and functions
+check_include_file("bsd/stdlib.h" HAVE_BSD_STDLIB_H)
+check_symbol_exists(arc4random "stdlib.h" HAVE_ARC4RANDOM_IN_STDLIB)
+check_symbol_exists(arc4random "bsd/stdlib.h" HAVE_ARC4RANDOM_IN_BSD_STDLIB)
+check_symbol_exists(arc4random_buf "stdlib.h" HAVE_ARC4RANDOM_BUF_IN_STDLIB)
+check_symbol_exists(arc4random_buf "bsd/stdlib.h" HAVE_ARC4RANDOM_BUF_IN_BSD_STDLIB)
+
+# Consolidated capability flags
+if (HAVE_ARC4RANDOM_IN_STDLIB OR HAVE_ARC4RANDOM_IN_BSD_STDLIB)
+    set(HAVE_ARC4RANDOM 1)
+endif()
+if (HAVE_ARC4RANDOM_BUF_IN_STDLIB OR HAVE_ARC4RANDOM_BUF_IN_BSD_STDLIB)
+    set(HAVE_ARC4RANDOM_BUF 1)
+endif()
+
+# Check for other RNG functions
+check_symbol_exists(srandomdev "stdlib.h" HAVE_SRANDOMDEV)
+check_symbol_exists(getentropy "unistd.h;sys/random.h" HAVE_GETENTROPY)
+
+# If we need libbsd for arc4random, link it
+if (HAVE_BSD_STDLIB_H AND NOT HAVE_ARC4RANDOM_IN_STDLIB AND HAVE_ARC4RANDOM)
+    check_library_exists(bsd arc4random "" HAVE_LIBBSD_ARC4)
+    if (HAVE_LIBBSD_ARC4)
+        set(HAVE_LIBBSD 1)
+        message(STATUS "Linking libbsd for arc4random support")
+    endif()
+endif()
+
+# Check if delay_output is available in curses library
+set(CMAKE_REQUIRED_INCLUDES ${CURSES_INCLUDE_DIR})
+check_symbol_exists(delay_output "curses.h" HAVE_DELAY_OUTPUT)
+
+# Generate config.h with feature detection results
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config.h.in
+    ${CMAKE_BINARY_DIR}/generated/config.h
+    @ONLY
+)
 
 
 set(HACK_SOURCES
@@ -105,6 +146,8 @@ target_include_directories(hack PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/generated
+    ${CURSES_INCLUDE_DIR}
 )
 # Compiler flags
 target_compile_options(hack PRIVATE 
@@ -186,9 +229,12 @@ if(ENABLE_SAVE_SANITIZERS)
 endif()
 
 # Link libraries
-target_link_libraries(hack ${TERMCAP_LIBRARY})
+target_link_libraries(hack ${CURSES_LIBRARIES})
 if(COMPAT_LIBRARY)
     target_link_libraries(hack ${COMPAT_LIBRARY})
+endif()
+if(HAVE_LIBBSD)
+    target_link_libraries(hack bsd)
 endif()
 
 # Data files

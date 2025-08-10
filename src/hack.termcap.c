@@ -2,10 +2,12 @@
 /* hack.termcap.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+#include "generated/config.h"
 #include <stdio.h>
 #include <termcap.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <curses.h>
 #include "hack.h"	/* for function prototypes - includes def.flag.h */
 
 static char tbuf[512];
@@ -244,7 +246,34 @@ static short tmspc10[] = {		/* from termcap */
 	0, 2000, 1333, 909, 743, 666, 500, 333, 166, 83, 55, 41, 20, 10, 5, 3, 2, 1
 };
 
+#if !HAVE_DELAY_OUTPUT
+/**
+ * MODERN ADDITION (2025): Fallback delay_output for systems without curses version
+ * 
+ * WHY: NetBSD provides delay_output in libcurses, but other systems may not have it.
+ * Original implementation was disabled with #if 0, causing link failures.
+ * 
+ * HOW: Uses feature detection to provide fallback only when curses doesn't have it.
+ * Simplified implementation using usleep() for portability across Unix systems.
+ * 
+ * PRESERVES: Original delay_output timing behavior (50ms default).
+ * Maintains authentic 1984 gameplay timing for visual effects.
+ * 
+ * ADDS: Conditional compilation based on curses feature detection rather than
+ * hardcoded disabling. Matches curses library signature (returns int).
+ */
+int
+delay_output(int ms)
+{
+	if (ms <= 0) return 0;
+	(void) fflush(stdout);
+	usleep((useconds_t)ms * 1000u);
+	return 0;  /* success, matching curses library behavior */
+}
+#endif /* !HAVE_DELAY_OUTPUT */
+
 #if 0
+/* ORIGINAL 1984 CODE - preserved for reference */
 delay_output() {
 	/* delay 50 ms - could also use a 'nap'-system call */
 	/* BUG: if the padding character is visible, as it is on the 5620

@@ -293,7 +293,7 @@ extern int doredraw(void);
 extern void docorner(int xmin, int ymax);
 extern void curs_on_u(void);
 extern void pru(void);
-extern void delay_output(int ms);
+/* delay_output provided by curses library or fallback implementation */
 extern void prl(int x, int y);
 extern void newsym(int x, int y);
 extern void mnewsym(int x, int y);
@@ -312,7 +312,7 @@ extern int movecmd(char sym);
 extern void confdir(void);
 extern int doextcmd(void);
 extern char lowc(char sym);
-extern char unctrl(char sym);
+extern char hack_unctrl(char sym);
 extern void glo(int foo);
 extern void impossible(char *s, int x1, int x2);
 extern void getret(void);
@@ -339,7 +339,7 @@ extern void monfree(struct monst *mtmp);
 extern void rloc(struct monst *mtmp);
 extern coord enexto(xchar xx, xchar yy);
 extern void glibr(void);
-extern void timeout(void);
+extern void hack_timeout(void);
 extern void stoned_dialogue(void);
 extern void done(char *how);
 
