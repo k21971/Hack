@@ -9,13 +9,13 @@ task:
     MAKEFLAGS: -j$(sysctl -n hw.ncpu)
     CIRRUS_CLONE_DEPTH: "1"
 
-  checkout_script:
-    - git clone --depth 1 "$CIRRUS_REPO_CLONE_URL" src
-    - cd src
-
   install_script:
     - sudo pkg update -f
     - sudo pkg install -y gmake cmake ninja pkgconf ncurses git
+
+  checkout_script:
+    - git clone --depth 1 "$CIRRUS_REPO_CLONE_URL" src
+    - cd src
 
   build_script:
     - cd src
