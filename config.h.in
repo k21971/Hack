@@ -1,0 +1,16 @@
+/* config.h.in - Feature detection for restoHack NetBSD/pkgsrc compatibility */
+
+/* Header availability */
+#cmakedefine HAVE_BSD_STDLIB_H 1
+
+/* RNG seeding functions - prefer arc4random_buf, then arc4random, then getentropy */
+#cmakedefine HAVE_ARC4RANDOM_BUF 1
+#cmakedefine HAVE_ARC4RANDOM 1
+#cmakedefine HAVE_SRANDOMDEV 1
+#cmakedefine HAVE_GETENTROPY 1
+
+/* Library linkage */
+#cmakedefine HAVE_LIBBSD 1
+
+/* Terminal/curses functions */
+#cmakedefine HAVE_DELAY_OUTPUT 1
