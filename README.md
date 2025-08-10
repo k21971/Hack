@@ -54,10 +54,10 @@ paru -S restohack
 ### Prebuilt Static Binary (Linux)
 
 ```bash
-mkdir -p ~/Games/restoHack
-mv ~/Downloads/restoHack-static-20250808-linux-x86_64.tar.gz ~/Games/restoHack/
-cd ~/Games/restoHack
-tar -xzf restoHack-static-20250808-linux-x86_64.tar.gz
+mkdir -p ~/Games/restohack
+mv ~/Downloads/restohack-static-20250808-linux-x86_64.tar.gz ~/Games/restohack/
+cd ~/Games/restohack
+tar -xzf restohack-static-1.0.3-linux-x86_64.tar.gz
 ./run-hack.sh
 ```
 
