@@ -21,7 +21,13 @@ extern void settty(char *s);
 #ifdef __linux__
 #include	<termios.h>
 #else
-#include	<sgtty.h>
+/* ORIGINAL 1984: #include	<sgtty.h> */
+/* MODERN: FreeBSD uses POSIX termios like Linux */
+#ifdef __FreeBSD__
+#include	<termios.h>
+#else
+#include	<sgtty.h>  /* Original BSD sgtty interface */
+#endif
 #endif
 /* Fallback definitions for missing BSD terminal constants */
 #ifndef TIOCGLTC
