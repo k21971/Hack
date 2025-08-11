@@ -51,17 +51,29 @@ yay -S restohack
 paru -S restohack
 ```
 
-### Prebuilt Static Binary (Linux)
+### Hybrid Binary+Source Tarball (Linux)
+
+Download from [Releases](https://github.com/Critlist/restoHack/releases) and extract:
 
 ```bash
 mkdir -p ~/Games/restohack
-mv ~/Downloads/restohack-static-20250808-linux-x86_64.tar.gz ~/Games/restohack/
 cd ~/Games/restohack
-tar -xzf restohack-static-1.0.3-linux-x86_64.tar.gz
+tar -xzf restoHack-static-YYYYMMDD-linux-x86_64.tar.gz
+```
+
+**Option 1: Run immediately** (static binary, no dependencies):
+```bash
 ./run-hack.sh
 ```
 
-Runs anywhere—no ncurses or extra libs needed.
+**Option 2: Build from included source** (requires cmake, gcc, ncurses):
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/hack
+```
+
+**BSD Systems:** See [BSD Build Instructions](#bsd-build-instructions) below.
 
 ---
 
@@ -106,6 +118,42 @@ cmake --build .
 ./hack
 ```
 
+### BSD Build Instructions
+
+**FreeBSD:**
+```bash
+# Install dependencies
+pkg install cmake gcc ncurses
+
+# Build from hybrid tarball or git clone
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/hack
+```
+
+**OpenBSD:**
+```bash
+# Install dependencies  
+pkg_add cmake gcc ncurses
+
+# Build with explicit compiler paths
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER=/usr/local/bin/gcc
+cmake --build build
+./build/hack
+```
+
+**NetBSD:**
+```bash
+# Install dependencies
+pkgin install cmake gcc ncurses
+
+# Use pkgsrc paths for libraries
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_PREFIX_PATH=/usr/pkg
+cmake --build build  
+./build/hack
+```
 
 ---
 

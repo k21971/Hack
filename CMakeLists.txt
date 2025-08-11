@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(restoHack VERSION 1.0.3 LANGUAGES C)
+project(restoHack VERSION 1.0.4 LANGUAGES C)
 
 # Set C standard
 set(CMAKE_C_STANDARD 99)
@@ -325,6 +325,7 @@ set(CPACK_SOURCE_IGNORE_FILES
     "\\.DS_Store"
     ".*~$"
 )
+
 # Platform-specific packaging #   #I'm hopeful people want to play this on their systems, so this will be implemented for later use
 if(WIN32)
     # Windows NSIS installer

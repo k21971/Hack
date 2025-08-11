@@ -1,23 +1,77 @@
 # .cirrus.yml — FreeBSD build sanity for restoHack
 
-task:
+freebsd_build_task:
   name: FreeBSD build (curses sanity)
   freebsd_instance:
     image_family: freebsd-14-2
-
   env:
-    MAKEFLAGS: -j$(sysctl -n hw.ncpu)
     CIRRUS_CLONE_DEPTH: "1"
+  install_script: |
+    set -euxo pipefail
+    pkg update -f
+    pkg install -y cmake ninja pkgconf ncurses
+  build_script: |
+    set -euxo pipefail
+    cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+    cmake --build build --parallel
+  verify_script: |
+    set -euxo pipefail
+    file build/hack
+    # Verify a minimal curses link works
+    printf '#include <curses.h>\nint main(){initscr(); endwin(); return 0;}\n' > /tmp/t.c
+    cc /tmp/t.c -lcurses -o /tmp/t
+    /tmp/t
+  always:
+    artifacts:
+      build_logs:
+        path: build/**
+        type: ARCHIVE
 
-  install_script:
-    - sudo pkg update -f
-    - sudo pkg install -y gmake cmake ninja pkgconf ncurses
-
-  build_script:
-    - cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-    - cmake --build build -j
-
-  verify_script:
-    - file build/hack || true
-    - printf '#include <curses.h>\nint main(){initscr();endwin();return 0;}\n' > /tmp/t.c
-    - cc /tmp/t.c -lcurses -o /tmp/t && /tmp/t || true
+tarball_test_task:
+  name: Test hybrid tarball build
+  only_if: $CIRRUS_TAG =~ '^v[0-9].+'
+  freebsd_instance:
+    image_family: freebsd-14-2
+  env:
+    CIRRUS_CLONE_DEPTH: "1"
+  depends_on:
+    - freebsd_build_task
+  install_script: |
+    set -euxo pipefail
+    pkg update -f
+    pkg install -y cmake ninja pkgconf ncurses curl jq ca_root_nss
+  download_tarball_script: |
+    set -euxo pipefail
+    echo "Attempting to download hybrid tarball for tag: ${CIRRUS_TAG:-<unset>}"
+    API_JSON="$(curl -sf https://api.github.com/repos/Critlist/restoHack/releases/tags/${CIRRUS_TAG})"
+    TARBALL_URL="$(echo "$API_JSON" | jq -r '.assets[]?.browser_download_url | select(test("restoHack-static.*linux-x86_64\\.tar\\.gz$"))' | head -n1)"
+    test -n "$TARBALL_URL" || { echo "No matching tarball asset found for ${CIRRUS_TAG}"; exit 1; }
+    echo "Found tarball URL: $TARBALL_URL"
+    curl -fL -o hybrid-tarball.tar.gz "$TARBALL_URL"
+    ls -la hybrid-tarball.tar.gz
+  test_tarball_extraction_script: |
+    set -euxo pipefail
+    mkdir tarball_test && cd tarball_test
+    tar -xzf ../hybrid-tarball.tar.gz
+    ls -la  # Show tarball contents
+  verify_hybrid_contents_script: |
+    set -euxo pipefail
+    cd tarball_test
+    echo "Checking for required source files..."
+    test -f CMakeLists.txt || { echo "✗ CMakeLists.txt missing"; exit 1; }
+    echo "✓ CMakeLists.txt present"
+    test -f config.h.in || { echo "✗ config.h.in missing"; exit 1; }
+    echo "✓ config.h.in present"
+    test -d src || { echo "✗ src/ directory missing"; exit 1; }
+    echo "✓ src/ directory present"
+    test -f hack || { echo "✗ hack binary missing"; exit 1; }
+    echo "✓ hack binary present"
+    # Optional helpers
+    if [ -f run-hack.sh ]; then echo "• run-hack.sh present"; else echo "• run-hack.sh not present (optional)"; fi
+  test_source_build_script: |
+    set -euxo pipefail
+    cd tarball_test
+    echo "Testing build from included source..."
+    cmake -S . -B test_build -DCMAKE_BUILD_TYPE=Release -G Ninja
+    cmake --build test_build --parallel
+    file test_build/hack

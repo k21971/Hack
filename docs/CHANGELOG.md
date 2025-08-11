@@ -5,6 +5,23 @@ All notable changes to restoHack will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-08-11
+
+### Added
+- Hybrid binary+source tarballs containing both static executable and source code
+- BSD-specific build instructions for FreeBSD, OpenBSD, and NetBSD
+- Support for building from hybrid tarballs without separate source download
+
+### Fixed
+- Shell syntax error in static-build.sh (apostrophe in comment breaking Docker string)
+- BusyBox tar compatibility issues with GNU tar-specific options
+- Missing source files in static binary releases preventing user rebuilds
+
+### Changed
+- Static build script now includes CMakeLists.txt, config.h.in, and src/ directory
+- Updated documentation with hybrid tarball usage instructions
+- Improved cross-platform build documentation
+
 ## [1.0.3] - 2025-08-10
 
 ### Added

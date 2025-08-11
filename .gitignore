@@ -147,6 +147,7 @@ hackdir/safelock
 
 # Test outputs
 test_results/
+test_tarball/
 *.log
 
 # Package files
