@@ -300,6 +300,9 @@ install(TARGETS hack DESTINATION bin)
 install(FILES ${DATA_FILES} DESTINATION share/hack)
 install(FILES man/hack.6 DESTINATION share/man/man6)
 
+# ---- Packaging (optional) ----
+option(RESTOHACK_ENABLE_PACKAGE "Enable CPack packaging" ON)
+
 # Modern CMake: CPack configuration for professional distribution
 set(CPACK_PACKAGE_NAME "restohack")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
@@ -310,9 +313,15 @@ set(CPACK_PACKAGE_VENDOR "restoHack Project")
 set(CPACK_PACKAGE_CONTACT "https://github.com/Critlist/restoHack.git")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/Critlist/restoHack.git")
 
-# Package metadata
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+# Allow override via -DCPACK_RESOURCE_FILE_*; default to files in source tree.
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" CACHE FILEPATH "")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md" CACHE FILEPATH "")
+
+# If the resources aren't present, disable packaging instead of erroring.
+if(NOT EXISTS "${CPACK_RESOURCE_FILE_LICENSE}" OR NOT EXISTS "${CPACK_RESOURCE_FILE_README}")
+    message(WARNING "CPack resources missing; disabling packaging for this build.")
+    set(RESTOHACK_ENABLE_PACKAGE OFF)
+endif()
 
 # Source package configuration
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-src")
@@ -355,5 +364,7 @@ else()
     set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
 endif()
 
-# Enable CPack
-include(CPack)
+# Enable CPack only if packaging is enabled
+if(RESTOHACK_ENABLE_PACKAGE)
+    include(CPack)
+endif()

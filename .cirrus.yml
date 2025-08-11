@@ -64,6 +64,10 @@ tarball_test_task:
     echo "✓ config.h.in present"
     test -d src || { echo "✗ src/ directory missing"; exit 1; }
     echo "✓ src/ directory present"
+    test -f README.md || { echo "✗ README.md missing"; exit 1; }
+    echo "✓ README.md present"
+    test -f LICENSE || { echo "✗ LICENSE missing"; exit 1; }
+    echo "✓ LICENSE present"
     test -f hack || { echo "✗ hack binary missing"; exit 1; }
     echo "✓ hack binary present"
     # Optional helpers
@@ -72,6 +76,6 @@ tarball_test_task:
     set -euxo pipefail
     cd tarball_test
     echo "Testing build from included source..."
-    cmake -S . -B test_build -DCMAKE_BUILD_TYPE=Release -G Ninja
+    cmake -S . -B test_build -DCMAKE_BUILD_TYPE=Release -G Ninja -DRESTOHACK_ENABLE_PACKAGE=OFF
     cmake --build test_build --parallel
     file test_build/hack
