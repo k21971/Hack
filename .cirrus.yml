@@ -68,6 +68,14 @@ tarball_test_task:
     echo "✓ README.md present"
     test -f LICENSE || { echo "✗ LICENSE missing"; exit 1; }
     echo "✓ LICENSE present"
+    test -d data || { echo "✗ data/ directory missing"; exit 1; }
+    echo "✓ data/ directory present"
+    test -f help || { echo "✗ help file missing"; exit 1; }
+    echo "✓ help file present"
+    test -f hh || { echo "✗ hh file missing"; exit 1; }
+    echo "✓ hh file present"
+    test -f rumors || { echo "✗ rumors file missing"; exit 1; }
+    echo "✓ rumors file present"
     test -f hack || { echo "✗ hack binary missing"; exit 1; }
     echo "✓ hack binary present"
     # Optional helpers
