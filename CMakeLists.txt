@@ -277,33 +277,10 @@ add_custom_target(setup_hackdir ALL
     VERBATIM
 )
 
-# Copy asset files/directories (only if they exist and copying is enabled)
+# Copy asset files (only if they exist and copying is enabled)
 if(RESTOHACK_COPY_ASSETS)
-    # Handle data directory specially
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data)
-        if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
-            add_custom_command(TARGET setup_hackdir POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                        ${CMAKE_CURRENT_SOURCE_DIR}/data
-                        ${CMAKE_BINARY_DIR}/hackdir/data
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                        ${CMAKE_CURRENT_SOURCE_DIR}/data
-                        ${CMAKE_BINARY_DIR}/data)
-        else()
-            add_custom_command(TARGET setup_hackdir POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        ${CMAKE_CURRENT_SOURCE_DIR}/data
-                        ${CMAKE_BINARY_DIR}/hackdir/data
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        ${CMAKE_CURRENT_SOURCE_DIR}/data
-                        ${CMAKE_BINARY_DIR}/data)
-        endif()
-    else()
-        message(WARNING "Asset 'data' missing in source tree.")
-    endif()
-    
-    # Handle other assets (help, hh, rumors are files)
-    foreach(_asset help hh rumors)
+    # All assets are files, not directories
+    foreach(_asset data help hh rumors)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_asset})
             add_custom_command(TARGET setup_hackdir POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
