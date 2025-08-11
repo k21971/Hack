@@ -11,16 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hybrid binary+source tarballs containing both static executable and source code
 - BSD-specific build instructions for FreeBSD, OpenBSD, and NetBSD
 - Support for building from hybrid tarballs without separate source download
+- CI testing for published hybrid tarballs on release tags
+- FreeBSD CI reliability improvements with enhanced error handling
 
 ### Fixed
 - Shell syntax error in static-build.sh (apostrophe in comment breaking Docker string)
 - BusyBox tar compatibility issues with GNU tar-specific options
 - Missing source files in static binary releases preventing user rebuilds
+- CI flakes in FreeBSD environment by removing interactive game execution
+- TLS certificate issues in CI with ca_root_nss package addition
 
 ### Changed
 - Static build script now includes CMakeLists.txt, config.h.in, and src/ directory
 - Updated documentation with hybrid tarball usage instructions
 - Improved cross-platform build documentation
+- Enhanced CI with hard failure tests for required files instead of soft warnings
 
 ## [1.0.3] - 2025-08-10
 

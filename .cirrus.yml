@@ -35,7 +35,7 @@ tarball_test_task:
   env:
     CIRRUS_CLONE_DEPTH: "1"
   depends_on:
-    - freebsd_build_task
+    - FreeBSD build (curses sanity)
   install_script: |
     set -euxo pipefail
     pkg update -f

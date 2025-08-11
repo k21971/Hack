@@ -169,3 +169,4 @@ static-build.sh
 .gitignore
 test.sh
 tools/build-matrix.sh
+restoHack-static-*-linux-x86_64.tar.gz.sha256
