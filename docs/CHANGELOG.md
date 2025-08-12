@@ -5,6 +5,22 @@ All notable changes to restoHack will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-08-12
+
+### Added
+- Coding standards documentation for non-original code contributions
+- Historical source files and game commands documentation
+
+### Changed  
+- Refactored memory allocation functions to ANSI C standards with enhanced type safety
+- Improved asset copying logic to handle files uniformly with better error messaging
+- Updated CMake and CI configuration for BSD builds
+- Enhanced CPack configuration with optional packaging support
+
+### Technical
+- Preserved original 1984 behavior while eliminating casting requirements in memory allocation
+- Enhanced build system reliability across different platforms
+
 ## [1.0.4] - 2025-08-11
 
 ### Added
