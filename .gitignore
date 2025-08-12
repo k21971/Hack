@@ -171,3 +171,4 @@ test.sh
 tools/build-matrix.sh
 restoHack-static-*-linux-x86_64.tar.gz.sha256
 verify-release.sh
+gh-release-notes.txt
