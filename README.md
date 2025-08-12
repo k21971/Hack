@@ -51,7 +51,7 @@ yay -S restohack
 paru -S restohack
 ```
 
-### Hybrid Binary+Source Tarball (Linux)
+### Hybrid Binary+Source Tarball
 
 Download from [Releases](https://github.com/Critlist/restoHack/releases) and extract:
 
@@ -61,12 +61,14 @@ cd ~/Games/restohack
 tar -xzf restoHack-static-YYYYMMDD-linux-x86_64.tar.gz
 ```
 
-**Option 1: Run immediately** (static binary, no dependencies):
+**Option 1: Run immediately  (Linux)** (static binary, no dependencies):
+
 ```bash
 ./run-hack.sh
 ```
 
 **Option 2: Build from included source** (requires cmake, gcc, ncurses):
+
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
@@ -121,6 +123,7 @@ cmake --build .
 ### BSD Build Instructions
 
 **FreeBSD:**
+
 ```bash
 # Install dependencies
 pkg install cmake gcc ncurses
@@ -132,6 +135,7 @@ cmake --build build
 ```
 
 **OpenBSD:**
+
 ```bash
 # Install dependencies  
 pkg_add cmake gcc ncurses
@@ -144,6 +148,7 @@ cmake --build build
 ```
 
 **NetBSD:**
+
 ```bash
 # Install dependencies
 pkgin install cmake gcc ncurses
