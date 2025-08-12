@@ -23,6 +23,44 @@ long dummy = ftell(stderr);
 
 #else
 
+#if 0
+/* ORIGINAL 1984 CODE - preserved for reference */
+long *
+alloc(lth)
+unsigned lth;
+{
+	char *ptr;
+
+	if(!(ptr = malloc(lth)))
+		panic("Cannot get %d bytes", lth);
+	return((long *) ptr);
+}
+
+long *
+enlarge(ptr,lth)
+char *ptr;
+unsigned lth;
+{
+	char *nptr;
+
+	if(!(nptr = realloc(ptr,lth)))
+		panic("Cannot reallocate %d bytes", lth);
+	return((long *) nptr);
+}
+#endif
+
+/**
+ * MODERN ADDITION (2025): ANSI C memory allocation functions
+ * 
+ * WHY: Original returned long* which required casting at every call site.
+ * Modern void* return eliminates casting and follows ANSI C conventions.
+ * 
+ * HOW: Changed return type from long* to void*, updated function signatures
+ * to ANSI C style with proper parameter declarations.
+ * 
+ * PRESERVES: Identical allocation behavior and error handling via panic()
+ * ADDS: Type safety and ANSI C compliance without casting requirements
+ */
 void *
 alloc(unsigned lth)
 {

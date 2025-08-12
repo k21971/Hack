@@ -246,9 +246,6 @@ endif()
 # Data files
 set(DATA_FILES rumors help hh data)
 
-# MODERN ADDITION (2025): Create hackdir structure in build directory
-# Use custom target instead of POST_BUILD for reliability
-# All hardcoded file paths from config.h that need to exist after chdir("./hackdir")
 
 # Versioned save system configuration
 set(HACK_VERSION "${PROJECT_VERSION}")

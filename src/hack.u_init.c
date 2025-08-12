@@ -19,7 +19,7 @@ char pl_character[PL_CSIZ];
 /**
  * MODERN ADDITION (2025): Mutable character role strings
  * 
- * WHY: Original K&R C code at line 171 attempts to modify roles[i][0] = pc;
+ * WHY: Original K&R C code at line 184 attempts to modify roles[i][0] = pc;
  * In K&R C, string literals could be modified, but in ANSI C and modern C,
  * string literals are stored in read-only memory, causing segmentation faults.
  * 
@@ -29,12 +29,16 @@ char pl_character[PL_CSIZ];
  * 
  * PRESERVES: Original game logic for experienced player character selection
  * ADDS: ANSI C compatibility without changing game behavior
+ * 
+ * AUTHENTICITY FIX (2025): Added separate Cave-woman array to prevent
+ * pointer reassignment to string literal, maintaining consistent mutable behavior.
  */
 static char role_tourist[] = "Tourist";
 static char role_speleologist[] = "Speleologist"; 
 static char role_fighter[] = "Fighter";
 static char role_knight[] = "Knight";
 static char role_caveman[] = "Cave-man";
+static char role_cavewoman[] = "Cave-woman";
 static char role_wizard[] = "Wizard";
 
 char *(roles[]) = {	/* must all have distinct first letter */
@@ -113,7 +117,9 @@ int i;
 char exper = 'y', pc;
 extern char readchar();
 	if(flags.female)	/* should have been set in HACKOPTIONS */
-		roles[4] = "Cave-woman";
+		roles[4] = role_cavewoman;
+	else
+		roles[4] = role_caveman;
 	for(i = 0; i < NR_OF_ROLES; i++)
 		rolesyms[i] = roles[i][0];
 	rolesyms[i] = 0;
