@@ -162,6 +162,12 @@ target_compile_options(hack PRIVATE
     # Packaging compatibility: Suppress warnings that might be treated as errors
     -Wno-error=format-security
     -Wno-error
+    # K&R vintage code compatibility: Suppress warnings for 1984 heritage code
+    -Wno-deprecated-non-prototype
+    -Wno-parentheses
+    -Wno-unused-variable
+    -Wno-misleading-indentation
+    $<$<C_COMPILER_ID:Clang>:-Wno-knr-promoted-parameter>
     # Buffer overflow protection for save system safety
     $<$<C_COMPILER_ID:GNU>:-fstack-protector-strong>
     $<$<C_COMPILER_ID:Clang>:-fstack-protector-strong>
@@ -169,8 +175,11 @@ target_compile_options(hack PRIVATE
     -g
 )
 
-# Fortify source for additional buffer overflow detection
-target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=2)
+# Fortify source for additional buffer overflow detection (only with optimization)
+# Only enable when optimization is present (Release/RelWithDebInfo builds)
+target_compile_definitions(hack PRIVATE 
+    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:_FORTIFY_SOURCE=2>
+)
 
 # Runtime path configuration - inject absolute paths to prevent hardcoded path issues
 if(DEFINED HACKDIR_OVERRIDE)
