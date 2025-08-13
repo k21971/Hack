@@ -87,6 +87,18 @@ secure_seed(void)
 	return (uint32_t)(time(NULL) ^ (getpid() * 0x9e3779b1u));
 }
 
+/**
+ * MODERN ADDITION (2025): Cross-platform PRNG seeding wrapper
+ * 
+ * WHY: Original 1984 code used simple time()-based seeding which is predictable.
+ * Modern systems need cryptographically secure seeding for game integrity.
+ * 
+ * HOW: Uses feature detection to choose best available seeding method:
+ * srandomdev() on BSD systems, secure_seed() fallback on others.
+ * 
+ * PRESERVES: Same srandom() interface as original 1984 implementation
+ * ADDS: Secure entropy sources (arc4random, getentropy) for unpredictable seeds
+ */
 static void
 seed_prng(void)
 {

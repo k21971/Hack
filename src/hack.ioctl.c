@@ -25,6 +25,20 @@
 extern void settty(char *s);
 
 #ifdef BSD
+/**
+ * MODERN ADDITION (2025): Platform-specific terminal interface selection
+ * 
+ * WHY: Original 1984 code used only BSD sgtty interfaces. Modern FreeBSD 
+ * has deprecated sgtty in favor of POSIX termios for standards compliance.
+ * 
+ * HOW: Uses feature detection to include appropriate terminal headers:
+ * - Linux: Always POSIX termios
+ * - FreeBSD: POSIX termios (modern standard)
+ * - Other BSD: Original sgtty interface (compatibility)
+ * 
+ * PRESERVES: Original terminal control behavior and functionality
+ * ADDS: POSIX compliance and cross-platform compatibility
+ */
 #ifdef __linux__
 #include	<termios.h>
 #else
@@ -36,7 +50,18 @@ extern void settty(char *s);
 #include	<sgtty.h>  /* Original BSD sgtty interface */
 #endif
 #endif
-/* Fallback definitions for missing BSD terminal constants */
+/**
+ * MODERN ADDITION (2025): BSD terminal compatibility fallbacks
+ * 
+ * WHY: Original 1984 code assumed BSD sgtty interfaces available on all systems.
+ * Modern Linux and other systems may lack BSD-specific terminal constants.
+ * 
+ * HOW: Provides safe fallback definitions for missing BSD terminal control constants
+ * and structures, preventing compilation failures on non-BSD systems.
+ * 
+ * PRESERVES: Original 1984 terminal control logic and variable usage
+ * ADDS: Cross-platform compatibility without changing game behavior
+ */
 #ifndef TIOCGLTC
 #define TIOCGLTC 0
 #endif
