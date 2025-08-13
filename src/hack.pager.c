@@ -7,7 +7,23 @@
    contact the outside world. */
 
 #include	<sys/types.h>
+/**
+ * MODERN ADDITION (2025): Fix deprecated sys/signal.h warning
+ * 
+ * WHY: sys/signal.h is deprecated on modern systems and generates warnings.
+ *      Most systems now use signal.h directly.
+ * 
+ * HOW: Include signal.h directly instead of sys/signal.h to avoid warnings
+ *      while maintaining all signal functionality.
+ * 
+ * PRESERVES: All original signal functionality and behavior
+ * ADDS: Cross-platform compatibility without build warnings
+ */
+#if 0
+/* ORIGINAL 1984 CODE - preserved for reference */
 #include	<sys/signal.h>
+#endif
+#include	<signal.h>
 #include	<stdio.h>
 #include        <stdlib.h>
 #include        <unistd.h>
@@ -390,10 +406,51 @@ int child(int wt) {
 	f = fork();
 	if(f == 0){		/* child */
 		settty((char *) 0);		/* also calls end_screen() */
+		
+#if 0
+		/* ORIGINAL 1984 CODE - preserved for reference */
 		/* revoke */
 		setgid(getgid());
+#endif
+		/**
+		 * MODERN ADDITION (2025): Privilege dropping with error checking
+		 * 
+		 * WHY: Modern security practices require checking setgid() return value.
+		 *      Original 1984 code ignored potential privilege dropping failures.
+		 * 
+		 * HOW: Check setgid() return value and warn on failure, but continue
+		 *      execution since privilege dropping is advisory in this context.
+		 * 
+		 * PRESERVES: Original privilege dropping behavior and program flow
+		 * ADDS: Defensive programming and security robustness
+		 */
+		/* revoke */
+		if(setgid(getgid()) != 0) {
+			/* Privilege dropping failed, but continue - it's advisory */
+			perror("setgid warning");
+		}
+		
 #ifdef CHDIR
+#if 0
+		/* ORIGINAL 1984 CODE - preserved for reference */
 		(void) chdir(getenv("HOME"));
+#endif
+		/**
+		 * MODERN ADDITION (2025): Improved chdir error handling
+		 * 
+		 * WHY: Better error handling for directory changes in child process.
+		 *      Original code explicitly ignored chdir return value.
+		 * 
+		 * HOW: Check chdir() return value and warn on failure, but continue
+		 *      since failure to change to HOME is not fatal.
+		 * 
+		 * PRESERVES: Original behavior of continuing on chdir failure
+		 * ADDS: Visibility into chdir failures for debugging
+		 */
+		if(chdir(getenv("HOME")) != 0) {
+			/* Failed to change to HOME directory, warn but continue */
+			perror("chdir to HOME warning");
+		}
 #endif /* CHDIR */
 		return(1);
 	}

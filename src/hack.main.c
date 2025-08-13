@@ -465,8 +465,30 @@ chdirx(char *dir, boolean wr)
 	       && strcmp(dir, HACKDIR)		/* and not the default? */
 #endif
 		) {
+#if 0
+		/* ORIGINAL 1984 CODE - preserved for reference */
 		/* revoke */
 		setgid(getgid());
+#endif
+		/**
+		 * MODERN ADDITION (2025): Privilege dropping with error checking
+		 * 
+		 * WHY: Security best practice requires checking setgid() return value.
+		 *      Original code ignored potential failures when dropping privileges
+		 *      for user-specified directories.
+		 * 
+		 * HOW: Check setgid() return value and warn on failure, but continue
+		 *      since privilege dropping is a security measure, not critical
+		 *      for basic functionality.
+		 * 
+		 * PRESERVES: Original security model and program flow
+		 * ADDS: Defensive programming and error visibility
+		 */
+		/* revoke */
+		if(setgid(getgid()) != 0) {
+			/* Privilege dropping failed, warn but continue */
+			perror("setgid warning");
+		}
 	}
 #endif
 
