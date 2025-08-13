@@ -2,6 +2,12 @@
 /* hack.mkmaze.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Maze generation system for 1984 Hack - labyrinth creation algorithms
+ * Original 1984 source: docs/historical/original-source/hack.mkmaze.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
 
 #include "hack.h"
 extern struct permonst pm_wizard;

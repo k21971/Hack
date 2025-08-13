@@ -2,6 +2,13 @@
 /* hack.do_name.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Object naming system for 1984 Hack - item identification and custom names
+ * Original 1984 source: docs/historical/original-source/hack.do_name.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 #include <stdio.h>
 extern char plname[];

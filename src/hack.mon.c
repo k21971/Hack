@@ -2,6 +2,13 @@
 /* hack.mon.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Monster AI system for 1984 Hack - monster movement and behavior
+ * Original 1984 source: docs/historical/original-source/hack.mon.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 #include "hack.mfndpos.h"
 

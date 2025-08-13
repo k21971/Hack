@@ -2,6 +2,13 @@
 /* hack.lev.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Level save/load system for 1984 Hack - dungeon persistence
+ * Original 1984 source: docs/historical/original-source/hack.lev.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 /* def.mkroom.h already included via hack.h */
 #include <stdio.h>

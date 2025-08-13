@@ -2,7 +2,12 @@
 /* hack.invent.c - version 1.0.3 */
 /* $FreeBSD$ */
 
-
+/* 
+ * Inventory management system for 1984 Hack - object handling and display
+ * Original 1984 source: docs/historical/original-source/hack.invent.c
+ * 
+ * Key modernizations: ANSI C function prototypes, explicit return types
+ */
 
 #include	"hack.h"
 #include	<stdio.h>

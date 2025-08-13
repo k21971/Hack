@@ -7,6 +7,13 @@
 
 
 
+/* 
+ * Bones file system for 1984 Hack - death and ghost management
+ * Original 1984 source: docs/historical/original-source/hack.bones.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include <unistd.h>
 #include <fcntl.h>
 #include "hack.h"

@@ -2,6 +2,13 @@
 /* hack.fight.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Combat system for 1984 Hack - player vs monster combat mechanics
+ * Original 1984 source: docs/historical/original-source/hack.fight.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 #include	<stdio.h>
 extern struct permonst li_dog, dog, la_dog;

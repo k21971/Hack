@@ -2,6 +2,13 @@
 /* hack.makemon.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Monster creation system for 1984 Hack - spawning and monster management
+ * Original 1984 source: docs/historical/original-source/hack.makemon.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 extern char fut_geno[];
 extern char *index(const char *s, int c);
