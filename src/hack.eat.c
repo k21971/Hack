@@ -2,6 +2,13 @@
 /* hack.eat.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Food and eating system for 1984 Hack - hunger, nutrition, and food effects
+ * Original 1984 source: docs/historical/original-source/hack.eat.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 #include <stdio.h>
 char POISONOUS[] = "ADKSVabhks";

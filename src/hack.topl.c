@@ -2,6 +2,13 @@
 /* hack.topl.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Top line display for 1984 Hack - message handling and screen output
+ * Original 1984 source: docs/historical/original-source/hack.topl.c
+ * 
+ * Key modernizations: ANSI C function signatures, stdarg.h for varargs
+ */
+
 #include "hack.h"
 #include <stdio.h>
 #include <stdarg.h>

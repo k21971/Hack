@@ -2,6 +2,13 @@
 /* hack.ioctl.c - version 1.0.2 */
 /* $FreeBSD$
 
+/* 
+ * Terminal I/O control for 1984 Hack - raw mode and signal handling
+ * Original 1984 source: docs/historical/original-source/hack.ioctl.c
+ * 
+ * Key modernizations: POSIX termios instead of sgtty
+ */
+
 /* This cannot be part of hack.tty.c (as it was earlier) since on some
    systems (e.g. MUNIX) the include files <termio.h> and <sgtty.h>
    define the same constants, and the C preprocessor complains. */

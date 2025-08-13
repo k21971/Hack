@@ -2,6 +2,13 @@
 /* hack.cmd.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Command processing for 1984 Hack - input handling and command dispatch
+ * Original 1984 source: docs/historical/original-source/hack.cmd.c
+ * 
+ * Key modernizations: ANSI C function signatures, renamed hack_unctrl() for curses compatibility
+ */
+
 #include	"hack.h"
 #include	"def.func_tab.h"
 

@@ -2,6 +2,13 @@
 /* hack.u_init.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Player initialization for 1984 Hack - character creation and starting equipment
+ * Original 1984 source: docs/historical/original-source/hack.u_init.c
+ * 
+ * Key modernizations: ANSI C function signatures, mutable role strings for memory safety
+ */
+
 #include "hack.h"
 #include <stdio.h>
 #include <signal.h>

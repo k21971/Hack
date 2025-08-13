@@ -2,6 +2,13 @@
 /* hack.apply.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Object application system for 1984 Hack - item usage and effects
+ * Original 1984 source: docs/historical/original-source/hack.apply.c
+ * 
+ * Key modernizations: ANSI C function signatures, static function prototypes
+ */
+
 #include	"hack.h"
 #include	"def.edog.h"
 static struct monst *bchit(int ddx, int ddy, int range, char sym);

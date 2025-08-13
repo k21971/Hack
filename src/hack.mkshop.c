@@ -1,6 +1,14 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* hack.mkshop.c - version 1.0.3 */
 /* $FreeBSD$ */
+
+/* 
+ * Shop creation system for 1984 Hack - shopkeeper and inventory generation
+ * Original 1984 source: docs/historical/original-source/hack.mkshop.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #ifndef QUEST
 #include "hack.h"
 #include "def.eshk.h"

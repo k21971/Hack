@@ -2,6 +2,13 @@
 /* hack.read.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Scroll reading system for 1984 Hack - magical scroll effects and identification
+ * Original 1984 source: docs/historical/original-source/hack.read.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 
 extern struct monst *makemon();

@@ -2,6 +2,13 @@
 /* hack.end.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Game ending system for 1984 Hack - death, victory, and score handling
+ * Original 1984 source: docs/historical/original-source/hack.end.c
+ * 
+ * Key modernizations: ANSI C function signatures, modern file locking
+ */
+
 #include "hack.h"
 #include <stdio.h>
 #include <signal.h>

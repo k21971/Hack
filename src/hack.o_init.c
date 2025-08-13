@@ -2,6 +2,13 @@
 /* hack.o_init.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Object initialization for 1984 Hack - item properties and game setup
+ * Original 1984 source: docs/historical/original-source/hack.o_init.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include	"config.h"		/* for typedefs */

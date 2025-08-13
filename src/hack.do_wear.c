@@ -2,6 +2,13 @@
 /* hack.do_wear.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Equipment system for 1984 Hack - wearing and removing armor/rings
+ * Original 1984 source: docs/historical/original-source/hack.do_wear.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 #include <stdio.h>
 extern char *nomovemsg;

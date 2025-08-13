@@ -2,6 +2,13 @@
 /* hack.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Main game engine for 1984 Hack - movement, combat, and core mechanics
+ * Original 1984 source: docs/historical/original-source/hack.c
+ * 
+ * Key modernizations: K&R to ANSI C function signatures, explicit return types
+ */
+
 #include "hack.h"
 #include <stdio.h>
 
