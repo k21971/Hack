@@ -2,6 +2,13 @@
 /* hack.mkobj.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Object creation system for 1984 Hack - item spawning and generation
+ * Original 1984 source: docs/historical/original-source/hack.mkobj.c
+ * 
+ * Key modernizations: ANSI C function signatures, K&R notation preserved
+ */
+
 #include "hack.h"
 
 char mkobjstr[] = "))[[!!!!????%%%%/=**))[[!!!!????%%%%/=**(%";

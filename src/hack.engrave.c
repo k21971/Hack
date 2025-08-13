@@ -2,6 +2,13 @@
 /* hack.engrave.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Engraving system for 1984 Hack - floor inscriptions and Elbereth
+ * Original 1984 source: docs/historical/original-source/hack.engrave.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 
 extern char *nomovemsg;

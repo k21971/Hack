@@ -2,6 +2,13 @@
 /* hack.objnam.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Object naming system for 1984 Hack - item descriptions and display names
+ * Original 1984 source: docs/historical/original-source/hack.objnam.c
+ * 
+ * Key modernizations: ANSI C function signatures, string safety macros
+ */
+
 #include	"hack.h"
 #include <stdio.h>
 #include <string.h>

@@ -1,6 +1,13 @@
 /* rnd.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Random number utilities for 1984 Hack - dice rolling and random generation
+ * Original 1984 source: docs/historical/original-source/rnd.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include <stdlib.h>
 
 #define RND(x)  (random() % x)

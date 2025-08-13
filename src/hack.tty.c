@@ -44,6 +44,13 @@ static const char rcsid[] =
 /* With thanks to the people who sent code for SYSV - hpscdi!jon,
    arnold@ucsf-cgl, wcs@bo95b, cbcephus!pds and others. */
 
+/* 
+ * Terminal I/O system for 1984 Hack - screen control and cursor management
+ * Original 1984 source: docs/historical/original-source/hack.tty.c
+ * 
+ * Key modernizations: ANSI C function signatures, POSIX terminal control
+ */
+
 #include	"hack.h"
 #include	<stdio.h>
 #include	<stdarg.h>

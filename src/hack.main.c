@@ -2,6 +2,13 @@
 /* hack.main.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Main entry point for 1984 Hack - initialization and game loop
+ * Original 1984 source: docs/historical/original-source/hack.main.c
+ * 
+ * Key modernizations: ANSI C main() signature, POSIX system includes
+ */
+
 #include <stdio.h>
 #include <signal.h>
 /* MODERN ADDITION (2025): Added for ANSI C standard library compatibility */

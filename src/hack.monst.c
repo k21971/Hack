@@ -1,6 +1,13 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* hack.monst.c - version 1.0.2 */
 
+/* 
+ * Monster definitions for 1984 Hack - creature stats and abilities
+ * Original 1984 source: docs/historical/original-source/hack.monst.c
+ * 
+ * Key modernizations: ANSI C compatibility
+ */
+
 #include "hack.h"
 #include "def.eshk.h"
 extern char plname[PL_NSIZ];

@@ -2,6 +2,13 @@
 /* hack.track.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Player tracking system for 1984 Hack - movement history for monsters
+ * Original 1984 source: docs/historical/original-source/hack.track.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include "hack.h"
 
 #define	UTSZ	50

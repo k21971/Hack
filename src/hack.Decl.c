@@ -1,6 +1,13 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* hack.Decl.c - version 1.0.3 */
 
+/* 
+ * Global variable declarations for 1984 Hack - game state and data structures
+ * Original 1984 source: docs/historical/original-source/hack.Decl.c
+ * 
+ * Key modernizations: ANSI C compatibility
+ */
+
 #include	"hack.h"
 char nul[40];			/* contains zeros */
 char plname[PL_NSIZ];		/* player name */

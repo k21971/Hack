@@ -4,6 +4,13 @@
 
 
 
+/* 
+ * Game options system for 1984 Hack - player preferences and configuration
+ * Original 1984 source: docs/historical/original-source/hack.options.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "config.h"

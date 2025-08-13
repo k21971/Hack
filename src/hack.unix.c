@@ -2,6 +2,13 @@
 /* hack.unix.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Unix system interface for 1984 Hack - file operations and system calls
+ * Original 1984 source: docs/historical/original-source/hack.unix.c
+ * 
+ * Key modernizations: ANSI C function signatures, POSIX compatibility
+ */
+
 /* This file collects some Unix dependencies; hack.pager.c contains some more */
 
 /*

@@ -2,6 +2,13 @@
 /* hack.trap.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Trap system for 1984 Hack - dungeon hazards and effects
+ * Original 1984 source: docs/historical/original-source/hack.trap.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 
 extern struct monst *makemon();

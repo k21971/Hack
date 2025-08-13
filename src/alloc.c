@@ -1,6 +1,13 @@
 /* alloc.c - version 1.0.2 */
 /* $FreeBSD$ */
 
+/* 
+ * Memory allocation utilities for 1984 Hack - safe malloc/free wrappers
+ * Original 1984 source: docs/historical/original-source/alloc.c
+ * 
+ * Key modernizations: ANSI C function signatures, enhanced type safety
+ */
+
 #include <stdlib.h>
 #include "hack.h"
 

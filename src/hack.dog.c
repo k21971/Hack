@@ -2,6 +2,13 @@
 /* hack.dog.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Dog companion system for 1984 Hack - pet behavior and AI
+ * Original 1984 source: docs/historical/original-source/hack.dog.c
+ * 
+ * Key modernizations: ANSI C function signatures
+ */
+
 #include	"hack.h"
 #include	"hack.mfndpos.h"
 extern struct monst *makemon();

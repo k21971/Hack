@@ -2,6 +2,13 @@
 /* hack.timeout.c - version 1.0.3 */
 /* $FreeBSD$ */
 
+/* 
+ * Timeout system for 1984 Hack - timed effects and events
+ * Original 1984 source: docs/historical/original-source/hack.timeout.c
+ * 
+ * Key modernizations: ANSI C function signatures, hack_timeout() renamed for curses compatibility
+ */
+
 #include	"hack.h"
 
 #if 0
