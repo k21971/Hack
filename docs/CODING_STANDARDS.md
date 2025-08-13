@@ -47,11 +47,12 @@ This project preserves authentic 1984 Hack source code while making minimal mode
 
 ### Original Source Preservation Rule
 
-**NEVER DELETE ORIGINAL 1984 CODE**
+### NEVER DELETE ORIGINAL 1984 CODE
 
 All original source code must be preserved using one of these methods:
 
 1. **Comment Preservation** (Preferred):
+
 ```c
 #if 0
 /* ORIGINAL 1984 CODE - preserved for reference */
@@ -62,12 +63,14 @@ original_function() {
 ```
 
 2. **Inline Comments** (For small changes):
+
 ```c
 /* Original 1984: old_approach(); */
 modern_approach();  /* MODERN: explanation */
 ```
 
 3. **Documentation References**:
+
 ```c
 /* See docs/historical/original-source/filename.c for original implementation */
 ```
@@ -98,6 +101,7 @@ As of August 2025, the following modern additions have been documented:
 ### Original Code Preservation Audit
 
 **✅ COMPLIANT FILES** (Original code preserved):
+
 - hack.termcap.c: delay_output() preserved under #if 0
 - hack.unix.c: setrandom() and link() locking preserved
 - hack.timeout.c: timeout() preserved under #if 0  
