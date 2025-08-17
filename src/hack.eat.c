@@ -180,6 +180,11 @@ gotit:
 		occtxt = "opening the tin";
 		return(1);
 	}
+	/* MODERN: Add bounds checking for objects array access */
+	if(otmp->otyp < 0 || otmp->otyp >= NROFOBJECTS) {
+		pline("Strange food indeed!");
+		return(0);  /* Cannot eat unknown object type */
+	}
 	ftmp = &objects[otmp->otyp];
 	multi = -ftmp->oc_delay;
 	if(otmp->otyp >= CORPSE && eatcorpse(otmp)) goto eatx;
@@ -391,7 +396,12 @@ int tp = 0;
 		pline("Ulch -- that meat was tainted!");
 		pline("You get very sick.");
 		Sick = 10 + rn2(10);
-		u.usick_cause = objects[otmp->otyp].oc_name;
+		/* MODERN: Add bounds checking for objects array access */
+		if(otmp->otyp >= 0 && otmp->otyp < NROFOBJECTS) {
+			u.usick_cause = objects[otmp->otyp].oc_name;
+		} else {
+			u.usick_cause = "something strange";
+		}
 	} else if(index(POISONOUS, let) && rn2(5)){
 		tp++;
 		pline("Ecch -- that must have been poisonous!");

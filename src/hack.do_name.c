@@ -86,7 +86,7 @@ extern char *lmonnam();
 		return(1);
 	lth = strlen(buf)+1;
 	if(lth > 63){
-		buf[62] = 0;
+		buf[62] = 0;  /* MODERN: Safe bounds checking for 62-char monster names */
 		lth = 63;
 	}
 	mtmp2 = newmonst(mtmp->mxlth + lth);
@@ -115,7 +115,7 @@ char buf[BUFSZ];
 		return;
 	lth = strlen(buf)+1;
 	if(lth > 63){
-		buf[62] = 0;
+		buf[62] = 0;  /* MODERN: Safe bounds checking for 62-char object names */
 		lth = 63;
 	}
 	otmp2 = newobj(lth);
@@ -193,10 +193,11 @@ char *ghostnames[] = {		/* these names should have length < PL_NSIZ */
 
 char *
 xmonnam(struct monst *mtmp, int vb) {
-static char buf[BUFSZ];		/* %% */
+static char buf[BUFSZ];		/* MODERN: Static buffer reuse issue - overwrites on each call */
 extern char *shkname();
 	if(mtmp->mnamelth && !vb) {
-		(void) strcpy(buf, NAME(mtmp));
+		(void) strncpy(buf, NAME(mtmp), BUFSZ - 1);  /* MODERN: Safe copy */
+		buf[BUFSZ - 1] = 0;
 		return(buf);
 	}
 	switch(mtmp->data->mlet) {
@@ -248,10 +249,10 @@ char *
 amonnam(struct monst *mtmp, char *adj)
 {
 	char *bp = monnam(mtmp);
-	static char buf[BUFSZ];		/* %% */
+	static char buf[BUFSZ];		/* MODERN: Static buffer reuse issue - overwrites on each call */
 
 	if(!strncmp(bp, "the ", 4)) bp += 4;
-	(void) sprintf(buf, "the %s %s", adj, bp);
+	(void) snprintf(buf, BUFSZ, "the %s %s", adj, bp);  /* MODERN: Safe sprintf */
 	return(buf);
 }
 

@@ -190,22 +190,54 @@ int doset(void)
 	pline("What options do you want to set? ");
 	getlin(buf);
 	if(!buf[0] || buf[0] == '\033') {
-	    (void) strcpy(buf,"HACKOPTIONS=");
-	    (void) strcat(buf, flags.female ? "female," : "male,");
-	    if(flags.standout) (void) strcat(buf,"standout,");
-	    if(flags.nonull) (void) strcat(buf,"nonull,");
-	    if(flags.nonews) (void) strcat(buf,"nonews,");
-	    if(flags.time) (void) strcat(buf,"time,");
-	    if(flags.notombstone) (void) strcat(buf,"notombstone,");
-	    if(flags.no_rest_on_space)
-		(void) strcat(buf,"!rest_on_space,");
-	    if(flags.end_top != 5 || flags.end_around != 4 || flags.end_own){
-		(void) sprintf(eos(buf), "endgame: %u topscores/%u around me",
+	    /* MODERN: Safe options string building with bounds tracking */
+	    int len = 0, remaining = BUFSZ;
+	    
+	    len = snprintf(buf, remaining, "HACKOPTIONS=");
+	    if(len >= remaining) len = remaining - 1;
+	    remaining -= len;
+	    
+	    if(remaining > 0) {
+		int added = snprintf(buf + len, remaining, "%s", flags.female ? "female," : "male,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.standout && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "standout,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.nonull && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "nonull,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.nonews && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "nonews,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.time && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "time,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.notombstone && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "notombstone,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if(flags.no_rest_on_space && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "!rest_on_space,");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	    if((flags.end_top != 5 || flags.end_around != 4 || flags.end_own) && remaining > 0) {
+		int added = snprintf(buf + len, remaining, "endgame: %u topscores/%u around me",
 			flags.end_top, flags.end_around);
-		if(flags.end_own) (void) strcat(buf, "/own scores");
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+		if(flags.end_own && remaining > 0) {
+		    added = snprintf(buf + len, remaining, "/own scores");
+		    if(added > 0 && added < remaining) { len += added; remaining -= added; }
+		}
 	    } else {
-		char *eop = eos(buf);
-		if(*--eop == ',') *eop = 0;
+		/* Remove trailing comma if present */
+		if(len > 0 && buf[len-1] == ',') {
+		    buf[len-1] = 0;
+		}
 	    }
 	    pline(buf);
 	} else

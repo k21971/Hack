@@ -325,7 +325,7 @@ int doread(void) {
 		else
 			pline("This is an identify scroll.");
 		useup(scroll);
-		objects[SCR_IDENTIFY].oc_name_known = 1;
+		SAFE_OBJECTS(SCR_IDENTIFY).oc_name_known = 1;  /* MODERN: Safe array access */
 		if(!confused)
 		    while(
 			!ggetobj("identify", identify, rn2(5) ? 1 : rn2(5))

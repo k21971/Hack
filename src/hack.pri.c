@@ -617,32 +617,56 @@ bot(void)
 {
 char *ob = oldbot, *nb = newbot;
 int i;
+int len, remaining;  /* MODERN: Track buffer usage for safe sprintf */
 	if(flags.botlx) *ob = 0;
 	flags.botl = flags.botlx = 0;
 #ifdef GOLD_ON_BOTL
-	(void) sprintf(newbot,
+	len = snprintf(newbot, sizeof(newbot),  /* MODERN: Safe sprintf replacement */
 		"Level %-2d  Gold %-5lu  Hp %3d(%d)  Ac %-2d  Str ",
 		dlevel, u.ugold, u.uhp, u.uhpmax, u.uac);
 #else
-	(void) sprintf(newbot,
+	len = snprintf(newbot, sizeof(newbot),  /* MODERN: Safe sprintf replacement */
 		"Level %-2d   Hp %3d(%d)   Ac %-2d   Str ",
 		dlevel,  u.uhp, u.uhpmax, u.uac);
 #endif /* GOLD_ON_BOTL */
+	if(len >= sizeof(newbot)) len = sizeof(newbot) - 1;
+	remaining = sizeof(newbot) - len;
+	
 	if(u.ustr>18) {
-	    if(u.ustr>117)
-		(void) strcat(newbot,"18/**");
-	    else
-		(void) sprintf(eos(newbot), "18/%02d",u.ustr-18);
-	} else
-	    (void) sprintf(eos(newbot), "%-2d   ",u.ustr);
+	    if(u.ustr>117) {
+		if(remaining > 5) {  /* MODERN: Check space before strcat */
+		    (void) strcat(newbot,"18/**");
+		    len += 5; remaining -= 5;
+		}
+	    } else {
+		int added = snprintf(eos(newbot), remaining, "18/%02d", u.ustr-18);
+		if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	    }
+	} else {
+	    int added = snprintf(eos(newbot), remaining, "%-2d   ", u.ustr);
+	    if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	}
 #ifdef EXP_ON_BOTL
-	(void) sprintf(eos(newbot), "  Exp %2d/%-5lu ", u.ulevel,u.uexp);
+	if(remaining > 0) {
+	    int added = snprintf(eos(newbot), remaining, "  Exp %2d/%-5lu ", u.ulevel, u.uexp);
+	    if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	}
 #else
-	(void) sprintf(eos(newbot), "   Exp %2u  ", u.ulevel);
+	if(remaining > 0) {
+	    int added = snprintf(eos(newbot), remaining, "   Exp %2u  ", u.ulevel);
+	    if(added > 0 && added < remaining) { len += added; remaining -= added; }
+	}
 #endif /* EXP_ON_BOTL */
-	(void) strcat(newbot, hu_stat[u.uhs]);
-	if(flags.time)
-	    (void) sprintf(eos(newbot), "  %ld", moves);
+	if(remaining > 0 && hu_stat[u.uhs]) {  /* MODERN: Check space and null pointer */
+	    int hu_len = strlen(hu_stat[u.uhs]);
+	    if(hu_len < remaining) {
+		(void) strcat(newbot, hu_stat[u.uhs]);
+		len += hu_len; remaining -= hu_len;
+	    }
+	}
+	if(flags.time && remaining > 0) {
+	    (void) snprintf(eos(newbot), remaining, "  %ld", moves);  /* MODERN: Safe sprintf */
+	}
 	if(strlen(newbot) >= COLNO) {
 		char *bp0, *bp1;
 		bp0 = bp1 = newbot;

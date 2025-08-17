@@ -54,6 +54,17 @@ typedef struct {
 #define	BUFSZ	256	/* for getlin buffers */
 #define	PL_NSIZ	32	/* name of player, ghost, shopkeeper */
 
+/**
+ * MODERN ADDITION (2025): Safe object array access macros
+ * 
+ * WHY: Original code accesses objects[] array without bounds checking
+ * HOW: Inline bounds check with fallback to STRANGE_OBJECT (index 0)
+ * PRESERVES: Same functionality when indices are valid
+ * ADDS: Protection against array bounds violations and segfaults
+ */
+#define SAFE_OBJ(otyp) ((otyp) >= 0 && (otyp) < NROFOBJECTS ? (otyp) : STRANGE_OBJECT)
+#define SAFE_OBJECTS(otyp) objects[SAFE_OBJ(otyp)]
+
 #include	"def.rm.h"
 #include	"def.permonst.h"
 #include	"def.mkroom.h"

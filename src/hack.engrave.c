@@ -247,11 +247,23 @@ struct obj *otmp;
 	sp = (char *)(ep + 1);	/* (char *)ep + sizeof(struct engr) */
 	ep->engr_txt = sp;
 	if(oep) {
-		(void) strcpy(sp, oep->engr_txt);
-		(void) strcat(sp, buf);
+		/* MODERN: Safe string concatenation with bounds checking */
+		int oep_len = strlen(oep->engr_txt);
+		int buf_len = strlen(buf);
+		if(oep_len + buf_len + 1 <= len + 1) {  /* +1 for null terminator */
+			(void) strcpy(sp, oep->engr_txt);
+			(void) strcat(sp, buf);
+		} else {
+			/* Truncate if combined length exceeds allocated space */
+			(void) strncpy(sp, oep->engr_txt, len);
+			sp[len] = 0;  /* Ensure null termination */
+		}
 		del_engr(oep);
-	} else
-		(void) strcpy(sp, buf);
+	} else {
+		/* MODERN: Safe copy with bounds checking */
+		(void) strncpy(sp, buf, len);
+		sp[len] = 0;  /* Ensure null termination */
+	}
 	ep->engr_lth = len+1;
 	ep->engr_type = type;
 	ep->engr_time = moves-multi;

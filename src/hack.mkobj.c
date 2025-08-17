@@ -60,6 +60,11 @@ mksobj(otyp)
 int otyp;
 {
 	struct obj *otmp;
+	/* MODERN: Add bounds checking for objects array access */
+	if(otyp < 0 || otyp >= NROFOBJECTS) {
+		impossible("mksobj called with invalid otyp %d", otyp, 0);
+		otyp = STRANGE_OBJECT;  /* Safe fallback */
+	}
 	char let = objects[otyp].oc_olet;
 
 	otmp = newobj(0);
@@ -137,7 +142,11 @@ int c;
 int weight(obj)
 struct obj *obj;
 {
-int wt = objects[obj->otyp].oc_weight;
+	/* MODERN: Add bounds checking for objects array access */
+	if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+		return(obj->quan + 1)/2;  /* Safe fallback weight calculation */
+	}
+	int wt = objects[obj->otyp].oc_weight;
 	return(wt ? wt*obj->quan : (obj->quan + 1)/2);
 }
 

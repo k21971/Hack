@@ -194,13 +194,23 @@ beginner:
 		(void) fflush(stdout);
 	}
 	if(exper) {
-		roles[i][0] = pc;
+		/* MODERN: Add bounds checking for array access */
+		if(i >= 0 && i < NR_OF_ROLES) {
+			roles[i][0] = pc;
+		}
 	}
 
 got_suffix:
 
-	(void) strncpy(pl_character, roles[i], PL_CSIZ-1);
-	pl_character[PL_CSIZ-1] = 0;
+	/* MODERN: Add bounds checking for roles array access */
+	if(i >= 0 && i < NR_OF_ROLES) {
+		(void) strncpy(pl_character, roles[i], PL_CSIZ-1);
+		pl_character[PL_CSIZ-1] = 0;
+	} else {
+		/* Fallback to default character if index invalid */
+		(void) strncpy(pl_character, roles[0], PL_CSIZ-1);
+		pl_character[PL_CSIZ-1] = 0;
+	}
 	flags.beginner = 1;
 	u = zerou;
 	u.usym = '@';

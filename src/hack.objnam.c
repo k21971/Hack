@@ -12,9 +12,39 @@
 #include	"hack.h"
 #include <stdio.h>
 #include <string.h>
-#define Sprintf (void) sprintf
-#define Strcat  (void) strcat
-#define	Strcpy	(void) strcpy
+/* MODERN ADDITION (2025): Safe string operation macros
+ * WHY: Original sprintf/strcpy/strcat unsafe with potential buffer overflows
+ * HOW: Replace with bounds-checked versions using available buffer space
+ * PRESERVES: Same functionality with identical buffer layout (PREFIX + content)
+ * ADDS: Buffer overflow protection for object name generation */
+#define SAFE_BUF_SIZE (BUFSZ - PREFIX)  /* Available space after prefix */
+
+/* Safe macros for main object name buffer */
+#define Sprintf(buf, ...) (void) snprintf(buf, SAFE_BUF_SIZE, __VA_ARGS__)
+#define Strcat(dest, src) do { \
+    size_t dest_len = strlen(dest); \
+    size_t remaining = SAFE_BUF_SIZE - dest_len; \
+    if(remaining > 1) { \
+        (void) strncat(dest, src, remaining - 1); \
+    } \
+} while(0)
+#define	Strcpy(dest, src) do { \
+    (void) strncpy(dest, src, SAFE_BUF_SIZE - 1); \
+    (dest)[SAFE_BUF_SIZE - 1] = 0; \
+} while(0)
+
+/* Safe macros for prefix buffer (smaller) */
+#define PREFIX_Strcat(dest, src) do { \
+    size_t dest_len = strlen(dest); \
+    size_t remaining = PREFIX - dest_len; \
+    if(remaining > 1) { \
+        (void) strncat(dest, src, remaining - 1); \
+    } \
+} while(0)
+#define PREFIX_Strcpy(dest, src) do { \
+    (void) strncpy(dest, src, PREFIX - 1); \
+    (dest)[PREFIX - 1] = 0; \
+} while(0)
 #define	PREFIX	15
 extern char *eos(char *s);
 extern int bases[];
@@ -43,6 +73,11 @@ typename(otyp)
 int otyp;
 {
 static char buf[BUFSZ];
+/* MODERN: Add bounds checking for objects array access */
+if(otyp < 0 || otyp >= NROFOBJECTS) {
+	Strcpy(buf, "strange object type");  /* Safe fallback */
+	return(buf);
+}
 struct objclass *ocl = &objects[otyp];
 char *an = ocl->oc_name;
 char *dn = ocl->oc_descr;
@@ -95,6 +130,11 @@ struct obj *obj;
 {
 static char bufr[BUFSZ];
 char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
+/* MODERN: Add bounds checking for objects array access */
+if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+	Strcpy(buf, "strange object");  /* Safe fallback */
+	return(buf);
+}
 int nn = objects[obj->otyp].oc_name_known;
 char *an = objects[obj->otyp].oc_name;
 char *dn = objects[obj->otyp].oc_descr;
@@ -256,13 +296,13 @@ struct obj *obj;
 char prefix[PREFIX];
 char *bp = xname(obj);
 	if(obj->quan != 1)
-		Sprintf(prefix, "%u ", obj->quan);
+		(void) snprintf(prefix, PREFIX, "%u ", obj->quan);  /* MODERN: Safe prefix sprintf */
 	else
-		Strcpy(prefix, "a ");
+		PREFIX_Strcpy(prefix, "a ");
 	switch(obj->olet) {
 	case AMULET_SYM:
 		if(strncmp(bp, "cheap ", 6))
-			Strcpy(prefix, "the ");
+			PREFIX_Strcpy(prefix, "the ");
 		break;
 	case ARMOR_SYM:
 		if(obj->owornmask & W_ARMOR)
@@ -270,8 +310,8 @@ char *bp = xname(obj);
 		/* fall into next case */
 	case WEAPON_SYM:
 		if(obj->known) {
-			Strcat(prefix, sitoa(obj->spe));
-			Strcat(prefix, " ");
+			PREFIX_Strcat(prefix, sitoa(obj->spe));
+			PREFIX_Strcat(prefix, " ");
 		}
 		break;
 	case WAND_SYM:
@@ -292,7 +332,7 @@ char *bp = xname(obj);
 	if(obj->unpaid)
 		Strcat(bp, " (unpaid)");
 	if(!strcmp(prefix, "a ") && index(vowels, *bp))
-		Strcpy(prefix, "an ");
+		PREFIX_Strcpy(prefix, "an ");
 	bp = strprepend(bp, prefix);
 	return(bp);
 }

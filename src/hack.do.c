@@ -359,7 +359,14 @@ int dothrow(void)
 					obfree(obj, (struct obj *) 0);
 					return(1);
 				}
-			} else miss(objects[obj->otyp].oc_name, mon);
+			} else {
+				/* MODERN: Add bounds checking for objects array access */
+				if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS) {
+					miss(objects[obj->otyp].oc_name, mon);
+				} else {
+					miss("strange object", mon);
+				}
+			}
 		} else if(obj->otyp == HEAVY_IRON_BALL) {
 			tmp = -1+u.ulevel+mon->data->ac+abon();
 			if(!Punished || obj != uball) tmp += 2;
@@ -379,7 +386,9 @@ int dothrow(void)
 				if(tamedog(mon,obj)) return(1);
 			if(obj->olet == GEM_SYM && mon->data->mlet == 'u' &&
 				!mon->mtame){
-			 if(obj->dknown && objects[obj->otyp].oc_name_known){
+			 /* MODERN: Add bounds checking for objects array access */
+			 if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS && 
+			    obj->dknown && objects[obj->otyp].oc_name_known){
 			  if(objects[obj->otyp].g_val > 0){
 			    u.uluck += 5;
 			    goto valuable;
