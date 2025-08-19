@@ -22,7 +22,8 @@
 #include "hack.h"
 
 /* Forward declarations for functions not properly visible */
-extern void settty(char *s);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *s);
 
 #ifdef BSD
 /**

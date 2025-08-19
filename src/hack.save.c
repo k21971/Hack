@@ -18,7 +18,8 @@ extern struct monst *restmonchn(int fd);
 extern int dosave0(int hu);
 extern void savenames(int fd);
 extern void restnames(int fd);
-extern void settty(char *s);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *s);
 
 int dosave(void){
 	if(dosave0(0)) {

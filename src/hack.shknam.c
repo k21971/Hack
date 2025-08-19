@@ -87,7 +87,8 @@ const char *const shkfoods[] = {
 	0
 };
 
-char *shkweapons[] = {
+/* MODERN: CONST-CORRECTNESS: shkweapons is a read-only array of string literals */
+const char *const shkweapons[] = {
 	/* Perigord */
 	"Voulgezac", "Rouffiac", "Lerignac", "Touverac", "Guizengeard",
 	"Melac", "Neuvicq", "Vanzac", "Picq", "Urignac", "Corignac",
@@ -106,7 +107,8 @@ const char *const shkgeneral[] = {
 
 struct shk_nx {
 	char x;
-	char **xn;
+	/* MODERN: CONST-CORRECTNESS: shopkeeper name arrays are read-only */
+	const char *const *xn;
 } shk_nx[] = {
 	{ POTION_SYM,	shkliquors },
 	{ SCROLL_SYM,	shkbooks },
@@ -119,7 +121,8 @@ struct shk_nx {
 };
 void findname(char *nampt, char let) {
 struct shk_nx *p = shk_nx;
-char **q;
+/* MODERN: CONST-CORRECTNESS: shopkeeper name arrays are read-only */
+const char *const *q;
 int i;
 	while(p->x && p->x != let) p++;
 	q = p->xn;
