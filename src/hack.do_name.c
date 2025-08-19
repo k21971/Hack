@@ -213,11 +213,10 @@ extern char *shkname();
 		break;
 	case '@':
 		if(mtmp->isshk) {
-                        /* fallthrough after return */
 			(void) strcpy(buf, shkname(mtmp));
 			break;
 		}
-		/* fall into next case */
+		/* FALLTHROUGH */
 	default:
 		(void) snprintf(buf, BUFSZ, "the %s%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			mtmp->minvis ? "invisible " : "",

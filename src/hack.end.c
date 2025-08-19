@@ -55,6 +55,7 @@ int doquit(void)
 
 void done1(int sig)
 {
+	(void)sig;
 	doquit();
 }
 
@@ -63,6 +64,7 @@ int done_hup;
 
 void
 done_intr(int sig){
+	(void)sig;
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -593,6 +595,7 @@ int x;
  */
 void modern_cleanup_handler(int sig)
 {
+	(void)sig;
 	/* Ignore further interrupts during cleanup */
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGTERM, SIG_IGN);

@@ -264,7 +264,7 @@ int float_down(void) {
 			break;
 		case TRAPDOOR:
 			if(!xdnstair || u.ustuck) break;
-			/* fall into next case */
+			/* FALLTHROUGH */
 		default:
 			dotrap(trap);
 	}

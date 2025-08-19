@@ -100,6 +100,7 @@ static int got_intrup;
 
 void intruph(int sig)
 {
+	(void)sig;
 	got_intrup++;
 }
 

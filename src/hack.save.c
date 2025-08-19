@@ -44,6 +44,7 @@ int dosave(void){
  * ADDS: Modern signal compatibility for Hyprland/Wayland window closure
  */
 void modern_save_handler(int sig){
+	(void)sig;
 	/* Attempt to save game state before cleanup */
 	(void) dosave0(1);
 	exit(1);

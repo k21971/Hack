@@ -59,12 +59,12 @@ int init_uhunger(void){
 
 #define	TTSZ	SIZE(tintxts)
 struct { char *txt; int nut; } tintxts[] = {
-	"It contains first quality peaches - what a surprise!",	40,
-	"It contains salmon - not bad!",	60,
-	"It contains apple juice - perhaps not what you hoped for.", 20,
-	"It contains some nondescript substance, tasting awfully.", 500,
-	"It contains rotten meat. You vomit.", -50,
-	"It turns out to be empty.",	0
+	{"It contains first quality peaches - what a surprise!",	40},
+	{"It contains salmon - not bad!",	60},
+	{"It contains apple juice - perhaps not what you hoped for.", 20},
+	{"It contains some nondescript substance, tasting awfully.", 500},
+	{"It contains rotten meat. You vomit.", -50},
+	{"It turns out to be empty.",	0}
 };
 
 static struct {
@@ -428,11 +428,11 @@ int tp = 0;
 	case 'n':
 		u.uhp = u.uhpmax;
 		flags.botl = 1;
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case '@':
 		pline("You cannibal! You will be sorry for this!");
 		/* not tp++; */
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case 'd':
 		Aggravate_monster |= INTRINSIC;
 		break;
@@ -445,7 +445,7 @@ int tp = 0;
 			Invis |= INTRINSIC;
 			See_invisible |= INTRINSIC;
 		}
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case 'y':
 #ifdef QUEST
 		u.uhorizon++;
@@ -472,7 +472,7 @@ int tp = 0;
 		pline("You turn to stone.");
 		killer = "dead cockatrice";
 		done("died");
-		/* NOTREACHED */
+		/* FALLTHROUGH */
 	case 'a':
 	  if(Stoned) {
 	      pline("What a pity - you just destroyed a future piece of art!");

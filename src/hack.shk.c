@@ -737,6 +737,7 @@ int tmp, ac;
 		break;
 	case CHAIN_SYM:
 		pline("Strange ..., carrying a chain?");
+		/* FALLTHROUGH */
 	case BALL_SYM:
 		tmp = 10;
 		break;
