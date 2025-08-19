@@ -173,9 +173,3 @@ restoHack-static-*-linux-x86_64.tar.gz.sha256
 verify-release.sh
 gh-release-notes.txt
 linux-debug
-gauntlet_v2.sh
-gauntlet.sh
-repro.sh
-shrink_input.sh
-stress.sh
-summarize_logs.sh
