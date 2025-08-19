@@ -182,7 +182,7 @@ gotit:
 		return(1);
 	}
 	/* MODERN: Add bounds checking for objects array access */
-	if(otmp->otyp < 0 || otmp->otyp >= NROFOBJECTS) {
+	if(otmp->otyp >= NROFOBJECTS) {
 		pline("Strange food indeed!");
 		return(0);  /* Cannot eat unknown object type */
 	}

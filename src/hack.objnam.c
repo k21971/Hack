@@ -151,7 +151,7 @@ struct obj *obj;
 static char bufr[BUFSZ];
 char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
 /* MODERN: Add bounds checking for objects array access */
-if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+if(obj->otyp >= NROFOBJECTS) {
 	Strcpy(buf, "strange object");  /* Safe fallback */
 	return(buf);
 }
