@@ -184,7 +184,7 @@ void docall(struct obj *obj)
 	*str1 = str;
 }
 
-char *ghostnames[] = {		/* these names should have length < PL_NSIZ */
+const char *const ghostnames[] = {  /* these names should have length < PL_NSIZ */
 	"adri", "andries", "andreas", "bert", "david", "dirk", "emile",
 	"frans", "fred", "greg", "hether", "jay", "john", "jon", "kay",
 	"kenny", "maud", "michiel", "mike", "peter", "robert", "ron",

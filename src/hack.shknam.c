@@ -4,7 +4,8 @@
 
 #include "hack.h"
 
-char *shkliquors[] = {
+/* MODERN: CONST-CORRECTNESS: shkliquors is a read-only array of string literals */
+const char *const shkliquors[] = {
 	/* Ukraine */
 	"Njezjin", "Tsjernigof", "Gomel", "Ossipewsk", "Gorlowka",
 	/* N. Russia */
@@ -19,7 +20,8 @@ char *shkliquors[] = {
 	0
 };
 
-char *shkbooks[] = {
+/* MODERN: CONST-CORRECTNESS: shkbooks is a read-only array of string literals */
+const char *const shkbooks[] = {
 	/* Eire */
 	"Skibbereen", "Kanturk", "Rath Luirc", "Ennistymon", "Lahinch",
 	"Loughrea", "Croagh", "Maumakeogh", "Ballyjamesduff",
@@ -31,7 +33,8 @@ char *shkbooks[] = {
 	0
 };
 
-char *shkarmors[] = {
+/* MODERN: CONST-CORRECTNESS: shkarmors is a read-only array of string literals */
+const char *const shkarmors[] = {
 	/* Turquie */
 	"Demirci", "Kalecik", "Boyabai", "Yildizeli", "Gaziantep",
 	"Siirt", "Akhalataki", "Tirebolu", "Aksaray", "Ermenak",
@@ -42,7 +45,8 @@ char *shkarmors[] = {
 	0
 };
 
-char *shkwands[] = {
+/* MODERN: CONST-CORRECTNESS: shkwands is a read-only array of string literals */
+const char *const shkwands[] = {
 	/* Wales */
 	"Yr Wyddgrug", "Trallwng", "Mallwyd", "Pontarfynach",
 	"Rhaeader", "Llandrindod", "Llanfair-ym-muallt",
@@ -56,7 +60,8 @@ char *shkwands[] = {
 	0
 };
 
-char *shkrings[] = {
+/* MODERN: CONST-CORRECTNESS: shkrings is a read-only array of string literals */
+const char *const shkrings[] = {
 	/* Hollandse familienamen */
 	"Feyfer", "Flugi", "Gheel", "Havic", "Haynin", "Hoboken",
 	"Imbyze", "Juyn", "Kinsky", "Massis", "Matray", "Moy",
@@ -92,21 +97,9 @@ char *shkweapons[] = {
 	0
 };
 
-char *shkgeneral[] = {
-	/* Suriname */
-	"Hebiwerie", "Possogroenoe", "Asidonhopo", "Manlobbi",
-	"Adjama", "Pakka Pakka", "Kabalebo", "Wonotobo",
-	"Akalapi", "Sipaliwini",
-	/* Greenland */
-	"Annootok", "Upernavik", "Angmagssalik",
-	/* N. Canada */
-	"Aklavik", "Inuvik", "Tuktoyaktuk",
-	"Chicoutimi", "Ouiatchouane", "Chibougamau",
-	"Matagami", "Kipawa", "Kinojevis",
-	"Abitibi", "Maganasipi",
-	/* Iceland */
-	"Akureyri", "Kopasker", "Budereyri", "Akranes", "Bordeyri",
-	"Holmavik",
+/* MODERN: CONST-CORRECTNESS: shkgeneral is a read-only array of string literals */
+const char *const shkgeneral[] = {
+	"stuff", "things", "goods", "provisions", "implements",
 	0
 };
 

@@ -217,7 +217,8 @@ void strange_feeling(struct obj *obj, char *txt)
 	useup(obj);
 }
 
-char *bottlenames[] = {
+const char */* MODERN: CONST-CORRECTNESS: bottlenames is a read-only array of string literals */
+const char *const bottlenames[] = {
 	"bottle", "phial", "flagon", "carafe", "flask", "jar", "vial"
 };
 
