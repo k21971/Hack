@@ -487,7 +487,8 @@ struct monst *mtmp;
 	x0 = y0 = 0;
 #endif /* lint */
 	if(Blind || flags.run == 0) return;
-	if(flags.run == 1 && levl[u.ux][u.uy].typ == ROOM) return;
+	/* Original 1984: if(flags.run == 1 && levl[u.ux][u.uy].typ == ROOM) return; */
+	if(flags.run == 1 && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == ROOM) return; /* MODERN: safe array indexing */
 #ifdef QUEST
 	if(u.ux0 == u.ux+u.dx && u.uy0 == u.uy+u.dy) goto stop;
 #endif /* QUEST */
@@ -668,22 +669,25 @@ void setsee(void)
 		pru();
 		return;
 	}
-	if(!levl[u.ux][u.uy].lit) {
+	/* Original 1984: if(!levl[u.ux][u.uy].lit) { */
+	if(!levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: safe array indexing */
 		seelx = u.ux-1;
 		seehx = u.ux+1;
 		seely = u.uy-1;
 		seehy = u.uy+1;
 	} else {
-		for(seelx = u.ux; levl[seelx-1][u.uy].lit; seelx--);
-		for(seehx = u.ux; levl[seehx+1][u.uy].lit; seehx++);
-		for(seely = u.uy; levl[u.ux][seely-1].lit; seely--);
-		for(seehy = u.uy; levl[u.ux][seehy+1].lit; seehy++);
+		/* Original 1984: for(seelx = u.ux; levl[seelx-1][u.uy].lit; seelx--); etc. */
+		for(seelx = (unsigned char)u.ux; levl[seelx-1][(unsigned char)u.uy].lit; seelx--);
+		for(seehx = (unsigned char)u.ux; levl[seehx+1][(unsigned char)u.uy].lit; seehx++);
+		for(seely = (unsigned char)u.uy; levl[(unsigned char)u.ux][seely-1].lit; seely--);
+		for(seehy = (unsigned char)u.uy; levl[(unsigned char)u.ux][seehy+1].lit; seehy++); /* MODERN: safe array indexing */
 	}
 	for(y = seely; y <= seehy; y++)
 		for(x = seelx; x <= seehx; x++) {
 			prl(x,y);
 	}
-	if(!levl[u.ux][u.uy].lit) seehx = 0; /* seems necessary elsewhere */
+	/* Original 1984: if(!levl[u.ux][u.uy].lit) seehx = 0; */
+	if(!levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) seehx = 0; /* seems necessary elsewhere - MODERN: safe array indexing */
 	else {
 	    if(seely == u.uy) for(x = u.ux-1; x <= u.ux+1; x++) prl(x,seely-1);
 	    if(seehy == u.uy) for(x = u.ux-1; x <= u.ux+1; x++) prl(x,seehy+1);

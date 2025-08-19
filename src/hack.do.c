@@ -167,7 +167,8 @@ void goto_level(int newlevel, boolean at_stairs)
 		maxdlevel = dlevel;
 	glo(dlevel);
 
-	if(!level_exists[dlevel])
+	/* Original 1984: if(!level_exists[dlevel]) */
+	if(!level_exists[(unsigned char)dlevel]) /* MODERN: safe array indexing */
 		mklev();
 	else {
 		extern int hackpid;
@@ -217,8 +218,9 @@ void goto_level(int newlevel, boolean at_stairs)
 	    do {
 		u.ux = rnd(COLNO-1);
 		u.uy = rn2(ROWNO);
-	    } while(levl[u.ux][u.uy].typ != ROOM ||
-			m_at(u.ux,u.uy));
+	    /* Original 1984: } while(levl[u.ux][u.uy].typ != ROOM || m_at(u.ux,u.uy)); */
+	    } while(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ != ROOM ||
+			m_at(u.ux,u.uy)); /* MODERN: safe array indexing */
 	    if(Punished){
 		if(uwep != uball && !up /* %% */ && rn2(5)){
 			pline("The iron ball falls on your head.");

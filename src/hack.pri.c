@@ -91,7 +91,8 @@ on_scr(int x, int y)
 
 void
 tmp_at(schar x, schar y) {
-static schar prevx, prevy;
+/* Original 1984: static schar prevx, prevy; */
+static unsigned char prevx, prevy; /* MODERN: unsigned to prevent buffer underflow */
 static char let;
 	if((int)x == -2){	/* change let call */
 		let = y;
@@ -119,7 +120,8 @@ static char let;
 
 /* like the previous, but the symbols are first erased on completion */
 void
-Tmp_at(schar x, schar y) {
+/* Original 1984: Tmp_at(schar x, schar y) { */
+Tmp_at(unsigned char x, unsigned char y) { /* MODERN: unsigned to prevent buffer underflow */
 static char let;
 static xchar cnt;
 static coord tc[COLNO];		/* but watch reflecting beams! */
@@ -208,8 +210,9 @@ docrt(void)
 
 /* Some ridiculous code to get display of @ and monsters (almost) right */
 	if(!Invisible) {
-		levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym;
-		levl[u.udisx][u.udisy].seen = 1;
+		/* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym; levl[u.udisx][u.udisy].seen = 1; */
+		levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)].scrsym = u.usym;
+		levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen = 1; /* MODERN: safe array indexing */
 		u.udispl = 1;
 	} else	u.udispl = 0;
 
@@ -296,7 +299,8 @@ pru(void)
 		u.udisx = u.ux;
 		u.udisy = u.uy;
 	}
-	levl[u.ux][u.uy].seen = 1;
+	/* Original 1984: levl[u.ux][u.uy].seen = 1; */
+	levl[(unsigned char)u.ux][(unsigned char)u.uy].seen = 1; /* MODERN: safe array indexing */
 }
 
 #ifndef NOWORM
@@ -319,8 +323,9 @@ prl(int x, int y)
 	}
 	if(!isok(x,y)) return;
 	room = &levl[x][y];
+	/* Original 1984: if((!room->typ) || (IS_ROCK(room->typ) && levl[u.ux][u.uy].typ == CORR)) */
 	if((!room->typ) ||
-	   (IS_ROCK(room->typ) && levl[u.ux][u.uy].typ == CORR))
+	   (IS_ROCK(room->typ) && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR)) /* MODERN: safe array indexing */
 		return;
 	if((mtmp = m_at(x,y)) && !mtmp->mhide &&
 		(!mtmp->minvis || See_invisible)) {
@@ -349,7 +354,8 @@ prl(int x, int y)
 }
 
 char
-news0(xchar x, xchar y)
+/* Original 1984: news0(xchar x, xchar y) */
+news0(unsigned char x, unsigned char y) /* MODERN: unsigned to prevent buffer underflow */
 {
 	struct obj *otmp;
 	struct trap *ttmp;

@@ -121,7 +121,9 @@ struct obj *obj;
 struct trap *trap;
 xchar cnt,chcnt,nix,niy;
 schar dogroom,uroom;
-xchar gx,gy,gtyp,otyp;	/* current goal */
+/* Original 1984: xchar gx,gy,gtyp,otyp; */
+unsigned char gx,gy;
+xchar gtyp,otyp; /* current goal - MODERN: gx,gy unsigned to prevent buffer underflow */
 coord poss[9];
 int info[9];
 #define GDIST(x,y) ((x-gx)*(x-gx) + (y-gy)*(y-gy))
