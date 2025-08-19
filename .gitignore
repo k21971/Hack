@@ -69,7 +69,7 @@ Thumbs.db
 .idea/
 *.sublime-*
 *.code-workspace
-
+.claude/
 # CMake
 build/
 build-*/
@@ -120,7 +120,7 @@ coverage/
 # Valgrind
 *.valgrind
 vgcore.*
-
+logs/
 # Core dumps
 core
 core.*
@@ -172,3 +172,4 @@ tools/build-matrix.sh
 restoHack-static-*-linux-x86_64.tar.gz.sha256
 verify-release.sh
 gh-release-notes.txt
+linux-debug

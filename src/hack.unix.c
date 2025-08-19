@@ -134,10 +134,10 @@ getyear(void)
 char *
 getdatestr(void)
 {
-	static char datestr[7];
+	static char datestr[32];  /* MODERN: Buffer increased to handle worst-case snprintf output safely */
 	struct tm *lt = getlt();
 
-	(void) snprintf(datestr, sizeof(datestr), "%02d%02d%02d",
+	(void) snprintf(datestr, sizeof(datestr), "%02d%02d%02d",  /* MODERN: Safe sprintf replacement with adequate buffer */
 		lt->tm_year % 100, lt->tm_mon + 1, lt->tm_mday);
 	return(datestr);
 }

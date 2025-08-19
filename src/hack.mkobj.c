@@ -65,7 +65,7 @@ int otyp;
 		impossible("mksobj called with invalid otyp %d", otyp, 0);
 		otyp = STRANGE_OBJECT;  /* Safe fallback */
 	}
-	char let = objects[otyp].oc_olet;
+	unsigned char let = objects[otyp].oc_olet;  /* MODERN: Use unsigned char to prevent negative values in switch */
 
 	otmp = newobj(0);
 	*otmp = zeroobj;
@@ -127,7 +127,8 @@ int otyp;
 			otmp->cursed = 1;
 		break;
 	default:
-		panic("impossible mkobj");
+		panic("impossible mkobj: unknown object class '%c' (0x%02x) for otyp %d", 
+		      (let >= 32 && let < 127) ? let : '?', let, otyp);  /* MODERN: Better error reporting */
 	}
 	otmp->owt = weight(otmp);
 	return(otmp);

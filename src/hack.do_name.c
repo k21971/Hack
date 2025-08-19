@@ -208,7 +208,7 @@ extern char *shkname();
 		    if(!rn2(2)) (void)
 		      strcpy((char *) mtmp->mextra, !rn2(5) ? plname : gn);
 		  }
-		  (void) sprintf(buf, "%s's ghost", gn);
+		  (void) snprintf(buf, BUFSZ, "%s's ghost", gn);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		}
 		break;
 	case '@':
@@ -218,7 +218,7 @@ extern char *shkname();
 		}
 		/* fall into next case */
 	default:
-		(void) sprintf(buf, "the %s%s",
+		(void) snprintf(buf, BUFSZ, "the %s%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			mtmp->minvis ? "invisible " : "",
 			mtmp->data->mname);
 	}

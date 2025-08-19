@@ -667,17 +667,17 @@ int doinvbill(int mode)		/* 0: deliver count 1: paged */
 		thisused = bp->price * uquan;
 		totused += thisused;
 		obj->quan = uquan;		/* cheat doname */
-		(void) sprintf(buf, "x -  %s", doname(obj));
+		(void) snprintf(buf, BUFSZ, "x -  %s", doname(obj));  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		obj->quan = oquan;		/* restore value */
 		for(cnt = 0; buf[cnt]; cnt++);
 		while(cnt < 50)
 			buf[cnt++] = ' ';
-		(void) sprintf(&buf[cnt], " %5ld zorkmids", thisused);
+		(void) snprintf(&buf[cnt], BUFSZ - cnt, " %5ld zorkmids", thisused);  /* MODERN: Safe sprintf replacement to prevent overflow */
 		if(page_line(buf))
 			goto quit;
 	    }
 	}
-	(void) sprintf(buf, "Total:%50ld zorkmids", totused);
+	(void) snprintf(buf, BUFSZ, "Total:%50ld zorkmids", totused);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	if(page_line("") || page_line(buf))
 		goto quit;
 	set_pager(1);

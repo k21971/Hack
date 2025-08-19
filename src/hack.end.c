@@ -440,6 +440,8 @@ void topten(void){
 		(void) outentry(0, t0, 1);
 	(void) fclose(rfile);
 unlock:
+	/* TODO: Revisit memory cleanup - current cleanup causes use-after-free errors */
+	/* Original 1984 code had no cleanup as program exits immediately after topten() */
 #ifdef ENABLE_MODERN_LOCKING
 	modern_unlock_record();
 #else
@@ -502,9 +504,9 @@ char linebuf[BUFSZ];
 	Sprintf(eos(linebuf), ".");
 	if(t1->maxhp) {
 	  char *bp = eos(linebuf);
-	  char hpbuf[10];
+	  char hpbuf[12];  /* MODERN: Buffer size increased from 10 to 12 to prevent overflow from INT_MIN (-2147483648) */
 	  int hppos;
-	  Sprintf(hpbuf, "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");
+	  snprintf(hpbuf, sizeof(hpbuf), "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");  /* MODERN: Safe sprintf replacement to prevent buffer overflow */
 	  hppos = COLNO - 7 - strlen(hpbuf);
 	  if(bp <= linebuf + hppos) {
 	    while(bp < linebuf + hppos) *bp++ = ' ';
@@ -529,7 +531,7 @@ char linebuf[BUFSZ];
 char *
 itoa(int a) {
 static char buf[12];
-	Sprintf(buf,"%d",a);
+	snprintf(buf, sizeof(buf), "%d", a);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	return(buf);
 }
 

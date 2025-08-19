@@ -279,7 +279,7 @@ gotit:
 eatx:
 	if(multi<0 && !nomovemsg){
 		static char msgbuf[BUFSZ];
-		(void) sprintf(msgbuf, "You finished eating the %s.",
+		(void) snprintf(msgbuf, BUFSZ, "You finished eating the %s.",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 				ftmp->oc_name);
 		nomovemsg = msgbuf;
 	}

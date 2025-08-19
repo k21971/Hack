@@ -38,7 +38,7 @@ boolean vis;
 		char buf[BUFSZ];
 		if(mdef->mimic) seemimic(mdef);
 		if(magr->mimic) seemimic(magr);
-		(void) sprintf(buf,"%s %s", Monnam(magr),
+		(void) snprintf(buf, BUFSZ, "%s %s", Monnam(magr),  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			hit ? "hits" : "misses");
 		pline("%s %s.", buf, monnam(mdef));
 	} else {
