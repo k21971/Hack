@@ -73,13 +73,13 @@ static uint32_t
 secure_seed(void)
 {
 #if defined(HAVE_ARC4RANDOM_BUF)
-	uint32_t s;
+	uint32_t s = 0; /* MODERN: Initialize to prevent MSan warning */
 	arc4random_buf(&s, sizeof(s));
 	return s;
 #elif defined(HAVE_ARC4RANDOM)
 	return arc4random();
 #elif defined(HAVE_GETENTROPY)
-	uint32_t s;
+	uint32_t s = 0; /* MODERN: Initialize to prevent MSan warning */
 	if (getentropy(&s, sizeof(s)) == 0) return s;
 	/* fall through on error */
 #endif
