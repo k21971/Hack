@@ -169,4 +169,5 @@ int x,y;
 		fgold = gold;
 		/* do sth with display? */
 	}
+	return gold; /* MODERN: Return gold pointer - was missing return value */
 }

@@ -334,7 +334,7 @@ int doread(void) {
 		return(1);
 	case SCR_MAGIC_MAPPING:
 	    {	struct rm *lev;
-		int num, zx, zy;
+		int num = 0, zx, zy; /* MODERN: Initialize to prevent uninitialized use */
 
 		known = TRUE;
 		pline("On this scroll %s a map!",
@@ -380,7 +380,7 @@ int doread(void) {
 		break;
 	    }
 	case SCR_FIRE:
-	    {	int num;
+	    {	int num = 0; /* MODERN: Initialize to prevent uninitialized use */
 		struct monst *mtmp;
 
 		known = TRUE;

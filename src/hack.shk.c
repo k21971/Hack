@@ -786,7 +786,7 @@ int shk_move(struct monst *shkp)
 	int udist;
 	int z;
 	schar shkroom,chi,chcnt,cnt;
-	boolean uondoor, satdoor, avoid, badinv;
+	boolean uondoor = FALSE, satdoor, avoid = FALSE, badinv = FALSE; /* MODERN: Initialize to prevent uninitialized use */
 	coord poss[9];
 	int info[9];
 	struct obj *ib = 0;

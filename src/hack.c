@@ -87,9 +87,9 @@ void seeoff(int mode)	/* 1 to redo @, 0 to leave them */
 void domove(void)
 {
 	xchar oldx,oldy;
-	struct monst *mtmp;
+	struct monst *mtmp = NULL; /* MODERN: Initialize to prevent uninitialized use */
 	struct rm *tmpr,*ust;
-	struct trap *trap;
+	struct trap *trap = NULL; /* MODERN: Initialize to prevent uninitialized use */
 	struct obj *otmp;
 
 	u_wipe_engr(rnd(5));
@@ -479,13 +479,9 @@ int pickup(int all)
 /* turn around a corner if that is the only way we can proceed */
 /* do not turn left or right twice */
 void lookaround(void){
-int x,y,i,x0,y0,m0,i0 = 9;
+int x,y,i,x0 = 0,y0 = 0,m0 = 0,i0 = 9; /* MODERN: Initialize to prevent uninitialized use */
 int corrct = 0, noturn = 0;
 struct monst *mtmp;
-#ifdef lint
-	/* suppress "used before set" message */
-	x0 = y0 = 0;
-#endif /* lint */
 	if(Blind || flags.run == 0) return;
 	/* Original 1984: if(flags.run == 1 && levl[u.ux][u.uy].typ == ROOM) return; */
 	if(flags.run == 1 && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == ROOM) return; /* MODERN: safe array indexing */

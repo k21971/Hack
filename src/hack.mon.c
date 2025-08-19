@@ -302,7 +302,7 @@ m_move(struct monst *mtmp, int after)
 	int nx,ny,omx,omy,appr,nearer,cnt,i,j;
 	xchar gx,gy,nix,niy,chcnt;
 	schar chi;
-	boolean likegold, likegems, likeobjs;
+	boolean likegold = FALSE, likegems = FALSE, likeobjs = FALSE; /* MODERN: Initialize to prevent uninitialized use */
 	char msym = mtmp->data->mlet;
 	schar mmoved = 0;	/* not strictly nec.: chi >= 0 will do */
 	coord poss[9];

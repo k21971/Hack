@@ -49,6 +49,7 @@ int doquit(void)
 	}
 	done("quit");
 	/* NOTREACHED */
+	return 1; /* MODERN: Never reached but required for return-type correctness */
 }
 
 void done1(int sig)

@@ -71,7 +71,9 @@ int bhitm(struct monst *mtmp, struct obj *otmp)
 #endif /* WAN_PROBING */
 	default:
 		impossible("What an interesting wand (%u)", otmp->otyp, 0);
+		return 0; /* Unknown wand type */
 	}
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 int bhito(struct obj *obj, struct obj *otmp)	/* object obj was hit by the effect of wand otmp */
@@ -567,7 +569,7 @@ int zhit(struct monst *mon, int type)	/* returns damage to mon */
 		     :	'@' + (otyp - DEAD_HUMAN))
 int revive(struct obj *obj)
 {
-	struct monst *mtmp;
+	struct monst *mtmp = NULL; /* MODERN: Initialize to prevent uninitialized use */
 
 	if(obj->olet == FOOD_SYM && obj->otyp > CORPSE) {
 		/* do not (yet) revive shopkeepers */
