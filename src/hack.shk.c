@@ -83,7 +83,7 @@ void shkdead(struct monst *mtmp)				/* called in mon.c */
 	struct eshk *eshk = ESHK(mtmp);
 
 	if(eshk->shoplevel == dlevel)
-		rooms[eshk->shoproom].rtype = 0;
+		rooms[(unsigned char)(unsigned char)eshk->shoproom].rtype = 0; /* MODERN: Cast to unsigned char for safe array indexing */
 	if(mtmp == shopkeeper) {
 		setpaid();
 		shopkeeper = 0;
@@ -151,7 +151,7 @@ int roomno = inroom(u.ux,u.uy);
 				total);
 			ESHK(shopkeeper)->robbed += total;
 			setpaid();
-			if((rooms[ESHK(shopkeeper)->shoproom].rtype == GENERAL)
+			if((rooms[(unsigned char)ESHK(shopkeeper)->shoproom].rtype == GENERAL)
 			    == (rn2(3) == 0))
 			    ESHK(shopkeeper)->following = 1;
 		    }
@@ -163,7 +163,7 @@ int roomno = inroom(u.ux,u.uy);
 
 	/* Did we just enter a zoo of some kind? */
 	if(roomno >= 0) {
-		int rt = rooms[roomno].rtype;
+		int rt = rooms[(unsigned char)roomno].rtype;
 		struct monst *mtmp;
 		if(rt == ZOO) {
 			pline("Welcome to David's treasure zoo!");
@@ -179,7 +179,7 @@ int roomno = inroom(u.ux,u.uy);
 		} else
 			rt = 0;
 		if(rt != 0) {
-			rooms[roomno].rtype = 0;
+			rooms[(unsigned char)roomno].rtype = 0;
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 				if(rt != ZOO || !rn2(3))
 					mtmp->msleep = 0;
@@ -187,12 +187,12 @@ int roomno = inroom(u.ux,u.uy);
 	}
 
 	/* Did we just enter a shop? */
-	if(roomno >= 0 && rooms[roomno].rtype >= 8) {
+	if(roomno >= 0 && rooms[(unsigned char)roomno].rtype >= 8) {
 	    if(shlevel != dlevel || !shopkeeper
 				 || ESHK(shopkeeper)->shoproom != roomno)
 		findshk(roomno);
 	    if(!shopkeeper) {
-		rooms[roomno].rtype = 0;
+		rooms[(unsigned char)roomno].rtype = 0;
 		u.uinshop = 0;
 	    } else if(!u.uinshop){
 		if(!ESHK(shopkeeper)->visitct ||
@@ -211,7 +211,7 @@ int roomno = inroom(u.ux,u.uy);
 			plname,
 			ESHK(shopkeeper)->visitct++ ? " again" : "",
 			shkname(shopkeeper),
-			shopnam[rooms[ESHK(shopkeeper)->shoproom].rtype - 8] );
+			shopnam[rooms[(unsigned char)ESHK(shopkeeper)->shoproom].rtype - 8] );
 		    box = carrying(ICE_BOX);
 		    pick = carrying(PICK_AXE);
 		    if(box || pick) {
@@ -415,7 +415,7 @@ int pass, tmp;
 	}
 	pline("Thank you for shopping in %s's %s store!",
 		shkname(shopkeeper),
-		shopnam[rooms[ESHK(shopkeeper)->shoproom].rtype - 8]);
+		shopnam[rooms[(unsigned char)ESHK(shopkeeper)->shoproom].rtype - 8]);
 	NOTANGRY(shopkeeper) = 1;
 	return(1);
 }
@@ -598,7 +598,7 @@ struct bill_x *bp;
 		inroom(shopkeeper->mx,shopkeeper->my) != ESHK(shopkeeper)->shoproom)
 		return;
 	if(ESHK(shopkeeper)->billct == BILLSZ ||
-	  ((tmp = shtypes[rooms[ESHK(shopkeeper)->shoproom].rtype-8]) && tmp != obj->olet)
+	  ((tmp = shtypes[rooms[(unsigned char)ESHK(shopkeeper)->shoproom].rtype-8]) && tmp != obj->olet)
 	  || index("_0", obj->olet)) {
 		pline("%s seems not interested.", Monnam(shopkeeper));
 		return;
@@ -880,7 +880,7 @@ int shk_move(struct monst *shkp)
 	cnt = mfndpos(shkp,poss,info,ALLOW_SSM);
 	if(avoid && uondoor) {		/* perhaps we cannot avoid him */
 		for(i=0; i<cnt; i++)
-			if(!(info[i] & NOTONL)) goto notonl_ok;
+			if(!(info[(unsigned char)i] & NOTONL)) goto notonl_ok; /* MODERN: Cast to unsigned char for safe array indexing */
 		avoid = FALSE;
 	notonl_ok:
 		;
@@ -888,9 +888,9 @@ int shk_move(struct monst *shkp)
 	chi = -1;
 	chcnt = 0;
 	for(i=0; i<cnt; i++){
-		nx = poss[i].x;
-		ny = poss[i].y;
-	   	if(levl[nx][ny].typ == ROOM
+		nx = poss[(unsigned char)i].x; /* MODERN: Cast to unsigned char for safe array indexing */
+		ny = poss[(unsigned char)i].y; /* MODERN: Cast to unsigned char for safe array indexing */
+	   	if(levl[(unsigned char)nx][(unsigned char)ny].typ == ROOM
 		|| shkroom != ESHK(shkp)->shoproom
 		|| ESHK(shkp)->following) {
 #ifdef STUPID

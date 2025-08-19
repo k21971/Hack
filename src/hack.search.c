@@ -15,10 +15,10 @@ int findit(void)	/* returns number of things found */
 	unsigned char lx,hx,ly,hy;
 
 	if(u.uswallow) return(0);
-	for(lx = (unsigned char)u.ux; (num = levl[lx-1][u.uy].typ) && num != CORR; lx--) ;
-	for(hx = (unsigned char)u.ux; (num = levl[hx+1][u.uy].typ) && num != CORR; hx++) ;
-	for(ly = (unsigned char)u.uy; (num = levl[u.ux][ly-1].typ) && num != CORR; ly--) ;
-	for(hy = (unsigned char)u.uy; (num = levl[u.ux][hy+1].typ) && num != CORR; hy++) ;
+	for(lx = (unsigned char)u.ux; (num = levl[(unsigned char)(lx-1)][(unsigned char)u.uy].typ) && num != CORR; lx--) ; /* MODERN: Cast to unsigned char for safe array indexing */
+	for(hx = (unsigned char)u.ux; (num = levl[(unsigned char)(hx+1)][(unsigned char)u.uy].typ) && num != CORR; hx++) ; /* MODERN: Cast to unsigned char for safe array indexing */
+	for(ly = (unsigned char)u.uy; (num = levl[(unsigned char)u.ux][(unsigned char)(ly-1)].typ) && num != CORR; ly--) ; /* MODERN: Cast to unsigned char for safe array indexing */
+	for(hy = (unsigned char)u.uy; (num = levl[(unsigned char)u.ux][(unsigned char)(hy+1)].typ) && num != CORR; hy++) ; /* MODERN: Cast to unsigned char for safe array indexing */
 	num = 0;
 	for(zy = ly; zy <= hy; zy++)
 		for(zx = lx; zx <= hx; zx++) {

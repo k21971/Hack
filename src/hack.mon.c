@@ -345,7 +345,7 @@ m_move(struct monst *mtmp, int after)
 /* teleport if that lies in our nature ('t') or when badly wounded ('1') */
 	if((msym == 't' && !rn2(5))
 	|| (msym == '1' && (mtmp->mhp < 7 || (!xdnstair && !rn2(5))
-		|| levl[u.ux][u.uy].typ == STAIRS))) {
+		|| levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == STAIRS))) { /* MODERN: Cast to unsigned char for safe array indexing */
 		if(mtmp->mhp < 7 || (msym == 't' && rn2(2)))
 			rloc(mtmp);
 		else
@@ -470,13 +470,13 @@ not_special:
 	nxti:	;
 	}
 	if(mmoved){
-		if(info[chi] & ALLOW_M){
+		if(info[(unsigned char)chi] & ALLOW_M){ /* MODERN: Cast to unsigned char for safe array indexing */
 			mtmp2 = m_at(nix,niy);
 			if(hitmm(mtmp,mtmp2) == 1 && rn2(4) &&
 			  hitmm(mtmp2,mtmp) == 2) return(2);
 			return(0);
 		}
-		if(info[chi] & ALLOW_U){
+		if(info[(unsigned char)chi] & ALLOW_U){ /* MODERN: Cast to unsigned char for safe array indexing */
 		  (void) hitu(mtmp, d(mtmp->data->damn, mtmp->data->damd)+1);
 		  return(0);
 		}
@@ -516,7 +516,7 @@ struct gold *gold;
 	while(gold = g_at(mtmp->mx, mtmp->my)){
 		mtmp->mgold += gold->amount;
 		freegold(gold);
-		if(levl[mtmp->mx][mtmp->my].scrsym == '$')
+		if(levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym == '$') /* MODERN: Cast to unsigned char for safe array indexing */
 			newsym(mtmp->mx, mtmp->my);
 	}
 }
@@ -531,7 +531,7 @@ struct obj *otmp;
 	if(mtmp->data->mlet != 'u' || objects[otmp->otyp].g_val != 0){
 		freeobj(otmp);
 		mpickobj(mtmp, otmp);
-		if(levl[mtmp->mx][mtmp->my].scrsym == GEM_SYM)
+		if(levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym == GEM_SYM) /* MODERN: Cast to unsigned char for safe array indexing */
 			newsym(mtmp->mx, mtmp->my);	/* %% */
 		return;	/* pick only one object */
 	}
