@@ -900,7 +900,7 @@ int shk_move(struct monst *shkp)
 		    if(uondoor && (ib = sobj_at(ICE_BOX, nx, ny))) {
 			nix = nx; niy = ny; chi = i; break;
 		    }
-		    if(avoid && (info[i] & NOTONL))
+		    if(avoid && (info[(unsigned char)i] & NOTONL)) /* MODERN: Cast to unsigned char for safe array indexing */
 			continue;
 		    if((!appr && !rn2(++chcnt)) ||
 #ifdef STUPID
@@ -916,12 +916,12 @@ int shk_move(struct monst *shkp)
 		}
 	}
 	if(nix != omx || niy != omy){
-		if(info[chi] & ALLOW_M){
+		if(info[(unsigned char)chi] & ALLOW_M){ /* MODERN: Cast to unsigned char for safe array indexing */
 			mtmp = m_at(nix,niy);
 			if(hitmm(shkp,mtmp) == 1 && rn2(3) &&
 			   hitmm(mtmp,shkp) == 2) return(2);
 			return(0);
-		} else if(info[chi] & ALLOW_U){
+		} else if(info[(unsigned char)chi] & ALLOW_U){ /* MODERN: Cast to unsigned char for safe array indexing */
 			(void) hitu(shkp, d(mdat->damn, mdat->damd)+1);
 			return(0);
 		}
