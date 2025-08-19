@@ -17,12 +17,16 @@
 /* Function prototypes */
 extern int bwrite(int fd, char *buf, int len);
 extern int mread(int fd, char *buf, int len);
-extern void error(char *s, ...);
-extern void panic(char *str, ...);
+/* MODERN: CONST-CORRECTNESS: error message is read-only */
+extern void error(const char *s, ...);
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+extern void panic(const char *str, ...);
 extern int rn2(int x);
 extern void *alloc(unsigned lth);
-extern void cornline(int mode, char *text);
-extern void pline(char *line, ...);
+/* MODERN: CONST-CORRECTNESS: cornline text is read-only */
+extern void cornline(int mode, const char *text);
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+extern void pline(const char *line, ...);
 extern char *typename(int otyp);
 
 /* Forward declarations for functions defined in this file */

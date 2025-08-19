@@ -23,7 +23,8 @@ extern char plname[], pl_character[];
 extern void paybill(void);
 extern void savebones(void);
 extern void outrip(void);
-extern void settty(char *);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *);
 
 /* Forward declarations for functions in this file */
 void topten(void);
@@ -94,7 +95,8 @@ static char buf[BUFSZ];
 /* called with arg "died", "drowned", "escaped", "quit", "choked", "panicked",
    "burned", "starved" or "tricked" */
 /* Be careful not to call panic from here! */
-void done(char *st1)
+/* MODERN: CONST-CORRECTNESS: death reason string is read-only */
+void done(const char *st1)
 {
 
 #ifdef WIZARD

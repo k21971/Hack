@@ -39,7 +39,8 @@ swallowed(void)
 boolean panicking;
 
 void
-panic(char *str, ...)
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+panic(const char *str, ...)
 {
 	if(panicking++) exit(1);    /* avoid loops - this should never happen*/
 	home();

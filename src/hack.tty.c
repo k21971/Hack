@@ -165,7 +165,8 @@ struct termstruct inittyb, curttyb;
 /* Function prototypes */
 void clearlocks(void);
 void setctty(void);
-void cgetret(char *s);
+/* MODERN: CONST-CORRECTNESS: cgetret text is read-only */
+void cgetret(const char *s);
 char *parse(void);
 extern void getioctls(void);
 extern void setioctls(void);
@@ -218,7 +219,8 @@ gettty(void){
 
 /* reset terminal to original state */
 void
-settty(char *s) {
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+settty(const char *s) {
 	clear_screen();
 	end_screen();
 	if(s) printf("%s", s);
@@ -285,7 +287,8 @@ int change = 0;
 /* fatal error */
 /*VARARGS1*/
 void
-error(char *s, ...) {
+/* MODERN: CONST-CORRECTNESS: error message is read-only */
+error(const char *s, ...) {
 	va_list args;
 	va_start(args, s);
 	if(settty_needed)
@@ -353,7 +356,8 @@ getret(void) {
 }
 
 void
-cgetret(char *s)
+/* MODERN: CONST-CORRECTNESS: cgetret text is read-only */
+cgetret(const char *s)
 {
 	putsym('\n');
 	if(flags.standout)
@@ -369,7 +373,8 @@ cgetret(char *s)
 char morc;	/* tell the outside world what char he used */
 
 void
-xwaitforspace(char *s)	/* chars allowed besides space or return */
+/* MODERN: CONST-CORRECTNESS: xwaitforspace allowed chars is read-only */
+xwaitforspace(const char *s)	/* chars allowed besides space or return */
 {
 int c;
 

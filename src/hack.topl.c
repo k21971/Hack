@@ -79,7 +79,8 @@ int cnt = OTLMAX;
 }
 
 void
-addtopl(char *s)
+/* MODERN: CONST-CORRECTNESS: addtopl message is read-only */
+addtopl(const char *s)
 {
 	curs(tlx,tly);
 	if(tlx + strlen(s) > CO) putsym('\n');
@@ -90,7 +91,8 @@ addtopl(char *s)
 }
 
 void
-xmore(char *s)	/* allowed chars besides space/return */
+/* MODERN: CONST-CORRECTNESS: xmore message is read-only */
+xmore(const char *s)	/* allowed chars besides space/return */
 {
 	if(flags.toplin) {
 		curs(tlx, tly);
@@ -119,7 +121,8 @@ more(void)
 }
 
 void
-cmore(char *s)
+/* MODERN: CONST-CORRECTNESS: cmore message is read-only */
+cmore(const char *s)
 {
 	xmore(s);
 }
@@ -138,7 +141,8 @@ clrlin(void)
 
 /*VARARGS1*/
 void
-pline(char *line, ...)
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+pline(const char *line, ...)
 {
 	char pbuf[BUFSZ];
 	char *bp = pbuf, *tl;
@@ -215,7 +219,8 @@ putsym(char c)
 }
 
 void
-putstr(char *s)
+/* MODERN: CONST-CORRECTNESS: putstr message is read-only */
+putstr(const char *s)
 {
 	while(*s) putsym(*s++);
 }
