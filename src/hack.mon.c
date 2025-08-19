@@ -103,7 +103,7 @@ movemon(void)
 		/* most monsters drown in pools */
 		{ boolean inpool, iseel;
 
-		  inpool = (levl[mtmp->mx][mtmp->my].typ == POOL);
+		  inpool = (levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ == POOL); /* MODERN: Cast to unsigned char for safe array indexing */
 		  iseel = (mtmp->data->mlet == ';');
 		  if(inpool && !iseel) {
 			if(cansee(mtmp->mx,mtmp->my))

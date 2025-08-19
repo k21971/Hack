@@ -134,10 +134,10 @@ int xx,yy;
 		}
 		/* close call (do not distinguish y==0 and y==-1) */
 		while(cnt--) {
-			xx = tc[cnt].x;
-			yy = tc[cnt].y;
+			xx = tc[(unsigned char)cnt].x; /* MODERN: Cast to unsigned char for safe array indexing */
+			yy = tc[(unsigned char)cnt].y; /* MODERN: Cast to unsigned char for safe array indexing */
 			prl(xx, yy);
-			at(xx, yy, levl[xx][yy].scrsym);
+			at(xx, yy, levl[(unsigned char)xx][(unsigned char)yy].scrsym); /* MODERN: Cast to unsigned char for safe array indexing */
 		}
 		cnt = let = 0;	/* superfluous */
 		return;
@@ -150,10 +150,10 @@ int xx,yy;
 	if(cansee(x,y)) {
 		if(cnt) delay_output(50);
 		at(x,y,let);
-		tc[cnt].x = x;
-		tc[cnt].y = y;
+		tc[(unsigned char)cnt].x = x; /* MODERN: Cast to unsigned char for safe array indexing */
+		tc[(unsigned char)cnt].y = y; /* MODERN: Cast to unsigned char for safe array indexing */
 		if(++cnt >= COLNO) panic("Tmp_at overflow?");
-		levl[x][y].new = 0;	/* prevent pline-nscr erasing --- */
+		levl[(unsigned char)x][(unsigned char)y].new = 0;	/* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char for safe array indexing */
 	}
 }
 
@@ -554,7 +554,7 @@ struct monst *mtmp;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon){
 		if(mtmp->data->mlet == ';')
 			mtmp->minvis = (u.ustuck != mtmp &&
-					levl[mtmp->mx][mtmp->my].typ == POOL);
+					levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ == POOL); /* MODERN: Cast to unsigned char for safe array indexing */
 		pmon(mtmp);
 #ifndef NOWORM
 		if(mtmp->wormno) wormsee(mtmp->wormno);

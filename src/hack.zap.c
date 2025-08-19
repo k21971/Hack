@@ -221,7 +221,7 @@ int dozap(void)
 			Tmp_at(-1, '*');	/* open call */
 			while(--digdepth >= 0) {
 				if(!isok(zx,zy)) break;
-				room = &levl[zx][zy];
+				room = &levl[(unsigned char)zx][(unsigned char)zy]; /* MODERN: Cast to unsigned char for safe array indexing */
 				Tmp_at(zx,zy);
 				if(!xdnstair){
 					if(zx < 3 || zx > COLNO-3 ||
@@ -410,14 +410,14 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy)
 	while(range-- > 0) {
 		sx += dx;
 		sy += dy;
-		if((lev = &levl[sx][sy])->typ) Tmp_at(sx,sy);
+		if((lev = &levl[(unsigned char)sx][(unsigned char)sy])->typ) Tmp_at(sx,sy); /* MODERN: Cast to unsigned char for safe array indexing */
 		else {
 			int bounce = 0;
 			if(cansee(sx-dx,sy-dy))
 				pline("The %s bounces!", fltxt);
-			if(ZAP_POS(levl[sx][sy-dy].typ))
+			if(ZAP_POS(levl[(unsigned char)sx][(unsigned char)(sy-dy)].typ)) /* MODERN: Cast to unsigned char for safe array indexing */
 				bounce = 1;
-			if(ZAP_POS(levl[sx-dx][sy].typ)) {
+			if(ZAP_POS(levl[(unsigned char)(sx-dx)][(unsigned char)sy].typ)) { /* MODERN: Cast to unsigned char for safe array indexing */
 				if(!bounce || rn2(2)) bounce = 2;
 			}
 			switch(bounce){
@@ -504,11 +504,11 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy)
 				dx = -dx;
 				dy = -dy;
 			} else {
-			  if(ZAP_POS(rmn = levl[sx][sy-dy].typ) &&
-			    (IS_ROOM(rmn) || ZAP_POS(levl[sx+dx][sy-dy].typ)))
+			  if(ZAP_POS(rmn = levl[(unsigned char)sx][(unsigned char)(sy-dy)].typ) && /* MODERN: Cast to unsigned char for safe array indexing */
+			    (IS_ROOM(rmn) || ZAP_POS(levl[(unsigned char)(sx+dx)][(unsigned char)(sy-dy)].typ))) /* MODERN: Cast to unsigned char for safe array indexing */
 				bounce = 1;
-			  if(ZAP_POS(rmn = levl[sx-dx][sy].typ) &&
-			    (IS_ROOM(rmn) || ZAP_POS(levl[sx-dx][sy+dy].typ)))
+			  if(ZAP_POS(rmn = levl[(unsigned char)(sx-dx)][(unsigned char)sy].typ) && /* MODERN: Cast to unsigned char for safe array indexing */
+			    (IS_ROOM(rmn) || ZAP_POS(levl[(unsigned char)(sx-dx)][(unsigned char)(sy+dy)].typ))) /* MODERN: Cast to unsigned char for safe array indexing */
 				if(!bounce || rn2(2))
 					bounce = 2;
 

@@ -120,7 +120,7 @@ coverage/
 # Valgrind
 *.valgrind
 vgcore.*
-logs/
+*logs/
 # Core dumps
 core
 core.*

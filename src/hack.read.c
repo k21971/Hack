@@ -458,8 +458,8 @@ void litroom(boolean on)
 	/* first produce the text (provided he is not blind) */
 	if(Blind) goto do_it;
 	if(!on) {
-		if(u.uswallow || !xdnstair || levl[u.ux][u.uy].typ == CORR ||
-		    !levl[u.ux][u.uy].lit) {
+		if(u.uswallow || !xdnstair || levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR ||
+		    !levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: Cast to unsigned char for safe array indexing */
 			pline("It seems even darker in here than before.");
 			return;
 		} else

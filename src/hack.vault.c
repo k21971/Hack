@@ -32,7 +32,8 @@ static struct permonst pm_guard =
 
 static struct monst *guard;
 static int gdlevel;
-#define	EGD	((struct egd *)(&(guard->mextra[0])))
+/* Original 1984: #define EGD ((struct egd *)(&(guard->mextra[0]))) */
+#define	EGD	((struct egd *)(void *)(&(guard->mextra[0]))) /* MODERN: Add void* cast to fix strict-aliasing violation for server deployment */
 
 static void
 restfakecorr(void)
