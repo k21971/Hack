@@ -217,7 +217,7 @@ int
 dochug(struct monst *mtmp)
 {
 	struct permonst *mdat;
-	int tmp, nearby, scared;
+	int tmp = 0, nearby = 0, scared = 0;  /* MODERN: Initialize to prevent Valgrind warnings */
 
 	if(mtmp->cham && !rn2(6))
 		(void) newcham(mtmp, &mons[dlevel+14+rn2(CMNUM-14-dlevel)]);

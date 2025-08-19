@@ -224,7 +224,6 @@ void done(char *st1)
 	exit(0);
 }
 
-#define newttentry() (struct toptenentry *) alloc(sizeof(struct toptenentry))
 #define	NAMSZ	8
 #define	DTHSZ	40
 #define	PERSMAX	1
@@ -243,10 +242,27 @@ struct toptenentry {
 	char date[7];		/* yymmdd */
 } *tt_head;
 
+/* MODERN: Static arena allocator to prevent memory leaks */
+static struct toptenentry arena[ENTRYMAX + 2];  /* +2 for t0 and safety margin */
+static int arena_used = 0;
+
+static void reset_topten_arena(void) {
+	arena_used = 0;
+	memset(arena, 0, sizeof(arena));
+}
+
+struct toptenentry *newttentry(void) {
+	if(arena_used >= ENTRYMAX + 2) {
+		panic("topten arena exhausted");
+	}
+	return &arena[arena_used++];
+}
+
 /* Forward declaration after struct definition */
 int outentry(int rank, struct toptenentry *t1, int so);
 
 void topten(void){
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	int uid = getuid();
 	int rank, rank0 = -1, rank1 = 0;
 	int occ_cnt = PERSMAX;
@@ -613,6 +629,7 @@ void charcat(char *s, char c) {
  * if argc == -1).
  */
 void prscore(int argc, char **argv) {
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	extern char *hname;
 	char **players;
 	int playerct;
