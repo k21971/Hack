@@ -49,6 +49,7 @@ int doquit(void)
 	}
 	done("quit");
 	/* NOTREACHED */
+	return 1; /* MODERN: Never reached but required for return-type correctness */
 }
 
 void done1(int sig)
@@ -224,7 +225,6 @@ void done(char *st1)
 	exit(0);
 }
 
-#define newttentry() (struct toptenentry *) alloc(sizeof(struct toptenentry))
 #define	NAMSZ	8
 #define	DTHSZ	40
 #define	PERSMAX	1
@@ -243,10 +243,27 @@ struct toptenentry {
 	char date[7];		/* yymmdd */
 } *tt_head;
 
+/* MODERN: Static arena allocator to prevent memory leaks */
+static struct toptenentry arena[ENTRYMAX + 2];  /* +2 for t0 and safety margin */
+static int arena_used = 0;
+
+static void reset_topten_arena(void) {
+	arena_used = 0;
+	memset(arena, 0, sizeof(arena));
+}
+
+struct toptenentry *newttentry(void) {
+	if(arena_used >= ENTRYMAX + 2) {
+		panic("topten arena exhausted");
+	}
+	return &arena[arena_used++];
+}
+
 /* Forward declaration after struct definition */
 int outentry(int rank, struct toptenentry *t1, int so);
 
 void topten(void){
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	int uid = getuid();
 	int rank, rank0 = -1, rank1 = 0;
 	int occ_cnt = PERSMAX;
@@ -440,6 +457,8 @@ void topten(void){
 		(void) outentry(0, t0, 1);
 	(void) fclose(rfile);
 unlock:
+	/* TODO: Revisit memory cleanup - current cleanup causes use-after-free errors */
+	/* Original 1984 code had no cleanup as program exits immediately after topten() */
 #ifdef ENABLE_MODERN_LOCKING
 	modern_unlock_record();
 #else
@@ -502,9 +521,9 @@ char linebuf[BUFSZ];
 	Sprintf(eos(linebuf), ".");
 	if(t1->maxhp) {
 	  char *bp = eos(linebuf);
-	  char hpbuf[10];
+	  char hpbuf[12];  /* MODERN: Buffer size increased from 10 to 12 to prevent overflow from INT_MIN (-2147483648) */
 	  int hppos;
-	  Sprintf(hpbuf, "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");
+	  snprintf(hpbuf, sizeof(hpbuf), "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");  /* MODERN: Safe sprintf replacement to prevent buffer overflow */
 	  hppos = COLNO - 7 - strlen(hpbuf);
 	  if(bp <= linebuf + hppos) {
 	    while(bp < linebuf + hppos) *bp++ = ' ';
@@ -529,7 +548,7 @@ char linebuf[BUFSZ];
 char *
 itoa(int a) {
 static char buf[12];
-	Sprintf(buf,"%d",a);
+	snprintf(buf, sizeof(buf), "%d", a);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	return(buf);
 }
 
@@ -611,6 +630,7 @@ void charcat(char *s, char c) {
  * if argc == -1).
  */
 void prscore(int argc, char **argv) {
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	extern char *hname;
 	char **players;
 	int playerct;

@@ -25,9 +25,7 @@ int dosave(void){
 		settty("Be seeing you ...\n");
 		exit(0);
 	}
-#ifdef lint
-	return(0);
-#endif /* lint */
+	return(0); /* MODERN: Return failure if dosave0 failed - was only under lint */
 }
 
 #ifndef NOSAVEONHANGUP

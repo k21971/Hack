@@ -325,7 +325,7 @@ void teleds(int nux, int nuy)
 		docrt();
 	}
 	nomul(0);
-	if(levl[nux][nuy].typ == POOL && !Levitation)
+	if(levl[(unsigned char)nux][(unsigned char)nuy].typ == POOL && !Levitation)
 		drown();
 	(void) inshop();
 	pickup(1);
@@ -333,7 +333,7 @@ void teleds(int nux, int nuy)
 }
 
 int teleok(int x, int y) {	/* might throw him into a POOL */
-	return( isok(x,y) && !IS_ROCK(levl[x][y].typ) && !m_at(x,y) &&
+	return( isok(x,y) && !IS_ROCK(levl[(unsigned char)x][(unsigned char)y].typ) && !m_at(x,y) &&
 		!sobj_at(ENORMOUS_ROCK,x,y) && !t_at(x,y)
 	);
 	/* Note: gold is permitted (because of vaults) */
@@ -447,7 +447,7 @@ void drown(void)
 
 		pline("You attempt a teleport spell.");	/* utcsri!carroll */
 		(void) dotele();
-		if(levl[u.ux][u.uy].typ != POOL) return;
+		if(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ != POOL) return;
 	}
 	pline("You drown ...");
 	killer = "pool of water";

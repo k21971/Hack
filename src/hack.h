@@ -39,8 +39,9 @@
 
 #include	"def.objclass.h"
 
+/* Original 1984: typedef struct { xchar x,y; } coord; */
 typedef struct {
-	xchar x,y;
+	unsigned char x,y; /* MODERN: unsigned to prevent buffer underflow */
 } coord;
 
 #include	"def.monst.h"	/* uses coord */
@@ -92,7 +93,8 @@ extern int rn2(int x);
 extern int rnd(int x);
 extern void setuwep(struct obj *obj);
 extern void freeinv(struct obj *obj);
-extern void Tmp_at(schar x, schar y);
+/* Original 1984: extern void Tmp_at(schar x, schar y); */
+extern void Tmp_at(unsigned char x, unsigned char y); /* MODERN: unsigned to prevent buffer underflow */
 extern void mnexto(struct monst *mtmp);
 extern int abon(void);
 extern void dighole(void);
@@ -418,7 +420,8 @@ extern void setclipped(void);
 extern void getret(void);
 extern void set_whole_screen(void);
 
-extern xchar xdnstair, ydnstair, xupstair, yupstair; /* stairs up and down. */
+/* Original 1984: extern xchar xdnstair, ydnstair, xupstair, yupstair; */
+extern unsigned char xdnstair, ydnstair, xupstair, yupstair; /* stairs up and down - MODERN: unsigned to prevent buffer underflow */
 
 extern xchar dlevel;
 
@@ -439,7 +442,8 @@ extern void subfrombill(struct obj *obj);
 extern void unplacebc(void);
 extern void keepdogs(void);
 extern void seeoff(int mode);
-extern void savelev(int fd, xchar lev);
+/* Original 1984: extern void savelev(int fd, xchar lev); */
+extern void savelev(int fd, unsigned char lev); /* MODERN: unsigned to prevent buffer underflow */
 
 /* FORWARD DECLARATIONS FOR hack.mon.c */
 struct engr;
@@ -619,7 +623,8 @@ extern xchar curx,cury;	/* cursor location on screen */
 
 extern coord bhitpos;	/* place where thrown weapon falls to the ground */
 
-extern xchar seehx,seelx,seehy,seely; /* where to see*/
+/* Original 1984: extern xchar seehx,seelx,seehy,seely; */
+extern unsigned char seehx,seelx,seehy,seely; /* where to see - MODERN: unsigned to prevent buffer underflow vulnerability */
 extern char *save_cm,*killer;
 
 extern xchar dlevel, maxdlevel; /* dungeon level */

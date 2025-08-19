@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 	setftty();
-	(void) sprintf(SAVEF, "save/%d%s", getuid(), plname);
+	(void) snprintf(SAVEF, sizeof(SAVEF), "save/%d%s", getuid(), plname);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	regularize(SAVEF+5);		/* avoid . or / in name */
 	if((fd = open(SAVEF,0)) >= 0 &&
 	   (uptodate(fd) || unlink(SAVEF) == 666)) {
@@ -426,7 +426,7 @@ void glo(int foo)
 
 	tf = lock;
 	while(*tf && *tf != '.') tf++;
-	(void) sprintf(tf, ".%d", foo);
+	(void) snprintf(tf, (PL_NSIZ+4) - (tf - lock), ".%d", foo);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 }
 
 /*

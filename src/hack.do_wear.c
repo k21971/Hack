@@ -71,10 +71,8 @@ int doremring(void) {
 			/* might look at morc here %% */
 		}
 	}
-	/* NOTREACHED */
-#ifdef lint
+	/* MODERN: Return 0 if no valid action taken - was only under lint */
 	return(0);
-#endif /* lint */
 }
 
 int dorr(struct obj *otmp) {

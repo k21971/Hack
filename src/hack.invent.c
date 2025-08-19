@@ -562,6 +562,7 @@ int cnt = 0;
 		switch(sym){
 		case 'a':
 			allflag = 1;
+			/* fallthrough */
 		case 'y':
 			cnt += (*fn)(otmp);
 			if(--max == 0) goto ret;
@@ -606,7 +607,7 @@ char let;
 {
 	static char li[BUFSZ];
 
-	(void) sprintf(li, "%c - %s.",
+	(void) snprintf(li, BUFSZ, "%c - %s.",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		flags.invlet_constant ? obj->invlet : let,
 		doname(obj));
 	return(li);
@@ -765,7 +766,7 @@ dolook() {
     if(gold) {
 	char gbuf[30];
 
-	(void) sprintf(gbuf, "%ld gold piece%s",
+	(void) snprintf(gbuf, sizeof(gbuf), "%ld gold piece%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		gold->amount, plur(gold->amount));
 	if(!ct++)
 	    pline("You %s here %s.", verb, gbuf);

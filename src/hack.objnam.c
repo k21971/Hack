@@ -12,39 +12,59 @@
 #include	"hack.h"
 #include <stdio.h>
 #include <string.h>
-/* MODERN ADDITION (2025): Safe string operation macros
+/* MODERN ADDITION (2025): Safe string operation functions
  * WHY: Original sprintf/strcpy/strcat unsafe with potential buffer overflows
- * HOW: Replace with bounds-checked versions using available buffer space
+ * HOW: Replace with snprintf-based safe functions with proper truncation handling
  * PRESERVES: Same functionality with identical buffer layout (PREFIX + content)
- * ADDS: Buffer overflow protection for object name generation */
+ * ADDS: Buffer overflow protection + truncation detection for object name generation
+ * 
+ * SECURITY NOTES:
+ * - All functions guarantee NUL-termination
+ * - Truncation is detected and can be handled gracefully
+ * - Uses actual buffer capacity, not global macros
+ * - Safe for ASCII only (no UTF-8 multibyte considerations in 1984 codebase)
+ */
 #define SAFE_BUF_SIZE (BUFSZ - PREFIX)  /* Available space after prefix */
 
-/* Safe macros for main object name buffer */
-#define Sprintf(buf, ...) (void) snprintf(buf, SAFE_BUF_SIZE, __VA_ARGS__)
-#define Strcat(dest, src) do { \
-    size_t dest_len = strlen(dest); \
-    size_t remaining = SAFE_BUF_SIZE - dest_len; \
-    if(remaining > 1) { \
-        (void) strncat(dest, src, remaining - 1); \
-    } \
-} while(0)
-#define	Strcpy(dest, src) do { \
-    (void) strncpy(dest, src, SAFE_BUF_SIZE - 1); \
-    (dest)[SAFE_BUF_SIZE - 1] = 0; \
-} while(0)
+/* Safe string concatenation: returns 0 on success, 1 on truncation */
+static inline int safe_strcat(char *dst, size_t cap, const char *src) {
+    size_t len = strnlen(dst, cap);
+    if (len >= cap) return -1; /* buffer already full/corrupted */
+    size_t remaining = cap - len;
+    int wrote = snprintf(dst + len, remaining, "%s", src);
+    return (wrote >= 0 && (size_t)wrote < remaining) ? 0 : 1; /* 0=ok, 1=truncated */
+}
 
-/* Safe macros for prefix buffer (smaller) */
-#define PREFIX_Strcat(dest, src) do { \
-    size_t dest_len = strlen(dest); \
-    size_t remaining = PREFIX - dest_len; \
-    if(remaining > 1) { \
-        (void) strncat(dest, src, remaining - 1); \
-    } \
-} while(0)
-#define PREFIX_Strcpy(dest, src) do { \
-    (void) strncpy(dest, src, PREFIX - 1); \
-    (dest)[PREFIX - 1] = 0; \
-} while(0)
+/* Safe string copy: returns 0 on success, 1 on truncation */
+static inline int safe_strcpy(char *dst, size_t cap, const char *src) {
+    if (cap == 0) return -1;
+    int wrote = snprintf(dst, cap, "%s", src ? src : "");
+    return (wrote >= 0 && (size_t)wrote < cap) ? 0 : 1; /* 0=ok, 1=truncated */
+}
+
+/* Force ellipsis at end of string while preserving what fit */
+static inline void force_ellipsis(char *dst, size_t cap) {
+    if (cap == 0) return;
+    size_t len = strnlen(dst, cap);
+    if (len + 4 <= cap) {                /* room to append "..." */
+        dst[len++]='.'; dst[len++]='.'; dst[len++]='.'; dst[len]='\0';
+    } else if (cap >= 4) {               /* place at very end */
+        dst[cap-4]='.'; dst[cap-3]='.'; dst[cap-2]='.'; dst[cap-1]='\0';
+    } else {                             /* cap 1..3 */
+        size_t n = cap - 1;
+        for (size_t i=0; i<n; i++) dst[i]='.';
+        dst[n]='\0';
+    }
+}
+
+/* Legacy macro compatibility - now uses safe functions */
+#define Sprintf(buf, ...) (void) snprintf(buf, SAFE_BUF_SIZE, __VA_ARGS__)
+#define Strcat(dest, src) (void) safe_strcat(dest, SAFE_BUF_SIZE, src)
+#define Strcpy(dest, src) (void) safe_strcpy(dest, SAFE_BUF_SIZE, src)
+
+/* Prefix buffer operations with truncation detection */
+#define PREFIX_Strcat(dest, src) safe_strcat(dest, PREFIX, src)
+#define PREFIX_Strcpy(dest, src) safe_strcpy(dest, PREFIX, src)
 #define	PREFIX	15
 extern char *eos(char *s);
 extern int bases[];
@@ -64,7 +84,7 @@ int i = strlen(pref);
 char *
 sitoa(a) int a; {
 static char buf[13];
-	Sprintf(buf, (a < 0) ? "%d" : "+%d", a);
+	(void) snprintf(buf, sizeof(buf), (a < 0) ? "%d" : "+%d", a);
 	return(buf);
 }
 
@@ -161,7 +181,7 @@ int pl = (obj->quan != 1);
 			break;
 		}
 		/* fungis ? */
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->otyp == WORM_TOOTH && pl) {
 			pl = 0;
@@ -173,7 +193,7 @@ int pl = (obj->quan != 1);
 			Strcpy(buf, "crysknives");
 			break;
 		}
-		/* fall into next case */
+		/* fallthrough */
 	case ARMOR_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:
@@ -307,11 +327,15 @@ char *bp = xname(obj);
 	case ARMOR_SYM:
 		if(obj->owornmask & W_ARMOR)
 			Strcat(bp, " (being worn)");
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->known) {
-			PREFIX_Strcat(prefix, sitoa(obj->spe));
-			PREFIX_Strcat(prefix, " ");
+			int rc = safe_strcat(prefix, sizeof(prefix), sitoa(obj->spe));
+			if(rc) {
+				force_ellipsis(prefix, sizeof(prefix));
+			} else {
+				(void) safe_strcat(prefix, sizeof(prefix), " ");
+			}
 		}
 		break;
 	case WAND_SYM:
@@ -322,8 +346,12 @@ char *bp = xname(obj);
 		if(obj->owornmask & W_RINGR) Strcat(bp, " (on right hand)");
 		if(obj->owornmask & W_RINGL) Strcat(bp, " (on left hand)");
 		if(obj->known && (objects[obj->otyp].bits & SPEC)) {
-			Strcat(prefix, sitoa(obj->spe));
-			Strcat(prefix, " ");
+			int rc = safe_strcat(prefix, sizeof(prefix), sitoa(obj->spe));
+			if(rc) {
+				force_ellipsis(prefix, sizeof(prefix));
+			} else {
+				(void) safe_strcat(prefix, sizeof(prefix), " ");
+			}
 		}
 		break;
 	}
@@ -351,7 +379,7 @@ aobjnam(otmp,verb) struct obj *otmp; char *verb; {
 char *bp = xname(otmp);
 char prefix[PREFIX];
 	if(otmp->quan != 1) {
-		Sprintf(prefix, "%u ", otmp->quan);
+		(void) snprintf(prefix, sizeof(prefix), "%u ", otmp->quan);
 		bp = strprepend(bp, prefix);
 	}
 
@@ -388,7 +416,8 @@ readobjnam(bp) char *bp; {
 char *p;
 int i;
 int cnt, spe, spesgn, typ, heavy;
-char let;
+/* Original 1984: char let; */
+unsigned char let;  /* MODERN: unsigned to prevent negative array indexing vulnerability */
 char *un, *dn, *an;
 /* int the = 0; char *oname = 0; */
 	cnt = spe = spesgn = typ = heavy = 0;

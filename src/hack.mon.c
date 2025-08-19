@@ -103,7 +103,7 @@ movemon(void)
 		/* most monsters drown in pools */
 		{ boolean inpool, iseel;
 
-		  inpool = (levl[mtmp->mx][mtmp->my].typ == POOL);
+		  inpool = (levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ == POOL); /* MODERN: Cast to unsigned char for safe array indexing */
 		  iseel = (mtmp->data->mlet == ';');
 		  if(inpool && !iseel) {
 			if(cansee(mtmp->mx,mtmp->my))
@@ -217,7 +217,7 @@ int
 dochug(struct monst *mtmp)
 {
 	struct permonst *mdat;
-	int tmp, nearby, scared;
+	int tmp = 0, nearby = 0, scared = 0;  /* MODERN: Initialize to prevent Valgrind warnings */
 
 	if(mtmp->cham && !rn2(6))
 		(void) newcham(mtmp, &mons[dlevel+14+rn2(CMNUM-14-dlevel)]);
@@ -302,7 +302,7 @@ m_move(struct monst *mtmp, int after)
 	int nx,ny,omx,omy,appr,nearer,cnt,i,j;
 	xchar gx,gy,nix,niy,chcnt;
 	schar chi;
-	boolean likegold, likegems, likeobjs;
+	boolean likegold = FALSE, likegems = FALSE, likeobjs = FALSE; /* MODERN: Initialize to prevent uninitialized use */
 	char msym = mtmp->data->mlet;
 	schar mmoved = 0;	/* not strictly nec.: chi >= 0 will do */
 	coord poss[9];
@@ -345,7 +345,7 @@ m_move(struct monst *mtmp, int after)
 /* teleport if that lies in our nature ('t') or when badly wounded ('1') */
 	if((msym == 't' && !rn2(5))
 	|| (msym == '1' && (mtmp->mhp < 7 || (!xdnstair && !rn2(5))
-		|| levl[u.ux][u.uy].typ == STAIRS))) {
+		|| levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == STAIRS))) { /* MODERN: Cast to unsigned char for safe array indexing */
 		if(mtmp->mhp < 7 || (msym == 't' && rn2(2)))
 			rloc(mtmp);
 		else
@@ -470,13 +470,13 @@ not_special:
 	nxti:	;
 	}
 	if(mmoved){
-		if(info[chi] & ALLOW_M){
+		if(info[(unsigned char)chi] & ALLOW_M){ /* MODERN: Cast to unsigned char for safe array indexing */
 			mtmp2 = m_at(nix,niy);
 			if(hitmm(mtmp,mtmp2) == 1 && rn2(4) &&
 			  hitmm(mtmp2,mtmp) == 2) return(2);
 			return(0);
 		}
-		if(info[chi] & ALLOW_U){
+		if(info[(unsigned char)chi] & ALLOW_U){ /* MODERN: Cast to unsigned char for safe array indexing */
 		  (void) hitu(mtmp, d(mtmp->data->damn, mtmp->data->damd)+1);
 		  return(0);
 		}
@@ -516,7 +516,7 @@ struct gold *gold;
 	while(gold = g_at(mtmp->mx, mtmp->my)){
 		mtmp->mgold += gold->amount;
 		freegold(gold);
-		if(levl[mtmp->mx][mtmp->my].scrsym == '$')
+		if(levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym == '$') /* MODERN: Cast to unsigned char for safe array indexing */
 			newsym(mtmp->mx, mtmp->my);
 	}
 }
@@ -531,7 +531,7 @@ struct obj *otmp;
 	if(mtmp->data->mlet != 'u' || objects[otmp->otyp].g_val != 0){
 		freeobj(otmp);
 		mpickobj(mtmp, otmp);
-		if(levl[mtmp->mx][mtmp->my].scrsym == GEM_SYM)
+		if(levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym == GEM_SYM) /* MODERN: Cast to unsigned char for safe array indexing */
 			newsym(mtmp->mx, mtmp->my);	/* %% */
 		return;	/* pick only one object */
 	}

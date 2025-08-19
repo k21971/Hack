@@ -30,7 +30,8 @@ extern long wgrowtime[32];
 
 boolean level_exists[MAXLEVEL+1];
 
-void savelev(int fd, xchar lev)
+/* Original 1984: void savelev(int fd, xchar lev) */
+void savelev(int fd, unsigned char lev) /* MODERN: unsigned to prevent buffer underflow */
 {
 #ifndef NOWORM
 	struct wseg *wtmp, *wtmp2;

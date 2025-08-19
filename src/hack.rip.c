@@ -37,9 +37,9 @@ void outrip(void){
 	(void) strcpy(buf, plname);
 	buf[16] = 0;
 	center(6, buf);
-	(void) sprintf(buf, "%ld AU", u.ugold);
+	(void) snprintf(buf, BUFSZ, "%ld AU", u.ugold);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	center(7, buf);
-	(void) sprintf(buf, "killed by%s",
+	(void) snprintf(buf, BUFSZ, "killed by%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		!strncmp(killer, "the ", 4) ? "" :
 		!strcmp(killer, "starvation") ? "" :
 		index(vowels, *killer) ? " an" : " a");
@@ -56,7 +56,7 @@ void outrip(void){
 		buf[i0] = 0;
 	}
 	center(9, buf);
-	(void) sprintf(buf, "%4d", getyear());
+	(void) snprintf(buf, BUFSZ, "%4d", getyear());  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	center(11, buf);
 	for(y=8; rip[dp][0]; y++,dp++){
 		x = 0;

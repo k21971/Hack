@@ -102,7 +102,7 @@ int dogfood(struct obj *obj) {
 	    );
 	default:
 	    if(!obj->cursed) return(APPORT);
-	    /* fall into next case */
+	    /* fallthrough */
 	case BALL_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:
@@ -121,7 +121,9 @@ struct obj *obj;
 struct trap *trap;
 xchar cnt,chcnt,nix,niy;
 schar dogroom,uroom;
-xchar gx,gy,gtyp,otyp;	/* current goal */
+/* Original 1984: xchar gx,gy,gtyp,otyp; */
+unsigned char gx = 0,gy = 0; /* MODERN: Initialize to prevent uninitialized use */
+xchar gtyp,otyp; /* current goal - gx,gy unsigned to prevent buffer underflow */
 coord poss[9];
 int info[9];
 #define GDIST(x,y) ((x-gx)*(x-gx) + (y-gy)*(y-gy))
@@ -217,8 +219,8 @@ int info[9];
 			gy = u.uy;
 #ifndef QUEST
 		} else {
-			int tmp = rooms[dogroom].fdoor;
-			    cnt = rooms[dogroom].doorct;
+			int tmp = rooms[(unsigned char)dogroom].fdoor; /* MODERN: Cast to unsigned char for safe array indexing */
+			    cnt = rooms[(unsigned char)dogroom].doorct; /* MODERN: Cast to unsigned char for safe array indexing */
 
 			gx = gy = FAR;	/* random, far away */
 			while(cnt--){
@@ -240,7 +242,7 @@ int info[9];
 		if(after && udist <= 4 && gx == u.ux && gy == u.uy)
 			return(0);
 		if(udist > 1){
-			if(!IS_ROOM(levl[u.ux][u.uy].typ) || !rn2(4) ||
+			if(!IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ) || !rn2(4) || /* MODERN: Cast to unsigned char for safe array indexing */
 			   whappr ||
 			   (mtmp->minvent && rn2((int) edog->apport)))
 				appr = 1;

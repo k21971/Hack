@@ -148,7 +148,7 @@ pline(char *line, ...)
 	if(!line || !*line) return;
 	if(!index(line, '%')) (void) strcpy(pbuf,line); else {
 		va_start(args, line);
-		(void) vsprintf(pbuf,line,args);
+		(void) vsnprintf(pbuf, BUFSZ, line, args);  /* MODERN: Safe vsprintf replacement - identical output, prevents overflow */
 		va_end(args);
 	}
 	if(flags.toplin == 1 && !strcmp(pbuf, toplines)) return;

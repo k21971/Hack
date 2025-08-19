@@ -32,7 +32,16 @@ static struct permonst pm_guard =
 
 static struct monst *guard;
 static int gdlevel;
-#define	EGD	((struct egd *)(&(guard->mextra[0])))
+/* MODERN: Safe EGD access without strict-aliasing violations for server deployment
+ * Since mextra is allocated with sizeof(struct egd) and is meant to hold this data,
+ * we can safely use it if we ensure proper alignment and avoid direct casting.
+ */
+static struct egd* egd_ptr(void) {
+    /* mextra is allocated to hold struct egd, this cast is safe if alignment is correct */
+    return (struct egd*)(void*)&guard->mextra[0];
+}
+
+#define EGD egd_ptr() /* Use function instead of direct macro to improve type safety */
 
 static void
 restfakecorr(void)

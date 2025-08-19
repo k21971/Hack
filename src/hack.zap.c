@@ -71,7 +71,9 @@ int bhitm(struct monst *mtmp, struct obj *otmp)
 #endif /* WAN_PROBING */
 	default:
 		impossible("What an interesting wand (%u)", otmp->otyp, 0);
+		return 0; /* Unknown wand type */
 	}
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 int bhito(struct obj *obj, struct obj *otmp)	/* object obj was hit by the effect of wand otmp */
@@ -221,7 +223,7 @@ int dozap(void)
 			Tmp_at(-1, '*');	/* open call */
 			while(--digdepth >= 0) {
 				if(!isok(zx,zy)) break;
-				room = &levl[zx][zy];
+				room = &levl[(unsigned char)zx][(unsigned char)zy]; /* MODERN: Cast to unsigned char for safe array indexing */
 				Tmp_at(zx,zy);
 				if(!xdnstair){
 					if(zx < 3 || zx > COLNO-3 ||
@@ -410,14 +412,14 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy)
 	while(range-- > 0) {
 		sx += dx;
 		sy += dy;
-		if((lev = &levl[sx][sy])->typ) Tmp_at(sx,sy);
+		if((lev = &levl[(unsigned char)sx][(unsigned char)sy])->typ) Tmp_at(sx,sy); /* MODERN: Cast to unsigned char for safe array indexing */
 		else {
 			int bounce = 0;
 			if(cansee(sx-dx,sy-dy))
 				pline("The %s bounces!", fltxt);
-			if(ZAP_POS(levl[sx][sy-dy].typ))
+			if(ZAP_POS(levl[(unsigned char)sx][(unsigned char)(sy-dy)].typ)) /* MODERN: Cast to unsigned char for safe array indexing */
 				bounce = 1;
-			if(ZAP_POS(levl[sx-dx][sy].typ)) {
+			if(ZAP_POS(levl[(unsigned char)(sx-dx)][(unsigned char)sy].typ)) { /* MODERN: Cast to unsigned char for safe array indexing */
 				if(!bounce || rn2(2)) bounce = 2;
 			}
 			switch(bounce){
@@ -504,11 +506,11 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy)
 				dx = -dx;
 				dy = -dy;
 			} else {
-			  if(ZAP_POS(rmn = levl[sx][sy-dy].typ) &&
-			    (IS_ROOM(rmn) || ZAP_POS(levl[sx+dx][sy-dy].typ)))
+			  if(ZAP_POS(rmn = levl[(unsigned char)sx][(unsigned char)(sy-dy)].typ) && /* MODERN: Cast to unsigned char for safe array indexing */
+			    (IS_ROOM(rmn) || ZAP_POS(levl[(unsigned char)(sx+dx)][(unsigned char)(sy-dy)].typ))) /* MODERN: Cast to unsigned char for safe array indexing */
 				bounce = 1;
-			  if(ZAP_POS(rmn = levl[sx-dx][sy].typ) &&
-			    (IS_ROOM(rmn) || ZAP_POS(levl[sx-dx][sy+dy].typ)))
+			  if(ZAP_POS(rmn = levl[(unsigned char)(sx-dx)][(unsigned char)sy].typ) && /* MODERN: Cast to unsigned char for safe array indexing */
+			    (IS_ROOM(rmn) || ZAP_POS(levl[(unsigned char)(sx-dx)][(unsigned char)(sy+dy)].typ))) /* MODERN: Cast to unsigned char for safe array indexing */
 				if(!bounce || rn2(2))
 					bounce = 2;
 
@@ -567,7 +569,7 @@ int zhit(struct monst *mon, int type)	/* returns damage to mon */
 		     :	'@' + (otyp - DEAD_HUMAN))
 int revive(struct obj *obj)
 {
-	struct monst *mtmp;
+	struct monst *mtmp = NULL; /* MODERN: Initialize to prevent uninitialized use */
 
 	if(obj->olet == FOOD_SYM && obj->otyp > CORPSE) {
 		/* do not (yet) revive shopkeepers */
