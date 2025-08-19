@@ -102,7 +102,7 @@ int dogfood(struct obj *obj) {
 	    );
 	default:
 	    if(!obj->cursed) return(APPORT);
-	    /* fall into next case */
+	    /* fallthrough */
 	case BALL_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:

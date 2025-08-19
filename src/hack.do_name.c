@@ -213,6 +213,7 @@ extern char *shkname();
 		break;
 	case '@':
 		if(mtmp->isshk) {
+                        /* fallthrough after return */
 			(void) strcpy(buf, shkname(mtmp));
 			break;
 		}

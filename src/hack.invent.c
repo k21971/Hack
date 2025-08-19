@@ -562,6 +562,7 @@ int cnt = 0;
 		switch(sym){
 		case 'a':
 			allflag = 1;
+			/* fallthrough */
 		case 'y':
 			cnt += (*fn)(otmp);
 			if(--max == 0) goto ret;

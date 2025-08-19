@@ -181,7 +181,7 @@ int pl = (obj->quan != 1);
 			break;
 		}
 		/* fungis ? */
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->otyp == WORM_TOOTH && pl) {
 			pl = 0;
@@ -193,7 +193,7 @@ int pl = (obj->quan != 1);
 			Strcpy(buf, "crysknives");
 			break;
 		}
-		/* fall into next case */
+		/* fallthrough */
 	case ARMOR_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:
@@ -327,7 +327,7 @@ char *bp = xname(obj);
 	case ARMOR_SYM:
 		if(obj->owornmask & W_ARMOR)
 			Strcat(bp, " (being worn)");
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->known) {
 			int rc = safe_strcat(prefix, sizeof(prefix), sitoa(obj->spe));

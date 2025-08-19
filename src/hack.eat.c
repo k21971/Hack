@@ -427,11 +427,11 @@ int tp = 0;
 	case 'n':
 		u.uhp = u.uhpmax;
 		flags.botl = 1;
-		/* fall into next case */
+		/* fallthrough */
 	case '@':
 		pline("You cannibal! You will be sorry for this!");
 		/* not tp++; */
-		/* fall into next case */
+		/* fallthrough */
 	case 'd':
 		Aggravate_monster |= INTRINSIC;
 		break;
@@ -444,12 +444,12 @@ int tp = 0;
 			Invis |= INTRINSIC;
 			See_invisible |= INTRINSIC;
 		}
-		/* fall into next case */
+		/* fallthrough */
 	case 'y':
 #ifdef QUEST
 		u.uhorizon++;
 #endif /* QUEST */
-		/* fall into next case */
+		/* fallthrough */
 	case 'B':
 		Confusion = 50;
 		break;

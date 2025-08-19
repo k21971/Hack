@@ -134,7 +134,7 @@ void inrange(struct monst *mtmp)
 		    case 1:
 			pline("\"Destroy the thief, my pets!\"");
 			aggravate();	/* aggravate all the monsters */
-			/* fall into next case */
+			/* fallthrough */
 		    case 2:
 			if (flags.no_of_wizards == 1 && rnd(5) == 0)
 			    /* if only 1 wizard, clone himself */

@@ -246,6 +246,7 @@ addrs(int lowx, int lowy, int hix, int hiy)
 		if(hx - hix > 2*xlim + 4)
 			addrsx(hix+2,ly,hx,hy,discarded);
 	}
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 int
