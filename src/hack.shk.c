@@ -64,7 +64,8 @@ char shtypes[] = {	/* 8 shoptypes: 7 specialized, 1 mixed */
 	POTION_SYM, ARMOR_SYM, 0
 };
 
-static char *shopnam[] = {
+/* MODERN: CONST-CORRECTNESS: shop name strings are read-only */
+static const char *const shopnam[] = {
 	"engagement ring", "walking cane", "antique weapon",
 	"delicatessen", "second hand book", "liquor",
 	"used armor", "assorted antiques"

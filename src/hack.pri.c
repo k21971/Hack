@@ -9,7 +9,8 @@
 #include "hack.h"
 xchar scrlx, scrhx, scrly, scrhy;	/* corners of new area on screen */
 
-extern char *hu_stat[];	/* in eat.c */
+/* MODERN: CONST-CORRECTNESS: match hu_stat[] definition (read-only string table) */
+extern const char *const hu_stat[];	/* in eat.c */
 extern char *CD;
 
 void

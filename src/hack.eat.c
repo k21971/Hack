@@ -40,7 +40,8 @@ int unfaint(void);
 #define FAINTED		5
 #define STARVED		6
 
-char *hu_stat[] = {
+/* MODERN: CONST-CORRECTNESS: hunger status strings are read-only */
+const char *const hu_stat[] = {
 	"Satiated",
 	"        ",
 	"Hungry  ",

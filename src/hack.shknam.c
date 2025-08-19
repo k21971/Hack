@@ -74,7 +74,8 @@ const char *const shkrings[] = {
 	0
 };
 
-char *shkfoods[] = {
+/* MODERN: CONST-CORRECTNESS: food shop owner names are read-only */
+const char *const shkfoods[] = {
 	/* Indonesia */
 	"Djasinga", "Tjibarusa", "Tjiwidej", "Pengalengan",
 	"Bandjar", "Parbalingga", "Bojolali", "Sarangan",

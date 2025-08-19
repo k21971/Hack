@@ -71,11 +71,13 @@ typedef struct {
 #include	"def.mkroom.h"
 
 extern void *alloc(unsigned lth);
-extern void panic(char *str, ...);
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+extern void panic(const char *str, ...);
 
 /* Critical missing function prototypes */
 extern int carrying(int type);
-extern void pline(char *line, ...);
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+extern void pline(const char *line, ...);
 extern void nomul(int nturns);
 extern int doredotopl(void);
 extern void redotoplin(void);
@@ -204,7 +206,8 @@ extern char morc;
 extern struct wseg *wsegs[32];
 
 /* Function prototypes */
-extern void error(char *s, ...);
+/* MODERN: CONST-CORRECTNESS: error message is read-only */
+extern void error(const char *s, ...);
 extern void initoptions(void);
 extern void prscore(int argc, char **argv);
 extern void gettty(void);
@@ -585,7 +588,8 @@ struct you {
 
 extern struct you u;
 
-extern char *traps[];
+/* MODERN: CONST-CORRECTNESS: match traps[] definition (read-only string table) */
+extern const char *const traps[];
 extern char *aobjnam();
 extern char readchar();
 

@@ -75,7 +75,8 @@ extern void relobj(struct monst *mtmp, int flag);
 int warnlevel;		/* used by movemon and dochugw */
 long lastwarntime;
 int lastwarnlev;
-char *warnings[] = {
+/* MODERN: CONST-CORRECTNESS: warning color strings are read-only */
+const char *const warnings[] = {
 	"white", "pink", "red", "ruby", "purple", "black"
 };
 

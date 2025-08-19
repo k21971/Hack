@@ -16,7 +16,8 @@ static int goodpos(int x, int y) {
 	   ));
 }
 
-char *fl[]= {
+/* MODERN: CONST-CORRECTNESS: flash effect strings are read-only */
+const char *const fl[]= {
 	"magic missile",
 	"bolt of fire",
 	"sleep ray",
