@@ -416,7 +416,8 @@ readobjnam(bp) char *bp; {
 char *p;
 int i;
 int cnt, spe, spesgn, typ, heavy;
-char let;
+/* Original 1984: char let; */
+unsigned char let;  /* MODERN: unsigned to prevent negative array indexing vulnerability */
 char *un, *dn, *an;
 /* int the = 0; char *oname = 0; */
 	cnt = spe = spesgn = typ = heavy = 0;

@@ -9,16 +9,16 @@ extern struct monst *makemon();
 int findit(void)	/* returns number of things found */
 {
 	int num;
-	xchar zx,zy;
+	unsigned char zx,zy;
 	struct trap *ttmp;
 	struct monst *mtmp;
-	xchar lx,hx,ly,hy;
+	unsigned char lx,hx,ly,hy;
 
 	if(u.uswallow) return(0);
-	for(lx = u.ux; (num = levl[lx-1][u.uy].typ) && num != CORR; lx--) ;
-	for(hx = u.ux; (num = levl[hx+1][u.uy].typ) && num != CORR; hx++) ;
-	for(ly = u.uy; (num = levl[u.ux][ly-1].typ) && num != CORR; ly--) ;
-	for(hy = u.uy; (num = levl[u.ux][hy+1].typ) && num != CORR; hy++) ;
+	for(lx = (unsigned char)u.ux; (num = levl[lx-1][u.uy].typ) && num != CORR; lx--) ;
+	for(hx = (unsigned char)u.ux; (num = levl[hx+1][u.uy].typ) && num != CORR; hx++) ;
+	for(ly = (unsigned char)u.uy; (num = levl[u.ux][ly-1].typ) && num != CORR; ly--) ;
+	for(hy = (unsigned char)u.uy; (num = levl[u.ux][hy+1].typ) && num != CORR; hy++) ;
 	num = 0;
 	for(zy = ly; zy <= hy; zy++)
 		for(zx = lx; zx <= hx; zx++) {
@@ -51,7 +51,7 @@ int findit(void)	/* returns number of things found */
 
 int dosearch(void)
 {
-	xchar x,y;
+	unsigned char x,y;
 	struct trap *trap;
 	struct monst *mtmp;
 
@@ -60,8 +60,8 @@ int dosearch(void)
 		return(1);
 	}
 	else
-	for(x = u.ux-1; x < u.ux+2; x++)
-	for(y = u.uy-1; y < u.uy+2; y++) if(x != u.ux || y != u.uy) {
+	for(x = (unsigned char)(u.ux-1); x < (unsigned char)(u.ux+2); x++)
+	for(y = (unsigned char)(u.uy-1); y < (unsigned char)(u.uy+2); y++) if(x != (unsigned char)u.ux || y != (unsigned char)u.uy) {
 		if(levl[x][y].typ == SDOOR) {
 			if(rn2(7)) continue;
 			levl[x][y].typ = DOOR;

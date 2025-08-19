@@ -418,7 +418,8 @@ extern void setclipped(void);
 extern void getret(void);
 extern void set_whole_screen(void);
 
-extern xchar xdnstair, ydnstair, xupstair, yupstair; /* stairs up and down. */
+/* Original 1984: extern xchar xdnstair, ydnstair, xupstair, yupstair; */
+extern unsigned char xdnstair, ydnstair, xupstair, yupstair; /* stairs up and down - MODERN: unsigned to prevent buffer underflow */
 
 extern xchar dlevel;
 
@@ -619,7 +620,8 @@ extern xchar curx,cury;	/* cursor location on screen */
 
 extern coord bhitpos;	/* place where thrown weapon falls to the ground */
 
-extern xchar seehx,seelx,seehy,seely; /* where to see*/
+/* Original 1984: extern xchar seehx,seelx,seehy,seely; */
+extern unsigned char seehx,seelx,seehy,seely; /* where to see - MODERN: unsigned to prevent buffer underflow vulnerability */
 extern char *save_cm,*killer;
 
 extern xchar dlevel, maxdlevel; /* dungeon level */

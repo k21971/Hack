@@ -65,7 +65,8 @@ void seeoff(int mode)	/* 1 to redo @, 0 to leave them */
 
 	if(u.udispl && mode){
 		u.udispl = 0;
-		levl[u.udisx][u.udisy].scrsym = news0(u.udisx,u.udisy);
+		/* Original 1984: levl[u.udisx][u.udisy].scrsym = news0(u.udisx,u.udisy); */
+		levl[(unsigned char)u.udisx][(unsigned char)u.udisy].scrsym = news0(u.udisx,u.udisy); /* MODERN: safe array indexing */
 	}
 #ifndef QUEST
 	if(seehx) {
@@ -115,7 +116,8 @@ void domove(void)
 		}
 	}
 
-	ust = &levl[u.ux][u.uy];
+	/* Original 1984: ust = &levl[u.ux][u.uy]; */
+	ust = &levl[(unsigned char)u.ux][(unsigned char)u.uy]; /* MODERN: safe array indexing */
 	oldx = u.ux;
 	oldy = u.uy;
 	if(!u.uswallow && (trap = t_at(u.ux+u.dx, u.uy+u.dy)) && trap->tseen)
@@ -155,7 +157,8 @@ void domove(void)
 		}
 		return;
 	}
-	tmpr = &levl[u.ux+u.dx][u.uy+u.dy];
+	/* Original 1984: tmpr = &levl[u.ux+u.dx][u.uy+u.dy]; */
+	tmpr = &levl[(unsigned char)(u.ux+u.dx)][(unsigned char)(u.uy+u.dy)]; /* MODERN: safe array indexing */
 	if(IS_ROCK(tmpr->typ) ||
 	   (u.dx && u.dy && (tmpr->typ == DOOR || ust->typ == DOOR))){
 		flags.move = 0;
@@ -166,8 +169,9 @@ void domove(void)
 		xchar rx = u.ux+2*u.dx, ry = u.uy+2*u.dy;
 		struct trap *ttmp;
 		nomul(0);
-		if(isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) &&
-		    (levl[rx][ry].typ != DOOR || !(u.dx && u.dy)) &&
+		/* Original 1984: if(isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) && (levl[rx][ry].typ != DOOR || !(u.dx && u.dy)) && */
+		if(isok(rx,ry) && !IS_ROCK(levl[(unsigned char)rx][(unsigned char)ry].typ) &&
+		    (levl[(unsigned char)rx][(unsigned char)ry].typ != DOOR || !(u.dx && u.dy)) && /* MODERN: safe array indexing */
 		    !sobj_at(ENORMOUS_ROCK, rx, ry)) {
 			if(m_at(rx,ry)) {
 			    pline("You hear a monster behind the rock.");
@@ -187,8 +191,9 @@ void domove(void)
 				delobj(otmp);
 				continue;
 			    }
-			if(levl[rx][ry].typ == POOL) {
-				levl[rx][ry].typ = ROOM;
+			/* Original 1984: if(levl[rx][ry].typ == POOL) { levl[rx][ry].typ = ROOM; */
+			if(levl[(unsigned char)rx][(unsigned char)ry].typ == POOL) {
+				levl[(unsigned char)rx][(unsigned char)ry].typ = ROOM; /* MODERN: safe array indexing */
 				mnewsym(rx,ry);
 				prl(rx,ry);
 				pline("You push the rock into the water.");
@@ -213,16 +218,18 @@ void domove(void)
 		    pline("You try to move the enormous rock, but in vain.");
 	    cannot_push:
 		    if((!invent || inv_weight()+90 <= 0) &&
-			(!u.dx || !u.dy || (IS_ROCK(levl[u.ux][u.uy+u.dy].typ)
-					&& IS_ROCK(levl[u.ux+u.dx][u.uy].typ)))){
+			/* Original 1984: (!u.dx || !u.dy || (IS_ROCK(levl[u.ux][u.uy+u.dy].typ) && IS_ROCK(levl[u.ux+u.dx][u.uy].typ))){ */
+			(!u.dx || !u.dy || (IS_ROCK(levl[(unsigned char)u.ux][(unsigned char)(u.uy+u.dy)].typ)
+					&& IS_ROCK(levl[(unsigned char)(u.ux+u.dx)][(unsigned char)u.uy].typ)))){ /* MODERN: safe array indexing */
 			pline("However, you can squeeze yourself into a small opening.");
 			break;
 		    } else
 			return;
 		}
 	    }
-	if(u.dx && u.dy && IS_ROCK(levl[u.ux][u.uy+u.dy].typ) &&
-		IS_ROCK(levl[u.ux+u.dx][u.uy].typ) &&
+	/* Original 1984: if(u.dx && u.dy && IS_ROCK(levl[u.ux][u.uy+u.dy].typ) && IS_ROCK(levl[u.ux+u.dx][u.uy].typ) && */
+	if(u.dx && u.dy && IS_ROCK(levl[(unsigned char)u.ux][(unsigned char)(u.uy+u.dy)].typ) &&
+		IS_ROCK(levl[(unsigned char)(u.ux+u.dx)][(unsigned char)u.uy].typ) && /* MODERN: safe array indexing */
 		invent && inv_weight()+40 > 0) {
 		pline("You are carrying too much to get through.");
 		nomul(0);
