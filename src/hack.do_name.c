@@ -14,7 +14,16 @@
 extern char plname[];
 
 coord
-getpos(int force, char *goal) {
+/**
+ * MODERN ADDITION (2025): const-qualified goal parameter
+ * 
+ * WHY: goal parameter is never modified, only displayed to user
+ * HOW: Changed char *goal to const char *goal for const-correctness
+ * 
+ * PRESERVES: All original positioning functionality
+ * ADDS: Type safety for string literals passed as goal
+ */
+getpos(int force, const char *goal) {
 int cx,cy,i,c;
 extern char sdir[];		/* defined in hack.c */
 extern schar xdir[], ydir[];	/* idem */
@@ -94,6 +103,21 @@ extern char *lmonnam();
 	for(i=0; i<mtmp->mxlth; i++)
 		((char *) mtmp2->mextra)[i] = ((char *) mtmp->mextra)[i];
 	mtmp2->mnamelth = lth;
+	
+	/**
+	 * MODERN ADDITION (2025): Bounds checking for NAME() macro access
+	 * 
+	 * WHY: NAME(mtmp) macro uses pointer arithmetic with mxlth offset - if corrupted could write to arbitrary memory
+	 * HOW: Validate mxlth is within reasonable bounds before pointer arithmetic
+	 * 
+	 * PRESERVES: All original monster naming functionality for valid cases
+	 * ADDS: Protection against memory corruption from invalid mxlth values
+	 */
+	if(mtmp2->mxlth > 1024) {  /* MODERN: Sanity check - mxlth should never be this large */
+		impossible("monster mxlth corruption detected: %u", mtmp2->mxlth);
+		monfree(mtmp2);
+		return(1);
+	}
 	(void) strcpy(NAME(mtmp2), buf);
 	replmon(mtmp,mtmp2);
 	return(1);

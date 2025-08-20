@@ -37,7 +37,7 @@ struct engr *ep = head_engr;
 	return((struct engr *) 0);
 }
 
-int sengr_at(char *s, xchar x, xchar y) {
+int sengr_at(const char *s, xchar x, xchar y) {
 struct engr *ep = engr_at(x,y);
 char *t;
 int n;

@@ -85,8 +85,20 @@ static char buf[BUFSZ];
 		Sprintf(buf, "the ghost of %s", (char *) mtmp->mextra);
 		killer = buf;
 	} else if(mtmp->mnamelth) {
-		Sprintf(buf, "%s called %s",
-			mtmp->data->mname, NAME(mtmp));
+		/**
+		 * MODERN ADDITION (2025): Bounds checking for NAME() macro in death messages
+		 * 
+		 * WHY: NAME(mtmp) uses mxlth offset - corruption could access invalid memory in death screen
+		 * HOW: Validate mxlth before using NAME() macro
+		 * 
+		 * PRESERVES: All original death message functionality
+		 * ADDS: Protection against crash during death from corrupted monster names
+		 */
+		if(mtmp->mxlth > 1024) {  /* MODERN: Sanity check for corrupted mxlth */
+			Sprintf(buf, "%s called <corrupted name>", mtmp->data->mname);
+		} else {
+			Sprintf(buf, "%s called %s", mtmp->data->mname, NAME(mtmp));
+		}
 		killer = buf;
 	} else if(mtmp->minvis) {
 		Sprintf(buf, "invisible %s", mtmp->data->mname);
@@ -230,8 +242,17 @@ void done(const char *st1)
 	exit(0);
 }
 
-#define	NAMSZ	8
-#define	DTHSZ	40
+/**
+ * MODERN ADDITION (2025): Expanded buffer sizes for modern systems
+ * 
+ * WHY: Original 8-character name limit insufficient for modern usernames
+ * WHAT: NAMSZ expanded from 8 to 64, DTHSZ increased to 128 for longer death messages
+ * 
+ * PRESERVES: All original functionality and file format compatibility
+ * ADDS: Protection against buffer overflows from long usernames/death messages
+ */
+#define	NAMSZ	64		/* MODERN: Expanded from 8 to handle modern usernames */
+#define	DTHSZ	128		/* MODERN: Expanded from 40 to prevent death message truncation */
 #define	PERSMAX	1
 #define	POINTSMIN	1	/* must be > 0 */
 #define	ENTRYMAX	100	/* must be >= 10 */
@@ -352,7 +373,8 @@ void topten(void){
 	(t0->name)[NAMSZ] = 0;
 	(void) strncpy(t0->death, killer, DTHSZ);
 	(t0->death)[DTHSZ] = 0;
-	(void) strcpy(t0->date, getdatestr());
+	(void) strncpy(t0->date, getdatestr(), sizeof(t0->date) - 1);  /* MODERN: Safe bounded copy */
+	t0->date[sizeof(t0->date) - 1] = '\0';  /* MODERN: Ensure null termination */
 
 	/* assure minimum number of points */
 	if(t0->points < POINTSMIN)
