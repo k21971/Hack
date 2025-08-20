@@ -9,7 +9,8 @@
 #include "hack.h"
 xchar scrlx, scrhx, scrly, scrhy;	/* corners of new area on screen */
 
-extern char *hu_stat[];	/* in eat.c */
+/* MODERN: CONST-CORRECTNESS: match hu_stat[] definition (read-only string table) */
+extern const char *const hu_stat[];	/* in eat.c */
 extern char *CD;
 
 void
@@ -38,7 +39,8 @@ swallowed(void)
 boolean panicking;
 
 void
-panic(char *str, ...)
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+panic(const char *str, ...)
 {
 	if(panicking++) exit(1);    /* avoid loops - this should never happen*/
 	home();

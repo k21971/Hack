@@ -40,7 +40,8 @@ int unfaint(void);
 #define FAINTED		5
 #define STARVED		6
 
-char *hu_stat[] = {
+/* MODERN: CONST-CORRECTNESS: hunger status strings are read-only */
+const char *const hu_stat[] = {
 	"Satiated",
 	"        ",
 	"Hungry  ",
@@ -58,12 +59,12 @@ int init_uhunger(void){
 
 #define	TTSZ	SIZE(tintxts)
 struct { char *txt; int nut; } tintxts[] = {
-	"It contains first quality peaches - what a surprise!",	40,
-	"It contains salmon - not bad!",	60,
-	"It contains apple juice - perhaps not what you hoped for.", 20,
-	"It contains some nondescript substance, tasting awfully.", 500,
-	"It contains rotten meat. You vomit.", -50,
-	"It turns out to be empty.",	0
+	{"It contains first quality peaches - what a surprise!",	40},
+	{"It contains salmon - not bad!",	60},
+	{"It contains apple juice - perhaps not what you hoped for.", 20},
+	{"It contains some nondescript substance, tasting awfully.", 500},
+	{"It contains rotten meat. You vomit.", -50},
+	{"It turns out to be empty.",	0}
 };
 
 static struct {
@@ -181,7 +182,7 @@ gotit:
 		return(1);
 	}
 	/* MODERN: Add bounds checking for objects array access */
-	if(otmp->otyp < 0 || otmp->otyp >= NROFOBJECTS) {
+	if(otmp->otyp >= NROFOBJECTS) {
 		pline("Strange food indeed!");
 		return(0);  /* Cannot eat unknown object type */
 	}
@@ -427,11 +428,11 @@ int tp = 0;
 	case 'n':
 		u.uhp = u.uhpmax;
 		flags.botl = 1;
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case '@':
 		pline("You cannibal! You will be sorry for this!");
 		/* not tp++; */
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case 'd':
 		Aggravate_monster |= INTRINSIC;
 		break;
@@ -444,7 +445,7 @@ int tp = 0;
 			Invis |= INTRINSIC;
 			See_invisible |= INTRINSIC;
 		}
-		/* fallthrough */
+		/* FALLTHROUGH */
 	case 'y':
 #ifdef QUEST
 		u.uhorizon++;
@@ -471,7 +472,7 @@ int tp = 0;
 		pline("You turn to stone.");
 		killer = "dead cockatrice";
 		done("died");
-		/* NOTREACHED */
+		/* FALLTHROUGH */
 	case 'a':
 	  if(Stoned) {
 	      pline("What a pity - you just destroyed a future piece of art!");

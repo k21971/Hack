@@ -71,20 +71,26 @@ typedef struct {
 #include	"def.mkroom.h"
 
 extern void *alloc(unsigned lth);
-extern void panic(char *str, ...);
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+extern void panic(const char *str, ...);
 
 /* Critical missing function prototypes */
 extern int carrying(int type);
-extern void pline(char *line, ...);
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+extern void pline(const char *line, ...);
 extern void nomul(int nturns);
 extern int doredotopl(void);
 extern void redotoplin(void);
 extern void remember_topl(void);
-extern void xmore(char *s);
-extern void cmore(char *s);
+/* MODERN: CONST-CORRECTNESS: xmore message is read-only */
+extern void xmore(const char *s);
+/* MODERN: CONST-CORRECTNESS: cmore message is read-only */
+extern void cmore(const char *s);
 extern void putsym(char c);
-extern void putstr(char *s);
-extern void xwaitforspace(char *s);
+/* MODERN: CONST-CORRECTNESS: putstr message is read-only */
+extern void putstr(const char *s);
+/* MODERN: CONST-CORRECTNESS: xwaitforspace allowed chars is read-only */
+extern void xwaitforspace(const char *s);
 extern int getdir(boolean s);
 extern int dist(int x1, int y1);
 extern int cansee(int x, int y);
@@ -147,7 +153,8 @@ extern char *eos(char *s);
 extern int letindex(char let);
 extern char *doname(struct obj *obj);
 extern void getlin(char *buf);
-extern void xwaitforspace(char *s);
+/* MODERN: CONST-CORRECTNESS: xwaitforspace allowed chars is read-only */
+extern void xwaitforspace(const char *s);
 extern struct obj *splitobj(struct obj *obj, int cnt);
 extern void obfree(struct obj *obj, struct obj *merge);
 extern void oinit(void);
@@ -164,7 +171,8 @@ extern int doeat(void);
 extern int doread(void);
 extern int dodrink(void);
 extern int dozap(void);
-extern void make_engr_at(int x, int y, char *s);
+/* MODERN: CONST-CORRECTNESS: make_engr_at text is read-only */
+extern void make_engr_at(int x, int y, const char *s);
 extern coord mazexy(void);
 extern void mkshop(void);
 extern void mkzoo(int type);
@@ -204,11 +212,13 @@ extern char morc;
 extern struct wseg *wsegs[32];
 
 /* Function prototypes */
-extern void error(char *s, ...);
+/* MODERN: CONST-CORRECTNESS: error message is read-only */
+extern void error(const char *s, ...);
 extern void initoptions(void);
 extern void prscore(int argc, char **argv);
 extern void gettty(void);
-extern void settty(char *s);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *s);
 extern void setrandom(void);
 extern void startup(void);
 extern void cls(void);
@@ -327,7 +337,8 @@ extern int doextcmd(void);
 extern char lowc(char sym);
 extern char hack_unctrl(char sym);
 extern void glo(int foo);
-extern void impossible(char *s, int x1, int x2);
+/* MODERN: CONST-CORRECTNESS: impossible message is read-only */
+extern void impossible(const char *s, int x1, int x2);
 extern void getret(void);
 
 /* BUILD BLOCKER PROTOTYPES - Critical missing functions */
@@ -354,7 +365,8 @@ extern coord enexto(xchar xx, xchar yy);
 extern void glibr(void);
 extern void hack_timeout(void);
 extern void stoned_dialogue(void);
-extern void done(char *how);
+/* MODERN: CONST-CORRECTNESS: death reason string is read-only */
+extern void done(const char *how);
 
 /* MODERN LOCKING SYSTEM - hack.lock.c */
 extern int modern_lock_game(void);
@@ -397,7 +409,8 @@ extern int okdoor(int x, int y);
 extern void dosdoor(int x, int y, struct mkroom *aroom, int type);
 extern void join(int a, int b);
 extern void makeniche(boolean with_trap);
-extern void make_engr_at(int x, int y, char *s);
+/* MODERN: CONST-CORRECTNESS: make_engr_at text is read-only */
+extern void make_engr_at(int x, int y, const char *s);
 
 /* TERMCAP FUNCTION PROTOTYPES - from hack.termcap.c */
 extern void startup(void);
@@ -585,7 +598,8 @@ struct you {
 
 extern struct you u;
 
-extern char *traps[];
+/* MODERN: CONST-CORRECTNESS: match traps[] definition (read-only string table) */
+extern const char *const traps[];
 extern char *aobjnam();
 extern char readchar();
 
@@ -606,9 +620,11 @@ extern struct trap *t_at(int x, int y);
 extern struct gold *g_at(int x, int y);
 extern struct wseg *m_atseg;
 extern void setnotworn(struct obj *obj), obfree(struct obj *obj, struct obj *other), unpobj(struct obj *obj);
-extern void cornline(int mode, char *text);
+/* MODERN: CONST-CORRECTNESS: cornline text is read-only */
+extern void cornline(int mode, const char *text);
 extern int doinvbill(int mode);
-extern void getlin(char *buf), clrlin(void), addtopl(char *s);
+/* MODERN: CONST-CORRECTNESS: addtopl message is read-only */
+extern void getlin(char *buf), clrlin(void), addtopl(const char *s);
 extern char *doname(struct obj *obj);
 extern char vowels[];
 

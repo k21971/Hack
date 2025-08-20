@@ -38,7 +38,8 @@ void page_more(FILE *fp, int strip);
 void set_pager(int mode);
 int page_line(char *s);
 int dohelp(void);
-int page_file(char *fnam, boolean silent);
+/* MODERN: CONST-CORRECTNESS: page_file filename is read-only */
+int page_file(const char *fnam, boolean silent);
 void intruph(int sig);
 #ifdef UNIX
 #ifdef SHELL
@@ -48,8 +49,10 @@ int child(int wt);
 #endif
 
 /* External function prototypes for functions called but not declared in hack.h */
-extern void cgetret(char *text);
-extern void settty(char *arg);
+/* MODERN: CONST-CORRECTNESS: cgetret text is read-only */
+extern void cgetret(const char *text);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *arg);
 
 int dowhatis(void)
 {
@@ -97,6 +100,7 @@ static int got_intrup;
 
 void intruph(int sig)
 {
+	(void)sig;
 	got_intrup++;
 }
 
@@ -210,7 +214,8 @@ int page_line(char *s)		/* returns 1 if we should quit */
  *	cornline(3, 0)		: cleanup
  */
 
-void cornline(int mode, char *text)
+/* MODERN: CONST-CORRECTNESS: cornline text is read-only */
+void cornline(int mode, const char *text)
 {
 	static struct line {
 		struct line *next_line;
@@ -317,7 +322,8 @@ int dohelp(void)
 	return(0);
 }
 
-int page_file(char *fnam, boolean silent)	/* return: 0 - cannot open fnam; 1 - otherwise */
+/* MODERN: CONST-CORRECTNESS: page_file filename is read-only */
+int page_file(const char *fnam, boolean silent)	/* return: 0 - cannot open fnam; 1 - otherwise */
 {
 #ifdef DEF_PAGER			/* this implies that UNIX is defined */
       {

@@ -15,7 +15,8 @@ extern struct monst *makemon();
 
 char vowels[] = "aeiou";
 
-char *traps[] = {
+/* MODERN: CONST-CORRECTNESS: trap description strings are read-only */
+const char *const traps[] = {
 	" bear trap",
 	"n arrow trap",
 	" dart trap",
@@ -263,7 +264,7 @@ int float_down(void) {
 			break;
 		case TRAPDOOR:
 			if(!xdnstair || u.ustuck) break;
-			/* fall into next case */
+			/* FALLTHROUGH */
 		default:
 			dotrap(trap);
 	}

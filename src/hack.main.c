@@ -455,7 +455,8 @@ register int c,ct;
 }
 
 /*VARARGS1*/
-void impossible(char *s, int x1, int x2)
+/* MODERN: CONST-CORRECTNESS: impossible message is read-only */
+void impossible(const char *s, int x1, int x2)
 {
 	pline(s,x1,x2);
 	pline("Program in disorder - perhaps you'd better Quit.");

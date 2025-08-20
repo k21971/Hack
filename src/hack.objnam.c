@@ -151,7 +151,7 @@ struct obj *obj;
 static char bufr[BUFSZ];
 char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
 /* MODERN: Add bounds checking for objects array access */
-if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+if(obj->otyp >= NROFOBJECTS) {
 	Strcpy(buf, "strange object");  /* Safe fallback */
 	return(buf);
 }
@@ -408,7 +408,8 @@ struct obj *obj;
 	return(s);
 }
 
-char *wrp[] = { "wand", "ring", "potion", "scroll", "gem" };
+/* MODERN: CONST-CORRECTNESS: object type name strings are read-only */
+const char *const wrp[] = { "wand", "ring", "potion", "scroll", "gem" };
 char wrpsym[] = { WAND_SYM, RING_SYM, POTION_SYM, SCROLL_SYM, GEM_SYM };
 
 struct obj *

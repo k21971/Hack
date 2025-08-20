@@ -217,14 +217,15 @@ void strange_feeling(struct obj *obj, char *txt)
 	useup(obj);
 }
 
-char *bottlenames[] = {
+/* MODERN: CONST-CORRECTNESS: bottlenames is a read-only array of string literals */
+const char *const bottlenames[] = {
 	"bottle", "phial", "flagon", "carafe", "flask", "jar", "vial"
 };
 
 void potionhit(struct monst *mon, struct obj *obj)
 {
 	extern char *xname();
-	char *botlnam = bottlenames[rn2(SIZE(bottlenames))];
+	const char *botlnam = bottlenames[rn2(SIZE(bottlenames))];
 	boolean uclose, isyou = (mon == &youmonst);
 
 	if(isyou) {

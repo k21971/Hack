@@ -41,14 +41,8 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 ### Arch Linux (AUR)
 
-your choice of helper
-
 ```bash
 yay -S restohack
-```
-
-```bash
-paru -S restohack
 ```
 
 ### Hybrid Binary+Source Tarball

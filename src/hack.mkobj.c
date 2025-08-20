@@ -144,7 +144,7 @@ int weight(obj)
 struct obj *obj;
 {
 	/* MODERN: Add bounds checking for objects array access */
-	if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+	if(obj->otyp >= NROFOBJECTS) {
 		return(obj->quan + 1)/2;  /* Safe fallback weight calculation */
 	}
 	int wt = objects[obj->otyp].oc_weight;

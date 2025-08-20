@@ -1,6 +1,6 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* hack.ioctl.c - version 1.0.2 */
-/* $FreeBSD$
+/* $FreeBSD$ */
 
 /* 
  * Terminal I/O control for 1984 Hack - raw mode and signal handling
@@ -22,7 +22,8 @@
 #include "hack.h"
 
 /* Forward declarations for functions not properly visible */
-extern void settty(char *s);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *s);
 
 #ifdef BSD
 /**

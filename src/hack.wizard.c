@@ -69,9 +69,10 @@ hithim:
 
 	    /* if hit 1/20 chance of stealing amulet & vanish
 		- amulet is on level 26 again. */
-	    if(hitu(mtmp, d(mtmp->data->damn,mtmp->data->damd))
-		&& !rn2(20) && stealamulet(mtmp))
-		;
+		if(hitu(mtmp, d(mtmp->data->damn,mtmp->data->damd))
+		&& !rn2(20) && stealamulet(mtmp)) {
+		
+		}
 	}
 	else
 	    inrange(mtmp);			/* try magic */
@@ -177,7 +178,7 @@ void clonewiz(struct monst *mtmp)
 {
 	struct monst *mtmp2;
 
-	if(mtmp2 = makemon(PM_WIZARD, mtmp->mx, mtmp->my)) {
+	if((mtmp2 = makemon(PM_WIZARD, mtmp->mx, mtmp->my))) {
 		flags.no_of_wizards = 2;
 		unpmon(mtmp2);
 		mtmp2->mappearance = wizapp[rn2(sizeof(wizapp)-1)];

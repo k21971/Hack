@@ -23,7 +23,8 @@ extern char plname[], pl_character[];
 extern void paybill(void);
 extern void savebones(void);
 extern void outrip(void);
-extern void settty(char *);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *);
 
 /* Forward declarations for functions in this file */
 void topten(void);
@@ -54,6 +55,7 @@ int doquit(void)
 
 void done1(int sig)
 {
+	(void)sig;
 	doquit();
 }
 
@@ -62,6 +64,7 @@ int done_hup;
 
 void
 done_intr(int sig){
+	(void)sig;
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -94,7 +97,8 @@ static char buf[BUFSZ];
 /* called with arg "died", "drowned", "escaped", "quit", "choked", "panicked",
    "burned", "starved" or "tricked" */
 /* Be careful not to call panic from here! */
-void done(char *st1)
+/* MODERN: CONST-CORRECTNESS: death reason string is read-only */
+void done(const char *st1)
 {
 
 #ifdef WIZARD
@@ -591,6 +595,7 @@ int x;
  */
 void modern_cleanup_handler(int sig)
 {
+	(void)sig;
 	/* Ignore further interrupts during cleanup */
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGTERM, SIG_IGN);

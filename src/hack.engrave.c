@@ -106,7 +106,8 @@ struct engr *ep = engr_at(x,y);
 	}
 }
 
-void make_engr_at(int x, int y, char *s)
+/* MODERN: CONST-CORRECTNESS: make_engr_at text is read-only */
+void make_engr_at(int x, int y, const char *s)
 {
 	struct engr *ep;
 

@@ -184,7 +184,7 @@ void docall(struct obj *obj)
 	*str1 = str;
 }
 
-char *ghostnames[] = {		/* these names should have length < PL_NSIZ */
+const char *const ghostnames[] = {  /* these names should have length < PL_NSIZ */
 	"adri", "andries", "andreas", "bert", "david", "dirk", "emile",
 	"frans", "fred", "greg", "hether", "jay", "john", "jon", "kay",
 	"kenny", "maud", "michiel", "mike", "peter", "robert", "ron",
@@ -213,11 +213,10 @@ extern char *shkname();
 		break;
 	case '@':
 		if(mtmp->isshk) {
-                        /* fallthrough after return */
 			(void) strcpy(buf, shkname(mtmp));
 			break;
 		}
-		/* fall into next case */
+		/* FALLTHROUGH */
 	default:
 		(void) snprintf(buf, BUFSZ, "the %s%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			mtmp->minvis ? "invisible " : "",

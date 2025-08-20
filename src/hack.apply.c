@@ -43,7 +43,7 @@ int doapply(void) {
 			use_magic_whistle(obj);
 			break;
 		}
-		/* fall into next case */
+		/* FALLTHROUGH */
 	case WHISTLE:
 		use_whistle(obj);
 		break;
@@ -73,6 +73,7 @@ int doapply(void) {
 static void
 use_camera(struct obj *obj) {
 struct monst *mtmp;
+	(void)obj;
 	if(!getdir(1)){		/* ask: in what direction? */
 		flags.move = multi = 0;
 		return;
@@ -218,6 +219,7 @@ bchit(int ddx, int ddy, int range, char sym) {
 static void
 use_whistle(struct obj *obj) {
 struct monst *mtmp = fmon;
+	(void)obj;
 	pline("You produce a high whistling sound.");
 	while(mtmp) {
 		if(dist(mtmp->mx,mtmp->my) < u.ulevel*20) {
@@ -234,6 +236,7 @@ struct monst *mtmp = fmon;
 static void
 use_magic_whistle(struct obj *obj) {
 struct monst *mtmp = fmon;
+	(void)obj;
 	pline("You produce a strange whistling sound.");
 	while(mtmp) {
 		if(mtmp->mtame) mnexto(mtmp);
