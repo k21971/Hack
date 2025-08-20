@@ -238,7 +238,7 @@ build_asan_ubsan() {
   cflags+=" -fsanitize=address,undefined -fsanitize-address-use-after-scope"
   cflags+=" -fstack-protector-strong -D_FORTIFY_SOURCE=2"
   
-  cmake -S . -B "$BUILD_SAN_DIR" \
+  cmake -S .. -B "$BUILD_SAN_DIR" \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_C_FLAGS="$cflags" \
     -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" >/dev/null
@@ -251,7 +251,7 @@ build_tsan() {
     rm -rf "$BUILD_TSAN_DIR"
     local cflags="-g -O1 -fsanitize=thread -fPIE"
     
-    CC=clang cmake -S . -B "$BUILD_TSAN_DIR" \
+    CC=clang cmake -S .. -B "$BUILD_TSAN_DIR" \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_C_FLAGS="$cflags" \
       -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread -pie" >/dev/null 2>&1 || {
@@ -271,7 +271,7 @@ build_msan() {
     rm -rf "$BUILD_MSAN_DIR"
     local cflags="-g -O1 -fsanitize=memory -fsanitize-memory-track-origins=2 -fPIE"
     
-    CC=clang cmake -S . -B "$BUILD_MSAN_DIR" \
+    CC=clang cmake -S .. -B "$BUILD_MSAN_DIR" \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_C_FLAGS="$cflags" \
       -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=memory -pie" >/dev/null 2>&1 || {
@@ -293,7 +293,7 @@ build_hardened_extreme() {
   cflags+=" -fcf-protection=full -fstack-clash-protection"
   cflags+=" -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
   
-  cmake -S . -B "$BUILD_HARDENED_DIR" \
+  cmake -S .. -B "$BUILD_HARDENED_DIR" \
     -DCMAKE_BUILD_TYPE=Hardened \
     -DCMAKE_C_FLAGS="$cflags" \
     -DCMAKE_EXE_LINKER_FLAGS="-pie -Wl,-z,relro,-z,now" >/dev/null

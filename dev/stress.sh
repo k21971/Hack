@@ -155,7 +155,7 @@ build_sanitizers() {
   banner "Building (ASan+UBSan)"
   rm -rf "$BUILD_SAN_DIR"
   local cflags="-g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address,undefined"
-  cmake -S . -B "$BUILD_SAN_DIR" \
+  cmake -S .. -B "$BUILD_SAN_DIR" \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_C_FLAGS="$cflags" \
     -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" >/dev/null
@@ -164,14 +164,14 @@ build_sanitizers() {
 
 build_debug_plain() {
   rm -rf "$BUILD_SAN_DIR"
-  cmake -S . -B "$BUILD_SAN_DIR" -DCMAKE_BUILD_TYPE=Debug >/dev/null
+  cmake -S .. -B "$BUILD_SAN_DIR" -DCMAKE_BUILD_TYPE=Debug >/dev/null
   cmake --build "$BUILD_SAN_DIR" -j >/dev/null
 }
 
 build_release_fortify() {
   banner "Building (Release + FORTIFY=3)"
   rm -rf "$BUILD_REL_DIR"
-  cmake -S . -B "$BUILD_REL_DIR" \
+  cmake -S .. -B "$BUILD_REL_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_FLAGS="-O2 -D_FORTIFY_SOURCE=3 -Wformat-security -Werror=format-security" >/dev/null
   cmake --build "$BUILD_REL_DIR" -j >/dev/null
