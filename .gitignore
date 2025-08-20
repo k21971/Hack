@@ -162,14 +162,17 @@ test_tarball/
 *.tmp
 *.temp
 .cache/
+
+# Miscellaneous
 hackdir/game.lock
 hackdir/record.lock
 static-build.sh
-.gitignore
-.gitignore
 test.sh
 tools/build-matrix.sh
 restoHack-static-*-linux-x86_64.tar.gz.sha256
 verify-release.sh
 gh-release-notes.txt
 linux-debug
+sha256sums
+SHA256SUMS
+*.sha256

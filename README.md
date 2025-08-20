@@ -161,6 +161,7 @@ cmake --build build
 * **Modern Locking** – Replaced `link()` locks with `flock()` for clean recovery.
 * **NetBSD/pkgsrc Builds** – Fixed curses detection and RNG seeding via CMake feature checks.
 * **Tombstone Crash** – Fixed segfault in RIP screen by patching buffer overflow in name centering.
+* **Memory Safety and Hardening** - Addressed memory issues, Compiler warnings, and Hardened for varying enviroments.
 
 ---
 
