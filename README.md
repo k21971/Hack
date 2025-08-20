@@ -156,6 +156,23 @@ cmake --build build
 
 ---
 
+## Work in Progress
+
+**Current Development: v1.1 - Hardening and Safety**
+
+The current work-in-progress focuses on introducing comprehensive hardening and safety parameters that the original 1984 code lacked. This version emphasizes stability improvements including:
+
+* Enhanced memory safety and bounds checking
+* Improved error handling and recovery mechanisms  
+* Compiler warning elimination and code hardening
+* Environment-specific adaptations for varying systems
+* Robust input validation and sanitization
+* Address compiler warnings
+
+These changes maintain the authentic 1984 gameplay experience while providing the reliability expected from modern software.
+
+---
+
 ## Recent Fixes
 
 * **Modern Locking** – Replaced `link()` locks with `flock()` for clean recovery.
