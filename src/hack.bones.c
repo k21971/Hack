@@ -58,7 +58,8 @@ struct monst *mtmp;
 	mtmp->mx = u.ux;
 	mtmp->my = u.uy;
 	mtmp->msleep = 1;
-	(void) strcpy((char *) mtmp->mextra, plname);
+	(void) strncpy((char *) mtmp->mextra, plname, PL_NSIZ-1);
+	((char *) mtmp->mextra)[PL_NSIZ-1] = '\0';  /* MODERN: Ensure null termination */
 	mkgold(somegold() + d(dlevel,30), u.ux, u.uy);
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon){
 		mtmp->m_id = 0;

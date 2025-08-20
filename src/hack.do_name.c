@@ -205,8 +205,12 @@ extern char *shkname();
 		{ char *gn = (char *) mtmp->mextra;
 		  if(!*gn) {		/* might also look in scorefile */
 		    gn = ghostnames[rn2(SIZE(ghostnames))];
-		    if(!rn2(2)) (void)
-		      strcpy((char *) mtmp->mextra, !rn2(5) ? plname : gn);
+		    if(!rn2(2)) {
+		      /* MODERN: Safe copy with bounds check for ghost names */
+		      const char *name = !rn2(5) ? plname : gn;
+		      (void) strncpy((char *) mtmp->mextra, name, PL_NSIZ-1);
+		      ((char *) mtmp->mextra)[PL_NSIZ-1] = '\0';
+		    }
 		  }
 		  (void) snprintf(buf, BUFSZ, "%s's ghost", gn);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		}
@@ -223,8 +227,16 @@ extern char *shkname();
 			mtmp->data->mname);
 	}
 	if(vb && mtmp->mnamelth) {
-		(void) strcat(buf, " called ");
-		(void) strcat(buf, NAME(mtmp));
+		/* MODERN: Safe concatenation with bounds checking */
+		size_t buflen = strlen(buf);
+		if(buflen + 8 < BUFSZ) {  /* " called " = 8 chars */
+			(void) strcat(buf, " called ");
+			buflen += 8;
+			if(buflen < BUFSZ-1) {
+				(void) strncat(buf, NAME(mtmp), BUFSZ-1-buflen);
+				buf[BUFSZ-1] = '\0';
+			}
+		}
 	}
 	return(buf);
 }
@@ -249,10 +261,10 @@ char *
 amonnam(struct monst *mtmp, char *adj)
 {
 	char *bp = monnam(mtmp);
-	static char buf[BUFSZ];		/* MODERN: Static buffer reuse issue - overwrites on each call */
+	static char buf[BUFSZ + 64];	/* MODERN: Extra space for adj + static buffer reuse issue */
 
 	if(!strncmp(bp, "the ", 4)) bp += 4;
-	(void) snprintf(buf, BUFSZ, "the %s %s", adj, bp);  /* MODERN: Safe sprintf */
+	(void) snprintf(buf, sizeof(buf), "the %s %s", adj, bp);  /* MODERN: Safe sprintf with correct buffer size */
 	return(buf);
 }
 

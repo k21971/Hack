@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 	getmailstatus();
 #endif
 #ifdef WIZARD
-	if(wizard) (void) strcpy(plname, "wizard"); else
+	if(wizard) (void) strncpy(plname, "wizard", PL_NSIZ-1), plname[PL_NSIZ-1] = '\0'; else
 #endif
 	if(!*plname || !strncmp(plname, "player", 4)
 		    || !strncmp(plname, "games", 4))
@@ -221,8 +221,10 @@ int main(int argc, char *argv[])
 		 */
 		(void) signal(SIGQUIT,SIG_IGN);
 		(void) signal(SIGINT,SIG_IGN);
-		if(!locknum)
-			(void) strcpy(lock,plname);
+		if(!locknum) {
+			(void) strncpy(lock, plname, PL_NSIZ+4-1);
+			lock[PL_NSIZ+4-1] = '\0';  /* MODERN: Ensure null termination */
+		}
 #ifdef ENABLE_MODERN_LOCKING
 		/* MODERN ADDITION (2025): Clean up any stale locks on startup */
 		modern_cleanup_locks();
@@ -231,7 +233,8 @@ int main(int argc, char *argv[])
 #ifdef WIZARD
 	} else {
 		char *sfoo;
-		(void) strcpy(lock,plname);
+		(void) strncpy(lock, plname, PL_NSIZ+4-1);
+		lock[PL_NSIZ+4-1] = '\0';  /* MODERN: Ensure null termination */
 		if(sfoo = getenv("MAGIC")) 
 			while(*sfoo) {
 				switch(*sfoo++) {
@@ -252,7 +255,8 @@ int main(int argc, char *argv[])
 				*gp = 0;
 			} else
 				(void) strncpy(genocided, sfoo, sizeof(genocided)-1);
-			(void) strcpy(fut_geno, genocided);
+			(void) strncpy(fut_geno, genocided, 60-1);
+			fut_geno[60-1] = '\0';  /* MODERN: Ensure null termination */
 		}
 	}
 #endif

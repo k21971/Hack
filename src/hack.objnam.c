@@ -151,9 +151,9 @@ struct obj *obj;
 static char bufr[BUFSZ];
 char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
 /* MODERN: Add bounds checking for objects array access */
-if(obj->otyp >= NROFOBJECTS) {
-	Strcpy(buf, "strange object");  /* Safe fallback */
-	return(buf);
+if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
+	panic("xname: corrupted object otyp=%d (valid range: 0-%d), olet='%c', quan=%d, ox=%d, oy=%d", 
+	      obj->otyp, NROFOBJECTS-1, obj->olet, obj->quan, obj->ox, obj->oy);
 }
 int nn = objects[obj->otyp].oc_name_known;
 char *an = objects[obj->otyp].oc_name;

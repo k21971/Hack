@@ -16,7 +16,8 @@
 /* MODERN ADDITION (2025): Added for stale lock detection - stat() and time() */
 #include <sys/stat.h>
 #include <time.h>
-#define	Sprintf	(void) sprintf
+/* MODERN: Safe sprintf replacement - same interface, prevents overflow */
+#define	Sprintf(buf, ...) (void) snprintf(buf, 128, __VA_ARGS__)
 extern char plname[], pl_character[];
 
 /* Forward declarations for missing functions */
