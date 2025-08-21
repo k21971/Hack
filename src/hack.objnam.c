@@ -524,23 +524,23 @@ char *un, *dn, *an;
 		}
 		/* remove -s or -es (boxes) or -ies (rubies, zruties) */
 		p = eos(bp);
-		if(p[-1] == 's') {
-			if(p[-2] == 'e') {
-				if(p[-3] == 'i') {
-					if(!strcmp(p-7, "cookies"))
+		if(p > bp && p[-1] == 's') {
+			if(p - bp >= 2 && p[-2] == 'e') {
+				if(p - bp >= 3 && p[-3] == 'i') {
+					if(p - bp >= 7 && !strcmp(p-7, "cookies"))
 						goto mins;
 					Strcpy(p-3, "y");
 					goto sing;
 				}
 
 				/* note: cloves / knives from clove / knife */
-				if(!strcmp(p-6, "knives")) {
+				if(p - bp >= 6 && !strcmp(p-6, "knives")) {
 					Strcpy(p-3, "fe");
 					goto sing;
 				}
 
 				/* note: nurses, axes but boxes */
-				if(!strcmp(p-5, "boxes")) {
+				if(p - bp >= 5 && !strcmp(p-5, "boxes")) {
 					p[-2] = 0;
 					goto sing;
 				}
@@ -548,11 +548,11 @@ char *un, *dn, *an;
 		mins:
 			p[-1] = 0;
 		} else {
-			if(!strcmp(p-9, "homunculi")) {
+			if(p - bp >= 9 && !strcmp(p-9, "homunculi")) {
 				Strcpy(p-1, "us"); /* !! makes string longer */
 				goto sing;
 			}
-			if(!strcmp(p-5, "teeth")) {
+			if(p - bp >= 5 && !strcmp(p-5, "teeth")) {
 				Strcpy(p-5, "tooth");
 				goto sing;
 			}
@@ -565,7 +565,7 @@ sing:
 		goto typfnd;
 	}
 	p = eos(bp);
-	if(!strcmp(p-5, " mail")){	/* Note: ring mail is not a ring ! */
+	if(p - bp >= 5 && !strcmp(p-5, " mail")){	/* Note: ring mail is not a ring ! - MODERN: bounds check */
 		let = ARMOR_SYM;
 		an = bp;
 		goto srch;
@@ -579,16 +579,16 @@ sing:
 			/* else if(*bp) ?? */
 			goto srch;
 		}
-		if(!strcmp(p-j, wrp[i])){
+		if(p - bp >= j && !strcmp(p-j, wrp[i])){
 			let = wrpsym[i];
 			p -= j;
 			*p = 0;
-			if(p[-1] == ' ') p[-1] = 0;
+			if(p > bp && p[-1] == ' ') p[-1] = 0;
 			dn = bp;
 			goto srch;
 		}
 	}
-	if(!strcmp(p-6, " stone")){
+	if(p - bp >= 6 && !strcmp(p-6, " stone")){
 		p[-6] = 0;
 		let = GEM_SYM;
 		an = bp;
