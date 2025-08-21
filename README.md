@@ -169,12 +169,11 @@ The current work-in-progress focuses on introducing comprehensive hardening and 
 * Robust input validation and sanitization
 * Address compiler warnings
 
-⚠️ **RELAX, MAN, IT COMPILES!.**  
-This was the guiding philosophy of 1984. While undoubtedly brilliant,The original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose '80s-era K&R magic.  
-Stability was a suggestion, not a guarantee.  
+⚠️ **RELAX, MAN, IT COMPILES!**  
+This was the guiding philosophy of 1984. While undoubtedly brilliant, the original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose of ’80s-era K&R magic.  
+Stability was a suggestion, not a guarantee.
 
 Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
-
 ---
 
 ## Recent Fixes
