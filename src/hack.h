@@ -92,6 +92,8 @@ extern void putstr(const char *s);
 /* MODERN: CONST-CORRECTNESS: xwaitforspace allowed chars is read-only */
 extern void xwaitforspace(const char *s);
 extern int getdir(boolean s);
+/* MODERN: CONST-CORRECTNESS: getpos goal parameter is read-only */
+extern coord getpos(int force, const char *goal);
 extern int dist(int x1, int y1);
 extern int cansee(int x, int y);
 extern void setmangry(struct monst *mtmp);
@@ -165,7 +167,8 @@ extern int teleok(int x, int y);
 extern int dotele(void);
 extern int float_down(void);
 extern void morehungry(int num);
-extern void poisoned(char *string1, char *string2);
+/* MODERN: CONST-CORRECTNESS: poisoned message parameters are read-only */
+extern void poisoned(const char *string1, const char *string2);
 extern void fall_down(struct monst *mtmp);
 extern int doeat(void);
 extern int doread(void);
@@ -188,7 +191,8 @@ extern void done_in_by(struct monst *mtmp);
 extern int d(int n, int x);               /* Dice roll function */
 extern void setan(char *str, char *buf);  /* Set article for string */
 extern int dbon(void);                    /* Damage bonus */
-extern void hit(char *str, struct monst *mtmp, char *force);
+/* MODERN: CONST-CORRECTNESS: hit message parameters are read-only */
+extern void hit(const char *str, struct monst *mtmp, const char *force);
 extern void u_wipe_engr(int cnt);
 extern int m_move(struct monst *mtmp, int after);
 extern void wakeup(struct monst *mtmp);
@@ -204,8 +208,10 @@ extern void docall(struct obj *obj);
 extern char *visctrl(char c);
 extern char *Monnam(struct monst *mtmp);
 extern char *monnam(struct monst *mtmp);
-extern char *amonnam(struct monst *mtmp, char *adj);
-extern char *Amonnam(struct monst *mtmp, char *adj);
+/* MODERN: CONST-CORRECTNESS: amonnam adjective parameter is read-only */
+extern char *amonnam(struct monst *mtmp, const char *adj);
+/* MODERN: CONST-CORRECTNESS: Amonnam adjective parameter is read-only */
+extern char *Amonnam(struct monst *mtmp, const char *adj);
 
 /* GLOBAL VARIABLES */
 extern char morc;
@@ -238,7 +244,8 @@ extern void seeobjs(void);
 extern void seemons(void);
 extern void docrt(void);
 extern void read_engr_at(int x, int y);
-extern void losehp(int n, char *how);
+/* MODERN: CONST-CORRECTNESS: losehp death message is read-only */
+extern void losehp(int n, const char *how);
 extern void losexp(void);
 extern int dosearch(void);
 extern void gethungry(void);
@@ -247,7 +254,8 @@ extern void gethungry(void);
 extern void youswld(struct monst *mtmp, int dam, int die, char *name);
 extern int wiz_hit(struct monst *mtmp);
 extern void justswld(struct monst *mtmp, char *name);
-extern void kludge(char *str, char *arg);
+/* MODERN: CONST-CORRECTNESS: kludge parameters are read-only */
+extern void kludge(const char *str, const char *arg);
 extern void stealgold(struct monst *mtmp);
 extern int stealamulet(struct monst *mtmp);
 extern struct obj *steal(struct monst *mtmp);
@@ -269,7 +277,8 @@ extern int sq(int a);
 extern void invault(void);
 extern void amulet(void);
 extern void find_ac(void);
-extern void strange_feeling(struct obj *obj, char *txt);
+/* MODERN: CONST-CORRECTNESS: strange_feeling message is read-only */
+extern void strange_feeling(struct obj *obj, const char *txt);
 extern void ghost_from_bottle(void);
 extern void lesshungry(int num);
 extern void losestr(int num);
@@ -283,14 +292,16 @@ extern int chwepon(struct obj *otmp, int amount);
 extern void charcat(char *s, char c);
 extern struct monst *bhit(int ddx, int ddy, int range, char sym, int (*fhitm)(), int (*fhito)(), struct obj *obj);
 extern struct monst *boomhit(int dx, int dy);
-extern char *exclam(int force);
+/* MODERN: CONST-CORRECTNESS: exclam returns read-only string literals */
+extern const char *exclam(int force);
 extern int newcham(struct monst *mtmp, struct permonst *mdat);
 extern void rloco(struct obj *obj);
 extern int revive(struct obj *obj);
 extern int findit(void);
 extern void unstuck(struct monst *mtmp);
 extern void buzz(int type, xchar sx, xchar sy, int dx, int dy);
-extern int thitu(int tlev, int dam, char *name);
+/* MODERN: CONST-CORRECTNESS: thitu damage description is read-only */
+extern int thitu(int tlev, int dam, const char *name);
 extern int zhit(struct monst *mon, int type);
 extern void burn_scrolls(void);
 extern void nscr(void);
@@ -441,12 +452,14 @@ extern xchar dlevel;
 /* FUNCTIONS NEEDED BY hack.do.c */
 extern void getlev(int fd, int pid, xchar lev);
 extern void placebc(int u_in);
-extern void selftouch(char *arg);
+/* MODERN: CONST-CORRECTNESS: selftouch message is read-only */
+extern void selftouch(const char *arg);
 extern void losedogs(void);
 extern void potionhit(struct monst *mon, struct obj *obj);
 extern void potionbreathe(struct obj *obj);
 extern int shkcatch(struct obj *obj);
-extern void miss(char *s, struct monst *mtmp);
+/* MODERN: CONST-CORRECTNESS: miss message is read-only */
+extern void miss(const char *s, struct monst *mtmp);
 extern int tamedog(struct monst *mtmp, struct obj *obj);
 extern void mpickobj(struct monst *mtmp, struct obj *otmp);
 extern void unsee(void);
@@ -461,7 +474,8 @@ extern void savelev(int fd, unsigned char lev); /* MODERN: unsigned to prevent b
 /* FORWARD DECLARATIONS FOR hack.mon.c */
 struct engr;
 extern void wipe_engr_at(xchar x, xchar y, xchar cnt);
-extern int sengr_at(char *s, xchar x, xchar y);
+/* MODERN: CONST-CORRECTNESS: sengr_at search string is read-only */
+extern int sengr_at(const char *s, xchar x, xchar y);
 extern void del_engr(struct engr *ep);
 extern void bwrite(int fd, char *loc, unsigned num);
 extern void mread(int fd, char *buf, unsigned len);
@@ -500,7 +514,8 @@ extern int mfndpos(struct monst *mon, coord poss[9], int info[9], int flag);
 extern int online(int x, int y);
 extern int dochug(struct monst *mtmp);
 extern void set_pager(int mode);
-extern int page_line(char *line);
+/* MODERN: CONST-CORRECTNESS: page_line text parameter is read-only */
+extern int page_line(const char *line);
 extern void wormdead(struct monst *mtmp);
 extern void wormhit(struct monst *mtmp);
 extern void cutworm(struct monst *mtmp, xchar x, xchar y, uchar weptyp);
@@ -612,9 +627,11 @@ extern void freegold(struct gold *gold), deltrap(struct trap *trap), stackobj(st
 extern void prinv(struct obj *obj), doinv(char *lets);
 extern int ddoinv(), dotypeinv(), dolook();
 extern int merged(struct obj *otmp, struct obj *obj, int lose), countgold(), doprgold(), doprwep(), doprarm(), doprring();
-extern int digit(char c), ckunpaid(struct obj *otmp), ggetobj(char *word, int (*fn)(struct obj *), int max);
+/* MODERN: CONST-CORRECTNESS: ggetobj word parameter is read-only */
+extern int digit(char c), ckunpaid(struct obj *otmp), ggetobj(const char *word, int (*fn)(struct obj *), int max);
 extern int askchain(struct obj *objchn, char *olets, int allflag, int (*fn)(struct obj *), int (*ckfn)(struct obj *), int max);
-extern struct obj *getobj(char *let, char *word), *o_on(unsigned int id, struct obj *objchn), *mkgoldobj(long q);
+/* MODERN: CONST-CORRECTNESS: getobj parameters are read-only */
+extern struct obj *getobj(const char *let, const char *word), *o_on(unsigned int id, struct obj *objchn), *mkgoldobj(long q);
 extern struct monst *m_at(int x, int y);
 extern struct trap *t_at(int x, int y);
 extern struct gold *g_at(int x, int y);
@@ -641,7 +658,9 @@ extern coord bhitpos;	/* place where thrown weapon falls to the ground */
 
 /* Original 1984: extern xchar seehx,seelx,seehy,seely; */
 extern unsigned char seehx,seelx,seehy,seely; /* where to see - MODERN: unsigned to prevent buffer underflow vulnerability */
-extern char *save_cm,*killer;
+/* MODERN: CONST-CORRECTNESS: killer points to read-only death reasons */
+extern char *save_cm;
+extern const char *killer;
 
 extern xchar dlevel, maxdlevel; /* dungeon level */
 

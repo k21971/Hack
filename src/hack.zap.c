@@ -266,7 +266,16 @@ int dozap(void)
 	return(1);
 }
 
-char *exclam(int force)
+/**
+ * MODERN ADDITION (2025): const-qualified return type
+ * 
+ * WHY: Function returns string literals which are const char* 
+ * HOW: Changed return type from char* to const char* for const-correctness
+ * 
+ * PRESERVES: All original punctuation functionality for combat messages
+ * ADDS: Type safety preventing modification of string literals
+ */
+const char *exclam(int force)
 {
 	/* force == 0 occurs e.g. with sleep ray */
 	/* note that large force is usual with wands so that !! would
@@ -274,13 +283,22 @@ char *exclam(int force)
 	return( (force < 0) ? "?" : (force <= 4) ? "." : "!" );
 }
 
-void hit(char *str, struct monst *mtmp, char *force)	/* usually either "." or "!" */
+/**
+ * MODERN ADDITION (2025): const-qualified parameters
+ * 
+ * WHY: Function receives read-only string parameters
+ * HOW: Changed char* to const char* for str and force parameters
+ * 
+ * PRESERVES: All original hit message functionality  
+ * ADDS: Type safety for string literal arguments
+ */
+void hit(const char *str, struct monst *mtmp, const char *force)	/* usually either "." or "!" */
 {
 	if(!cansee(mtmp->mx,mtmp->my)) pline("The %s hits it.", str);
 	else pline("The %s hits %s%s", str, monnam(mtmp), force);
 }
 
-void miss(char *str, struct monst *mtmp)
+void miss(const char *str, struct monst *mtmp)
 {
 	if(!cansee(mtmp->mx,mtmp->my)) pline("The %s misses it.",str);
 	else pline("The %s misses %s.",str,monnam(mtmp));

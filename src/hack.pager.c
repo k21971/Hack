@@ -36,7 +36,7 @@ extern char quitchars[];
 int dowhatis(void);
 void page_more(FILE *fp, int strip);
 void set_pager(int mode);
-int page_line(char *s);
+int page_line(const char *s);
 int dohelp(void);
 /* MODERN: CONST-CORRECTNESS: page_file filename is read-only */
 int page_file(const char *fnam, boolean silent);
@@ -177,7 +177,7 @@ void set_pager(int mode)	/* 0: open  1: wait+close  2: close */
 	}
 }
 
-int page_line(char *s)		/* returns 1 if we should quit */
+int page_line(const char *s)		/* returns 1 if we should quit */
 {
 	extern char morc;
 

@@ -34,7 +34,8 @@ void outrip(void){
 	int x,y;
 
 	cls();
-	(void) strcpy(buf, plname);
+	(void) strncpy(buf, plname, BUFSZ-1);
+	buf[BUFSZ-1] = '\0';  /* MODERN: Ensure null termination */
 	buf[16] = 0;
 	center(6, buf);
 	(void) snprintf(buf, BUFSZ, "%ld AU", u.ugold);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
@@ -44,7 +45,8 @@ void outrip(void){
 		!strcmp(killer, "starvation") ? "" :
 		index(vowels, *killer) ? " an" : " a");
 	center(8, buf);
-	(void) strcpy(buf, killer);
+	(void) strncpy(buf, killer, BUFSZ-1);
+	buf[BUFSZ-1] = '\0';  /* MODERN: Ensure null termination */
 	if(strlen(buf) > 16) {
 	    int i,i0,i1;
 		i0 = i1 = 0;

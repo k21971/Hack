@@ -336,9 +336,9 @@ if(ENABLE_SAVE_SANITIZERS)
     message(STATUS "Memory sanitizers enabled for save system debugging")
 endif()
 
-# --- Hardened (K2) server profile ---
+# --- Hardened profile ---
 if(CMAKE_BUILD_TYPE STREQUAL "Hardened")
-  message(STATUS "Configuring Hardened (K2) server-grade build")
+  message(STATUS "Configuring Hardened build")
 
   # Perf + debuggable backtraces
   target_compile_options(hack PRIVATE -O2 -fno-omit-frame-pointer)
@@ -365,6 +365,51 @@ if(COMPAT_LIBRARY)
 endif()
 if(HAVE_LIBBSD)
     target_link_libraries(hack bsd)
+endif()
+# Always handy to inspect flags locally
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Common warnings for all builds (sane, not noisy)
+target_compile_options(hack PRIVATE
+  -Wall -Wextra -Wformat=2
+  -Wno-missing-field-initializers
+  -Wno-old-style-definition
+  -fno-common
+)
+
+# === Profiles ===
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  # General build = ship it
+  target_compile_options(hack PRIVATE -O2 -DNDEBUG)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  # Dev build = symbols + easy backtraces, warnings don’t kill flow
+  target_compile_options(hack PRIVATE -O0 -g3 -fno-omit-frame-pointer -Wwrite-strings -Wno-error)
+  target_link_options(hack PRIVATE -rdynamic)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Hardened")
+  # Hardfought-ish: safe, strict, but do NOT fail on warnings
+  target_compile_options(hack PRIVATE
+    -O2 -fno-omit-frame-pointer -fPIE
+    -Wwrite-strings
+    -Wno-error
+  )
+  # Fortify (3 if toolchain supports it; harmless if ignored)
+  target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=3)
+  target_link_options(hack PRIVATE
+    -pie
+    -Wl,-z,relro,-z,now
+    -Wl,-z,noexecstack
+  )
+  # Quiet a recent Clang nit, only if relevant
+  if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 18)
+    target_compile_options(hack PRIVATE -Wno-deprecated-non-prototype)
+  endif()
+endif()
+
+# Optional: ASan/UBSan toggle (default OFF, so no scope creep)
+option(RESTOHACK_SANITIZERS "Enable Address/Undefined Sanitizers" ON)
+if(RESTOHACK_SANITIZERS)
+  target_compile_options(hack PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g)
+  target_link_options(hack PRIVATE -fsanitize=address,undefined)
 endif()
 
 # Data files

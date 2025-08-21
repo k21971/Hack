@@ -58,7 +58,7 @@ extern int inroom(int x, int y);
 int dochugw(struct monst *mtmp);
 int dochug(struct monst *mtmp);
 void dmonsfree(void);
-void kludge(char *str, char *arg);
+void kludge(const char *str, const char *arg);
 void relmon(struct monst *mon);
 void monfree(struct monst *mtmp);
 void unstuck(struct monst *mtmp);
@@ -621,7 +621,7 @@ dist(int x, int y)
 }
 
 void
-poisoned(char *string, char *pname)
+poisoned(const char *string, const char *pname)
 {
 	int i;
 
@@ -831,7 +831,16 @@ killed(struct monst *mtmp)
 }
 
 void
-kludge(char *str, char *arg)
+/**
+ * MODERN ADDITION (2025): const-qualified parameters
+ * 
+ * WHY: Function receives read-only string parameters
+ * HOW: Changed char* to const char* for str and arg parameters  
+ * 
+ * PRESERVES: All original monster interaction message functionality
+ * ADDS: Type safety for string literal arguments
+ */
+kludge(const char *str, const char *arg)
 {
 	if(Blind) {
 		if(*str == '%') pline(str,"It");

@@ -1,8 +1,18 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* def.permonst.h - version 1.0.2 */
 
+/**
+ * MODERN ADDITION (2025): const-qualified monster name string
+ * 
+ * WHY: String literals are const char*, causing 251 discarded-qualifier warnings
+ * HOW: Changed mname from char* to const char* for type safety
+ * 
+ * PRESERVES: All original monster data and functionality
+ * ADDS: Type safety and eliminates const qualifier warnings
+ */
 struct permonst {
-	char *mname,mlet;
+	const char *mname;	/* MODERN: const-qualified for string literal safety */
+	char mlet;
 	schar mlevel,mmove,ac,damn,damd;
 	unsigned pxlth;
 };

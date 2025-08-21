@@ -14,7 +14,7 @@
 
 extern char news0();
 extern char *nomovemsg;
-extern char *exclam();
+extern const char *exclam(int force);
 extern struct obj *addinv();
 extern boolean hmon();
 
@@ -734,7 +734,7 @@ void losestr(int num)	/* may kill you; cause may be poison or monster like 'A' *
 	flags.botl = 1;
 }
 
-void losehp(int n, char *knam)
+void losehp(int n, const char *knam)
 {
 	u.uhp -= n;
 	if(u.uhp > u.uhpmax)

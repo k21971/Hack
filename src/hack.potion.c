@@ -206,7 +206,7 @@ void pluslvl(void)
 	flags.botl = 1;
 }
 
-void strange_feeling(struct obj *obj, char *txt)
+void strange_feeling(struct obj *obj, const char *txt)
 {
 	if(flags.beginner)
 	    pline("You have a strange feeling for a moment, then it passes.");

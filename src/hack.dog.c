@@ -413,7 +413,7 @@ int tamedog(struct monst *mtmp, struct obj *obj)
 	mtmp2 = newmonst(sizeof(struct edog) + mtmp->mnamelth);
 	*mtmp2 = *mtmp;
 	mtmp2->mxlth = sizeof(struct edog);
-	if(mtmp->mnamelth) (void) strcpy(NAME(mtmp2), NAME(mtmp));
+	if(mtmp->mnamelth) (void) strcpy(NAME(mtmp2), NAME(mtmp));  /* MODERN: Safe - allocated exact size */
 	initedog(mtmp2);
 	replmon(mtmp,mtmp2);
 	return(1);

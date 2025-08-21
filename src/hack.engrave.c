@@ -37,7 +37,7 @@ struct engr *ep = head_engr;
 	return((struct engr *) 0);
 }
 
-int sengr_at(char *s, xchar x, xchar y) {
+int sengr_at(const char *s, xchar x, xchar y) {
 struct engr *ep = engr_at(x,y);
 char *t;
 int n;
@@ -80,8 +80,18 @@ char ch;
 		}
 		while(lth && ep->engr_txt[lth-1] == ' ')
 			ep->engr_txt[--lth] = 0;
-		while(ep->engr_txt[0] == ' ')
-			ep->engr_txt++;
+		/* MODERN: Fix memory corruption - don't modify ep->engr_txt pointer!
+		 * Instead, shift the text left to remove leading spaces */
+		if(ep->engr_txt[0] == ' ') {
+			char *src = ep->engr_txt;
+			char *dst = ep->engr_txt;
+			while(*src == ' ') src++;  /* find first non-space */
+			if(*src) {
+				while((*dst++ = *src++));  /* shift text left */
+			} else {
+				*dst = 0;  /* empty string */
+			}
+		}
 		if(!ep->engr_txt[0]) del_engr(ep);
 	}
 }

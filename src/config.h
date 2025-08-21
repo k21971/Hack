@@ -28,7 +28,7 @@
 /* #define PYRAMID_BUG */	/* avoid a bug on the Pyramid */
 /* #define NOWAITINCLUDE */	/* neither <wait.h> nor <sys/wait.h> exists */
 
-#define WIZARD  "bruno"	/* the person allowed to use the -D option */
+#define WIZARD  "mjh"	/* the person allowed to use the -D option */
 #define RECORD	"record"/* the file containing the list of topscorers */
 #define	NEWS	"news"	/* the file containing the latest hack news */
 #define	HELP	"help"	/* the file containing a description of the commands */
