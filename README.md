@@ -173,7 +173,7 @@ The current work-in-progress focuses on introducing comprehensive hardening and 
 This was the guiding philosophy of 1984. While undoubtedly brilliant, the original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose of ’80s-era K&R magic.  
 Stability was a suggestion, not a guarantee.
 
-Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
+* Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
 ---
 
 ## Recent Fixes
@@ -181,7 +181,6 @@ Version **1.1** looks to fix that: modern hardening, memory safety, and input va
 * **Modern Locking** – Replaced `link()` locks with `flock()` for clean recovery.
 * **NetBSD/pkgsrc Builds** – Fixed curses detection and RNG seeding via CMake feature checks.
 * **Tombstone Crash** – Fixed segfault in RIP screen by patching buffer overflow in name centering.
-* **Memory Safety and Hardening** - Addressed memory issues, Compiler warnings, and Hardened for varying enviroments.
 
 ---
 
