@@ -306,8 +306,7 @@ long q;
  *	&zeroobj		explicitly no object (as in w-).
  */
 struct obj *
-getobj(let,word)
-char *let,*word;
+getobj(const char *let, const char *word)
 {
 	struct obj *otmp;
 	char ilet,ilet1,ilet2;
@@ -460,9 +459,7 @@ ckunpaid(otmp) struct obj *otmp; {
 /* interactive version of getobj - used for Drop and Identify */
 /* return the number of times fn was called successfully */
 int
-ggetobj(word, fn, max)
-char *word;
-int (*fn)(struct obj *),  max;
+ggetobj(const char *word, int (*fn)(struct obj *), int max)
 {
 char buf[BUFSZ];
 char *ip;

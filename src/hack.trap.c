@@ -234,7 +234,7 @@ pline("A trap door in the ceiling opens and a rock hits %s!", monnam(mtmp));
 	return(mtmp->mtrapped);
 }
 
-void selftouch(char *arg) {
+void selftouch(const char *arg) {
 	if(uwep && uwep->otyp == DEAD_COCKATRICE){
 		pline("%s touch the dead cockatrice.", arg);
 		pline("You turn to stone.");

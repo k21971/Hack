@@ -12,6 +12,7 @@
 #include	"hack.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 /* MODERN ADDITION (2025): Safe string operation functions
  * WHY: Original sprintf/strcpy/strcat unsafe with potential buffer overflows
  * HOW: Replace with snprintf-based safe functions with proper truncation handling

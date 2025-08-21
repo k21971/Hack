@@ -114,7 +114,7 @@ extern char *lmonnam();
 	 * ADDS: Protection against memory corruption from invalid mxlth values
 	 */
 	if(mtmp2->mxlth > 1024) {  /* MODERN: Sanity check - mxlth should never be this large */
-		impossible("monster mxlth corruption detected: %u", mtmp2->mxlth);
+		impossible("monster mxlth corruption detected: %u", mtmp2->mxlth, 0);
 		monfree(mtmp2);
 		return(1);
 	}
@@ -282,7 +282,7 @@ char *bp = monnam(mtmp);
 }
 
 char *
-amonnam(struct monst *mtmp, char *adj)
+amonnam(struct monst *mtmp, const char *adj)
 {
 	char *bp = monnam(mtmp);
 	static char buf[BUFSZ + 64];	/* MODERN: Extra space for adj + static buffer reuse issue */
@@ -293,7 +293,7 @@ amonnam(struct monst *mtmp, char *adj)
 }
 
 char *
-Amonnam(struct monst *mtmp, char *adj)
+Amonnam(struct monst *mtmp, const char *adj)
 {
 	char *bp = amonnam(mtmp,adj);
 

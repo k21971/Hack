@@ -12,7 +12,7 @@
 #include	"hack.h"
 #include	<stdio.h>
 extern struct permonst li_dog, dog, la_dog;
-extern char *exclam(), *xname();
+extern const char *exclam(int force); extern char *xname(struct obj *);
 extern struct obj *mkobj_at();
 
 static boolean far_noise;
@@ -115,7 +115,7 @@ struct monst *mon;
 }
 
 /* u is hit by sth, but not a monster */
-int thitu(int tlev, int dam, char *name)
+int thitu(int tlev, int dam, const char *name)
 {
 char buf[BUFSZ];
 	setan(name,buf);

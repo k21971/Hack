@@ -298,7 +298,7 @@ void hit(const char *str, struct monst *mtmp, const char *force)	/* usually eith
 	else pline("The %s hits %s%s", str, monnam(mtmp), force);
 }
 
-void miss(char *str, struct monst *mtmp)
+void miss(const char *str, struct monst *mtmp)
 {
 	if(!cansee(mtmp->mx,mtmp->my)) pline("The %s misses it.",str);
 	else pline("The %s misses %s.",str,monnam(mtmp));
