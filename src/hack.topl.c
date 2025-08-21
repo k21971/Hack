@@ -97,7 +97,8 @@ xmore(const char *s)	/* allowed chars besides space/return */
 {
 	if(flags.toplin) {
 		curs(tlx, tly);
-		if(tlx + 8 > CO) putsym('\n'), tly++;
+		/* Original 1984: if(tlx + 8 > CO) putsym('\n'), tly++; */
+		if(tlx + 8 > CO) putsym('\n');  /* MODERN: Removed redundant tly++ - putsym('\n') already increments tly in line 225 */
 	}
 
 	if(flags.standout)
