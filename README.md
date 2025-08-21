@@ -167,7 +167,6 @@ The current work-in-progress focuses on introducing comprehensive hardening and 
 * Compiler warning elimination and code hardening
 * Environment-specific adaptations for varying systems
 * Robust input validation and sanitization
-* Address compiler warnings
 
 ⚠️ **RELAX, MAN, IT COMPILES!**  
 This was the guiding philosophy of 1984. While undoubtedly brilliant, the original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose of ’80s-era K&R magic.  
