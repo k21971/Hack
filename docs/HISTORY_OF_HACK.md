@@ -1,29 +1,29 @@
 # 📜 The Complete History of Hack: From Rogue to restoHack
 
-* A comprehensive chronicle of roguelike gaming's forgotten masterpiece and its 2025 resurrection*
+* A comprehensive chronicle of roguelike gaming's overlooked masterpiece and its 2025 resurrection*
 
 ## ⏱️ Timeline at a Glance
 
 ```text
 1980 ████ ROGUE
-     │    ∘ Created by Toy, Wichman, Arnold at UC Santa Cruz
+     │    ∘ Created by Toy, Wichman (UCSC) and Arnold (UC Berkeley)
      │    ∘ Establishes procedural generation + permadeath
      │    ∘ ASCII graphics, turn-based gameplay
      │
 1982 ████ HACK (Fenlason Era)
      │    ∘ Jay Fenlason expands Rogue concept
-     │    ∘ Adds shops, complex inventory, monster AI
-     │    ∘ Introduces Wizard Mode for developers
+     │    ∘ Adds shops, complex inventory, rule-driven monster behaviors
+     │    ∘ Wizard Mode present in early Hack (likely introduced by Fenlason's team and refined in later versions)
      │
 1984 ████ HACK 1.0 (Brouwer Takes Control)
      │    ∘ Andries Brouwer assumes development
      │    ∘ Mathematical approach to game balance
-     │    ∘ 55+ monster types, complex interactions
+     │    ∘ 46 monster types with rule-driven behaviors
      │
 1985 ████ HACK 1.0.3 (The Masterpiece)
      │    ∘ Brouwer's final version - peak of design
      │    ∘ ~15,000 lines of optimized C code
-     │    ∘ Becomes template for all future roguelikes
+     │    ∘ Direct template for NetHack development
      │
 1987 ████ NETHACK SPLITS OFF
      │    ∘ Mike Stephenson organizes NetHack DevTeam
@@ -32,7 +32,7 @@
      │
 1990s ░░░ THE DARK AGES
       │   ∘ K&R C becomes obsolete, builds fail
-      │   ∘ NetHack dominates, Hack forgotten
+      │   ∘ NetHack dominates, Hack largely overshadowed
       │   ∘ BSD ports keep minimal versions alive
       │
 2010s ░░░ DIGITAL ARCHAEOLOGY
@@ -44,7 +44,7 @@
       │    ∘ K&R → ANSI C conversion (250+ functions)
       │    ∘ Memory safety without behavior changes  
       │    ∘ CMake build system, cross-platform support
-      │    ∘ 100% authentic 1984 gameplay preserved
+      │    ∘ Authentic 1984 gameplay preserved (verified by testing)
 
 Key: ████ = Active Development    ░░░ = Dormancy/Preservation
 ```
@@ -72,7 +72,7 @@ Key: ████ = Active Development    ░░░ = Dormancy/Preservation
 
 ### The Original Vision
 
-In 1980, three programmers at UC Santa Cruz—**Michael Toy**, **Glenn Wichman**, and **Ken Arnold**—created something that would fundamentally change computer gaming. *Rogue* wasn't just a game; it was a revolutionary concept that combined:
+In 1980, **Michael Toy and Glenn Wichman (UC Santa Cruz) created Rogue. Ken Arnold (UC Berkeley) later joined, contributing curses support and interface improvements.** Together, they created something that would fundamentally change computer gaming. *Rogue* wasn't just a game; it was a revolutionary concept that combined:
 
 - **Procedural generation**: Every dungeon was unique, generated algorithmically
 - **Permadeath**: No save-scumming, no respawns—death was final
@@ -170,7 +170,7 @@ In 1984, **Andries Brouwer**, a Dutch mathematician and programmer, assumed deve
 Brouwer approached Hack like a complex system requiring mathematical rigor:
 
 #### **Massive Content Expansion**
-- **Monster variety**: Expanded from ~30 to 55+ distinct creature types
+- **Monster variety**: Expanded from ~30 to 46 distinct creature types
 - **Dungeon features**: Altars, fountains, thrones, sinks with complex interactions
 - **Magic system**: Dozens of spells, wands, and magical effects
 - **Environmental storytelling**: Every room could tell a story
@@ -206,13 +206,10 @@ Brouwer's final version represented the pinnacle of 1980s game design:
 
 ### Cultural Phenomenon
 
-By 1985, Hack had transcended gaming to become a cultural force:
+By 1985, Hack had gained significant influence in academic computing environments:
 
 #### **Academic Integration**
-- **Computer science curricula** used Hack to teach data structures
-- **Research projects** analyzed its algorithms and AI
-- **Academic papers** referenced Hack's innovations
-- **Thesis projects** extended and analyzed the codebase
+- **Computer science students** sometimes examined Hack's data structures informally, often as code-reading or programming practice rather than formal coursework
 
 #### **Community Development**
 - **Strategy guides** circulated through academic networks
@@ -305,7 +302,7 @@ Despite neglect, some groups maintained Hack:
 The 2010s brought renewed interest in computing history:
 
 #### **Emulation Projects**
-- **SIMH** and **PDP-11 emulators** could run original Hack
+- **Historical Unix environments** (e.g. VAX running 4BSD in SIMH) were capable of running Hack
 - **Virtual machines** hosting historical Unix systems
 - **Container technology** isolating old software environments
 
@@ -348,14 +345,14 @@ Every "successful" preservation changed the experience:
 
 ### The Vision: Authentic Soul, Modern Body
 
-**restoHack** emerged with a radical preservation philosophy: maintain 100% authentic 1984 gameplay while building modern infrastructure underneath.
+**restoHack** emerged with a rigorous preservation philosophy: maintain authentic 1984 gameplay while building modern infrastructure underneath.
 
 ### Core Principles
 
 #### **Behavioral Preservation**
 - **Every monster interaction** exactly as Brouwer designed
 - **Item mechanics** preserved to the random number level
-- **Save file compatibility** with original 1984 saves
+- **Save file compatibility** maintained with 1984 format structure where possible under modern compilers
 - **Statistical verification** of all probability systems
 
 #### **Technical Modernization**
@@ -395,7 +392,7 @@ The complete [original 1984 source code](docs/historical/original-source/) remai
 #### **Behavioral Verification**
 - **Regression testing** against original binaries
 - **Statistical analysis** verifying RNG sequences
-- **Save compatibility** ensuring 1984 saves work
+- **Save system preservation** maintaining 1984 format structure
 - **Cross-platform validation** ensuring identical behavior
 
 ### Technical Achievements: A Modernization Masterclass
@@ -430,7 +427,7 @@ int doeat(struct obj *otmp) {
 **Conversion Statistics:**
 - **250+ functions** converted from K&R to ANSI C
 - **0 behavioral changes** in the conversion process
-- **100% backward compatibility** with 1984 save files
+- **Save format compatibility** preserved within modern compiler constraints
 - **Enhanced type safety** through modern compiler checks
 
 #### **Memory Safety Revolution Without Behavior Changes**
@@ -602,7 +599,7 @@ $ clang-static-analyzer scan-build make
 scan-build: 0 bugs found.
 ```
 
-### The Result: Perfect Preservation
+### The Result: Behavioral Preservation Verified by Regression Tests
 
 restoHack achieved what many thought impossible: **authentic 1984 Hack running reliably on 2025 systems** with zero compromises.
 
@@ -666,7 +663,7 @@ Contemporary games owing debt to Hack:
 
 ### Linguistic Legacy
 
-Hack introduced terms now fundamental to gaming:
+Hack exemplified mechanics that came to define roguelikes:
 - **"Roguelike"** as a genre definition
 - **"Permadeath"** for permanent character loss
 - **"Proc gen"** for procedural generation
@@ -710,12 +707,14 @@ The dungeons of Doom await. Choose your weapon, prepare your spells, and descend
 - **[FreeBSD Games Collection](https://cgit.freebsd.org/src/tree/games/hack?h=releng/4.10)** - Canonical preservation
 
 ### **restoHack Project Documentation**
+
 - **[README.md](../README.md)** - Quick start and installation guide
 - **[CODING_STANDARDS.md](CODING_STANDARDS.md)** - Complete modernization methodology
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and technical changes
 - **[C_LEARNING_LOG.md](C_LEARNING_LOG.md)** - Development notes and insights
 
 ### **Academic and Historical Context**
+
 - **[Original READ_ME](docs/historical/original-source/Original_READ_ME)** - Brouwer's 1985 documentation
 - **[BSD Games History](https://en.wikipedia.org/wiki/BSD_games)** - Unix gaming preservation
 - **[Roguelike Development Community](https://www.roguebasin.com/)** - Modern roguelike evolution
@@ -764,4 +763,4 @@ Please submit improvements via pull request to the [restoHack repository](https:
 
 ---
 
-*This document is maintained as part of the restoHack software preservation project. Last updated: January 2025.*
+*This document is maintained as part of the restoHack software preservation project. Last updated: August 2025.*
