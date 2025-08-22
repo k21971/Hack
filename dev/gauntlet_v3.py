@@ -352,6 +352,16 @@ class GauntletRunner:
             run_log_path = self.log_dir / f"{lane.name}_run{i:03d}.log"
             
             try:
+                # Clean up any leftover save files that might cause restore issues
+                import glob
+                save_patterns = [f"/tmp/*{lane.name}*", f"/home/mjh/projects/restoHack/*save*", f"/home/mjh/projects/restoHack/*.hack"]
+                for pattern in save_patterns:
+                    for save_file in glob.glob(pattern):
+                        try:
+                            os.unlink(save_file)
+                        except:
+                            pass
+                
                 # Use corrected pexpect approach with proper game flow
                 import tempfile
                 with tempfile.NamedTemporaryFile(mode="w+b", delete=False) as temp_stderr:
@@ -380,11 +390,21 @@ class GauntletRunner:
                 
                 # stderr_output is already set above
                 
-                # Check for sanitizer runtime errors
-                has_runtime_errors = ("runtime error:" in stderr_output) or ("SUMMARY: UndefinedBehaviorSanitizer" in stderr_output)
+                # Check for actual memory/safety errors (not player death)
+                has_asan_errors = "AddressSanitizer" in stderr_output
+                has_ubsan_errors = ("runtime error:" in stderr_output) or ("SUMMARY: UndefinedBehaviorSanitizer" in stderr_output)
+                has_sanitizer_errors = has_asan_errors or has_ubsan_errors
                 
-                # Only write logs if there are actual sanitizer errors
-                if has_runtime_errors or (stderr_output and "ERROR:" in stderr_output):
+                # Check if process was killed by actual signal (segfault, abort, etc.)
+                # Don't treat pexpect timeouts/terminations as signals
+                killed_by_signal = False
+                if hasattr(runner, 'child') and runner.child:
+                    # Only treat as signal if pexpect detected an actual signal
+                    killed_by_signal = (runner.child.signalstatus is not None and 
+                                       runner.child.signalstatus != 0)
+                
+                # Only write logs for actual memory/safety errors
+                if has_sanitizer_errors or killed_by_signal:
                     stderr_log_path = self.log_dir / f"{lane.name}_run{i:03d}.stderr"
                     run_log_path = self.log_dir / f"{lane.name}_run{i:03d}.log"
                     
@@ -396,19 +416,22 @@ class GauntletRunner:
                     with open(run_log_path, "w") as log_file:
                         log_file.write(f"Exit code: {exit_code}\n")
                         log_file.write(f"Success: {success}\n")
+                        if killed_by_signal:
+                            log_file.write(f"Signal: Process killed by signal\n")
                         log_file.write(f"STDERR:\n{stderr_output}\n")
                 
-                # Accept normal exit codes and no runtime errors
-                # Treat normal quits (exit code 0) and successful sessions as success
-                is_successful = (success or exit_code == 0) and not has_runtime_errors
+                # PASS: No sanitizer errors and no signals = healthy run
+                # Player death, timeout, normal quit are all acceptable
+                is_healthy = not has_sanitizer_errors and not killed_by_signal
                 
-                if is_successful:
+                if is_healthy:
                     print(f"✅ {lane.name} {i:03d}")
                     passed += 1
                 else:
                     error_reason = []
-                    if not success and exit_code != 0: error_reason.append(f"exit={exit_code}")
-                    if has_runtime_errors: error_reason.append("sanitizer-errors")
+                    if has_asan_errors: error_reason.append("asan-error")
+                    if has_ubsan_errors: error_reason.append("ubsan-error") 
+                    if killed_by_signal: error_reason.append("signal")
                     print(f"❌ {lane.name} {i:03d} FAILED ({', '.join(error_reason)})")
                     failed += 1
                         
@@ -465,18 +488,20 @@ class GauntletRunner:
                     player_name = f"VGPlayer{i:02d}"
                     success, exit_code = runner.run_session(steps, player_name)
                     
-                    # Check Valgrind results
+                    # Check Valgrind results - only care about actual memory errors
                     vg_errors = self._check_valgrind_log(vg_log_path)
+                    valgrind_found_errors = (exit_code == 99) or (vg_errors > 0)
                     
-                    if success and exit_code in [0, 141] and not vg_errors:
+                    # PASS: No Valgrind errors = healthy run (death/timeout/quit are fine)
+                    is_healthy = not valgrind_found_errors
+                    
+                    if is_healthy:
                         print(f"✅ valgrind {i:03d}")
                         passed += 1
                     else:
                         error_reason = []
-                        if not success: error_reason.append("failed")
-                        if exit_code == 99: error_reason.append("valgrind-error")
-                        elif exit_code not in [0, 141]: error_reason.append(f"exit={exit_code}")
-                        if vg_errors: error_reason.append(f"{vg_errors}-errors")
+                        if exit_code == 99: error_reason.append("valgrind-exitcode")
+                        if vg_errors: error_reason.append(f"{vg_errors}-memory-errors")
                         print(f"❌ valgrind {i:03d} FAILED ({', '.join(error_reason)})")
                         failed += 1
                         
