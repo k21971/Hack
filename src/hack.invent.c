@@ -724,8 +724,8 @@ dotypeinv ()				/* free after Robert Viduya */
 /* look at what is here */
 int
 dolook() {
-    struct obj *otmp, *otmp0;
-    struct gold *gold;
+    struct obj *otmp, *otmp0 = NULL;  /* MODERN: Initialize to prevent uninitialized use */
+    struct gold *gold = NULL;  /* MODERN: Initialize to prevent uninitialized use */
     const char *verb = Blind ? "feel" : "see";  /* MODERN: const because assigned string literals */
     int	ct = 0;
 

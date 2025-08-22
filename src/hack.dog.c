@@ -113,7 +113,7 @@ int dogfood(struct obj *obj) {
 /* return 0 (no move), 1 (move) or 2 (dead) */
 int dog_move(struct monst *mtmp, int after) {
 int nx,ny,omx,omy,appr,nearer,j;
-int udist,chi,i,whappr;
+int udist,chi = -1,i,whappr;  /* MODERN: Initialize chi to prevent uninitialized use */
 struct monst *mtmp2;
 struct permonst *mdat = mtmp->data;
 struct edog *edog = EDOG(mtmp);
@@ -161,7 +161,7 @@ int info[9];
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	if(mtmp->minvent){
 		if(!rn2(udist) || !rn2((int) edog->apport))
-		if(rn2(10) < edog->apport){
+		if((unsigned)rn2(10) < edog->apport){  /* MODERN: Cast to unsigned to match apport type */
 			relobj(mtmp, (int) mtmp->minvis);
 			if(edog->apport > 1) edog->apport--;
 			edog->dropdist = udist;		/* hpscdi!jon */
@@ -175,7 +175,7 @@ int info[9];
 			goto eatobj;
 		    }
 		    if(obj->owt < 10*mtmp->data->mlevel)
-		    if(rn2(20) < edog->apport+3)
+		    if((unsigned)rn2(20) < edog->apport+3)  /* MODERN: Cast to unsigned to match apport type */
 		    if(rn2(udist) || !rn2((int) edog->apport)){
 			freeobj(obj);
 			unpobj(obj);
@@ -206,7 +206,7 @@ int info[9];
 		} else
 		if(gtyp == UNDEF && dogroom >= 0 &&
 		   uroom == dogroom &&
-		   !mtmp->minvent && edog->apport > rn2(8)){
+		   !mtmp->minvent && edog->apport > (unsigned)rn2(8)){  /* MODERN: Cast to unsigned to match apport type */
 			gx = obj->ox;
 			gy = obj->oy;
 			gtyp = APPORT;

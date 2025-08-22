@@ -286,7 +286,7 @@ dig(void) {
 		}
 	} else
 	if(dig_effort > 100) {
-		char *digtxt;
+		const char *digtxt;  /* MODERN: const because assigned string literals */
 		struct obj *obj;
 
 		lev = &levl[dpx][dpy];
