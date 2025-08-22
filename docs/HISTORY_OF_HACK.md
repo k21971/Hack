@@ -50,8 +50,8 @@ Key: ████ = Active Development    ░░░ = Dormancy/Preservation
 ```
 
 **Project Status:** ✅ **Complete** - Authentic 1984 Hack running on 2025 systems  
-**Code Provenance:** [FreeBSD 4.10 Games Collection](docs/historical/original-source/download_hack.sh)  
-**Documentation:** [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) | [CHANGELOG.md](docs/CHANGELOG.md)
+**Code Provenance:** [FreeBSD 4.10 Games Collection](historical/original-source/download_hack.sh)  
+**Documentation:** [CODING_STANDARDS.md](CODING_STANDARDS.md) | [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
