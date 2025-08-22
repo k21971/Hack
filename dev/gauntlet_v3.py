@@ -50,8 +50,8 @@ class HackGameRunner:
         if self.debug:
             print(f"[GAME] {msg}", file=sys.stderr)
             
-    def run_session(self, steps: int = 50, player_name: str = "TestPlayer") -> Tuple[bool, int]:
-        """Run a complete game session with proper state handling"""
+    def run_session(self, steps: int = 200, player_name: str = "TestPlayer") -> Tuple[bool, int]:
+        """Run game session: ./hack -> n -> space -> space -> moves -> i -> space -> moves -> d -> a -> moves -> Q -> y"""
         try:
             # Start game
             cmd = f'{self.binary_path} -D'
@@ -61,7 +61,7 @@ class HackGameRunner:
             if self.debug:
                 self.child.logfile_read = sys.stderr.buffer
                 
-            # Handle startup sequence
+            # Handle startup sequence exactly as specified
             patterns = [
                 'Shall I pick a character',
                 'shall I pick a character', 
@@ -73,7 +73,7 @@ class HackGameRunner:
             index = self.child.expect(patterns, timeout=5)
             
             if index < 2:  # Character selection
-                self.child.sendline('n')
+                self.child.send('n')  # Choose "no" to pick character
                 self.child.expect(['What is your name', 'name'], timeout=3)
                 self.child.sendline(player_name)
             elif index == 2:  # Direct name prompt
@@ -81,37 +81,46 @@ class HackGameRunner:
             else:
                 return False, -1
                 
-            # Wait for game start
+            # Wait for game start and clear intro
             self.child.expect(['--More--', 'Hit space', '@', 'Dlvl:', pexpect.TIMEOUT], timeout=8)
-            self.child.send(' ')  # Clear any intro text
+            self.child.send(' ')  # First space
+            time.sleep(0.1)
+            self.child.send(' ')  # Second space (clear any remaining text)
+            time.sleep(0.1)
             
-            # Play the game
-            movement_keys = 'hjkl'
-            safe_commands = '.Ls?i'
-            
-            for i in range(steps):
-                if i % 10 == 0 and i > 0:
-                    # Occasional safe command
-                    cmd = random.choice(safe_commands)
-                    self.child.send(cmd)
-                    if cmd == 's':  # Save
-                        try:
-                            idx = self.child.expect(['Save', 'save', pexpect.TIMEOUT], timeout=1)
-                            if idx < 2:
-                                self.child.sendline('y')
-                        except:
-                            pass
-                else:
-                    # Movement
-                    self.child.send(random.choice(movement_keys))
-                    
-                time.sleep(0.02)  # Brief pause
+            # Phase 1: Move around (200 moves with hjklyubn)
+            movement_keys = 'hjklyubn'
+            for _ in range(200):
+                self.child.send(random.choice(movement_keys))
+                time.sleep(0.01)  # Very brief pause
                 
-            # Quit reliably
+            # Phase 2: Open inventory
+            self.child.send('i')
+            time.sleep(0.1)
+            self.child.send(' ')  # Space to close inventory
+            time.sleep(0.1)
+            
+            # Phase 3: Move some more (5 moves)
+            for _ in range(5):
+                self.child.send(random.choice(movement_keys))
+                time.sleep(0.01)
+                
+            # Phase 4: Drop and apply
+            self.child.send('d')  # Drop
+            time.sleep(0.1)
+            self.child.send('a')  # Apply  
+            time.sleep(0.1)
+            
+            # Phase 5: Final moves (5 more)
+            for _ in range(5):
+                self.child.send(random.choice(movement_keys))
+                time.sleep(0.01)
+                
+            # Quit sequence
             self.child.send('Q')
             try:
                 self.child.expect(['Really quit', 'quit'], timeout=3)
-                self.child.sendline('y')
+                self.child.send('y')
                 self.child.expect(pexpect.EOF, timeout=5)
             except:
                 self.child.terminate(force=True)
@@ -136,7 +145,7 @@ class HackGameRunner:
 class BuildLane:
     """Represents a sanitizer build configuration"""
     
-    def __init__(self, name: str, build_dir: str, cflags: str, env_vars: Dict[str, str] = None):
+    def __init__(self, name: str, build_dir: str, cflags: str, env_vars: Optional[Dict[str, str]] = None):
         self.name = name
         self.build_dir = build_dir
         self.cflags = cflags
@@ -160,46 +169,89 @@ class GauntletRunner:
         self.log_dir = self.root_dir / "gauntlet-logs" / timestamp
         self.log_dir.mkdir(parents=True, exist_ok=True)
         
-        # Build configurations
+        # Set up core dumps
+        self._setup_core_dumps()
+        
+        # Build configurations - battle-tested sanitizer settings
         self.lanes = [
             BuildLane(
                 "asan", 
-                str(self.root_dir / "build-asan"),
-                "-O1 -g -fsanitize=address -fno-omit-frame-pointer -fno-sanitize-recover=all",
-                {
-                    "ASAN_OPTIONS": "abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1",
-                }
+                str(self.project_root / "build-asan"),
+                "-fsanitize=address -fno-omit-frame-pointer -fno-sanitize-recover=all"
             ),
             BuildLane(
                 "ubsan",
-                str(self.root_dir / "build-ubsan"), 
-                "-O2 -g -fsanitize=undefined -fno-omit-frame-pointer -fno-sanitize-recover=all -Wall -Wextra -Wshadow -Wuninitialized -Wconditional-uninitialized",
-                {
-                    "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1",
-                }
+                str(self.project_root / "build-ubsan"), 
+                "-fsanitize=undefined,bounds,shift,integer-divide-by-zero,signed-integer-overflow,null,unreachable,vla-bound,object-size -fno-omit-frame-pointer -fno-sanitize-recover=all"
             ),
             BuildLane(
-                "msan",
-                str(self.root_dir / "build-msan"),
-                "-O1 -g -fsanitize=memory -fno-omit-frame-pointer -fno-sanitize-recover=all -fsanitize-memory-track-origins=2",
-                {
-                    "MSAN_OPTIONS": "halt_on_error=0:exit_code=0:report_umrs=1:poison_in_dtor=1:track_origins=2",
-                }
+                "asan-ubsan",
+                str(self.project_root / "build-asan-ubsan"),
+                "-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all"
             ),
             BuildLane(
-                "rel",
-                str(self.root_dir / "build-rel"),
-                "-O2 -g -fno-omit-frame-pointer -Wall -Wextra"
+                "hardened",
+                str(self.project_root / "build-hardened"),
+                "-O2 -fPIE -fstack-protector-strong -D_FORTIFY_SOURCE=2"
             )
         ]
         
         self.results = {}
+    
+    def _setup_core_dumps(self) -> None:
+        """Enable core dumps for crash analysis"""
+        try:
+            import resource
+            resource.setrlimit(resource.RLIMIT_CORE, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+            Colors.say("SETUP", "Core dumps enabled")
+        except Exception as e:
+            Colors.error(f"Failed to enable core dumps: {e}")
+    
+    def _lane_env(self, lane: BuildLane, run_number: int) -> Dict[str, str]:
+        """Generate deterministic environment for each lane"""
+        env = os.environ.copy()
+        logbase = str(self.log_dir / f"{lane.name}_run{run_number:03d}")
+        sym = shutil.which("llvm-symbolizer") or shutil.which("addr2line") or ""
+        
+        # Set symbolizer for sanitizers
+        if sym:
+            env["ASAN_SYMBOLIZER_PATH"] = sym
+            env["UBSAN_SYMBOLIZER_PATH"] = sym
+        
+        # Sanitizer-specific options with logging
+        if "asan" in lane.name:
+            env["ASAN_OPTIONS"] = (
+                f"abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:"
+                f"check_initialization_order=1:detect_leaks=1:log_path={logbase}.asan"
+            )
+        if "ubsan" in lane.name:
+            env["UBSAN_OPTIONS"] = f"print_stacktrace=1:halt_on_error=1:log_path={logbase}.ubsan"
+        
+        # Add any lane-specific env vars
+        env.update(lane.env_vars)
+        
+        # Set consistent random seed for reproducibility
+        env["HACK_SEED"] = str(hash(f"{lane.name}_{run_number}") % 2**32)
+        
+        return env
+    
+    def drain_more(self, child: pexpect.spawn, tries: int = 5) -> None:
+        """Drain --More-- prompts and escape sequences"""
+        for _ in range(tries):
+            try:
+                i = child.expect([r'--More--', r'\x1b\[K', r'@', r'Dlvl:', pexpect.TIMEOUT], timeout=0.5)
+                if i == 0:  # --More--
+                    child.send(' ')
+                else:
+                    break
+            except:
+                break
         
     def log(self, msg: str) -> None:
         if self.debug:
             print(f"[GAUNTLET] {msg}", file=sys.stderr)
             
-    def run_command(self, cmd: List[str], cwd: str = None, env: Dict[str, str] = None) -> Tuple[int, str, str]:
+    def run_command(self, cmd: List[str], cwd: Optional[str] = None, env: Optional[Dict[str, str]] = None) -> Tuple[int, str, str]:
         """Run command and capture output"""
         full_env = os.environ.copy()
         if env:
@@ -228,12 +280,14 @@ class GauntletRunner:
         if os.path.exists(lane.build_dir):
             shutil.rmtree(lane.build_dir)
             
-        # Configure
+        # Configure with proper build type and flags
+        build_type = "Debug" if any(flag in lane.cflags for flag in ["-fsanitize", "-g"]) else "RelWithDebInfo"
         cmake_cmd = [
             'cmake', '-S', str(self.project_root), '-B', lane.build_dir,
-            '-DCMAKE_BUILD_TYPE=Hardened',
+            f'-DCMAKE_BUILD_TYPE={build_type}',
             '-DCMAKE_C_COMPILER=clang',
-            f'-DCMAKE_C_FLAGS={lane.cflags}'
+            f'-DCMAKE_C_FLAGS_DEBUG={lane.cflags}' if build_type == "Debug" else f'-DCMAKE_C_FLAGS_RELWITHDEBINFO={lane.cflags}',
+            '-DENABLE_SANITIZERS=ON' if 'sanitize' in lane.cflags else '-DENABLE_SANITIZERS=OFF'
         ]
         
         ret_code, stdout, stderr = self.run_command(cmake_cmd)
@@ -270,7 +324,7 @@ class GauntletRunner:
         return True
         
     def test_lane(self, lane: BuildLane, runs: int = 50, steps: int = 40) -> Tuple[int, int]:
-        """Test a built lane with stress runs"""
+        """Test a built lane with stress runs and proper logging"""
         if not os.path.exists(lane.binary_path):
             Colors.error(f"Binary not found: {lane.binary_path}")
             return 0, runs
@@ -280,57 +334,135 @@ class GauntletRunner:
         passed = 0
         failed = 0
         
-        # Set environment for this lane
-        test_env = os.environ.copy()
-        test_env.update(lane.env_vars)
+        # Add Valgrind for hardened builds
+        if lane.name == "hardened":
+            return self._test_lane_valgrind(lane, runs, steps)
         
         for i in range(1, runs + 1):
-            runner = HackGameRunner(lane.binary_path, debug=self.debug)
-            player_name = f"Player{i:02d}"
+            run_env = self._lane_env(lane, i)
             
-            # Set environment vars for sanitizers
-            old_env = {}
-            for key, value in lane.env_vars.items():
-                old_env[key] = os.environ.get(key)
-                os.environ[key] = value
-                
+            # Create run-specific log file
+            run_log_path = self.log_dir / f"{lane.name}_run{i:03d}.log"
+            
             try:
-                success, exit_code = runner.run_session(steps, player_name)
-                
-                # Accept normal exit codes
-                if success and (exit_code == 0 or exit_code == 141):
-                    print(f"✅ {lane.name} {i}")
-                    passed += 1
-                else:
-                    print(f"❌ {lane.name} {i} FAILED (exit={exit_code})")
-                    failed += 1
+                # Start game with proper environment
+                cmd = f'{lane.binary_path} -D'
+                with open(run_log_path, "wb") as log_file:
+                    child = pexpect.spawn(cmd, timeout=10, env=dict(run_env))
+                    child.logfile_read = log_file
                     
-            except Exception as e:
-                print(f"❌ {lane.name} {i} EXCEPTION: {e}")
-                failed += 1
-                
-            finally:
-                # Restore environment
-                for key, old_value in old_env.items():
-                    if old_value is None:
-                        os.environ.pop(key, None)
+                    runner = HackGameRunner(lane.binary_path, debug=self.debug)
+                    runner.child = child  # Use our configured child
+                    
+                    # Run the game session
+                    player_name = f"Player{i:02d}"
+                    success, exit_code = runner.run_session(steps, player_name)
+                    
+                    # Check for sanitizer runtime errors
+                    has_runtime_errors = self._check_sanitizer_logs(lane.name, i)
+                    
+                    # Accept normal exit codes and no runtime errors
+                    if success and (exit_code == 0 or exit_code == 141) and not has_runtime_errors:
+                        print(f"✅ {lane.name} {i:03d}")
+                        passed += 1
                     else:
-                        os.environ[key] = old_value
+                        error_reason = []
+                        if not success: error_reason.append("failed")
+                        if exit_code not in [0, 141]: error_reason.append(f"exit={exit_code}")
+                        if has_runtime_errors: error_reason.append("sanitizer-errors")
+                        print(f"❌ {lane.name} {i:03d} FAILED ({', '.join(error_reason)})")
+                        failed += 1
                         
-            time.sleep(0.05)  # Brief pause between runs
-            
-        # Log results
-        stress_log = self.log_dir / f"{lane.name}_stress.log"
-        with open(stress_log, 'w') as f:
-            f.write(f"Lane: {lane.name}\n")
-            f.write(f"Runs: {runs}\n")
-            f.write(f"Steps per run: {steps}\n")
-            f.write(f"Passed: {passed}\n")
-            f.write(f"Failed: {failed}\n")
-            f.write(f"Success rate: {(passed * 100) // runs}%\n")
-            
-        Colors.say("RESULT", f"{lane.name}: {passed} passed, {failed} failed")
+            except Exception as e:
+                print(f"❌ {lane.name} {i:03d} EXCEPTION: {e}")
+                failed += 1
+        
         return passed, failed
+    
+    def _check_sanitizer_logs(self, lane_name: str, run_number: int) -> bool:
+        """Check for sanitizer runtime errors in log files"""
+        has_errors = False
+        
+        # Check for ASan log files
+        for asan_log in self.log_dir.glob(f"{lane_name}_run{run_number:03d}.asan.*"):
+            has_errors = True
+            Colors.error(f"ASan error detected in {asan_log.name}")
+            
+        # Check for UBSan log files  
+        for ubsan_log in self.log_dir.glob(f"{lane_name}_run{run_number:03d}.ubsan.*"):
+            has_errors = True
+            Colors.error(f"UBSan error detected in {ubsan_log.name}")
+            
+        return has_errors
+    
+    def _test_lane_valgrind(self, lane: BuildLane, runs: int, steps: int) -> Tuple[int, int]:
+        """Test lane with Valgrind memory checking"""
+        Colors.say("VALGRIND", f"Running {runs} tests with memory checking")
+        
+        passed = 0
+        failed = 0
+        
+        valgrind_cmd = [
+            'valgrind', '--error-exitcode=99', '--leak-check=full', 
+            '--show-leak-kinds=all', '--track-origins=yes', '--error-limit=no',
+            '--read-var-info=yes', '--num-callers=20',
+            lane.binary_path, '-D'
+        ]
+        
+        for i in range(1, runs + 1):
+            run_env = self._lane_env(lane, i)
+            vg_log_path = self.log_dir / f"valgrind_run{i:03d}.log"
+            
+            try:
+                with open(vg_log_path, "wb") as log_file:
+                    child = pexpect.spawn(' '.join(valgrind_cmd), timeout=60, env=dict(run_env))
+                    child.logfile_read = log_file
+                    
+                    runner = HackGameRunner(lane.binary_path, debug=self.debug)
+                    runner.child = child
+                    
+                    player_name = f"VGPlayer{i:02d}"
+                    success, exit_code = runner.run_session(steps, player_name)
+                    
+                    # Check Valgrind results
+                    vg_errors = self._check_valgrind_log(vg_log_path)
+                    
+                    if success and exit_code in [0, 141] and not vg_errors:
+                        print(f"✅ valgrind {i:03d}")
+                        passed += 1
+                    else:
+                        error_reason = []
+                        if not success: error_reason.append("failed")
+                        if exit_code == 99: error_reason.append("valgrind-error")
+                        elif exit_code not in [0, 141]: error_reason.append(f"exit={exit_code}")
+                        if vg_errors: error_reason.append(f"{vg_errors}-errors")
+                        print(f"❌ valgrind {i:03d} FAILED ({', '.join(error_reason)})")
+                        failed += 1
+                        
+            except Exception as e:
+                print(f"❌ valgrind {i:03d} EXCEPTION: {e}")
+                failed += 1
+        
+        return passed, failed
+    
+    def _check_valgrind_log(self, log_path: Path) -> int:
+        """Parse Valgrind log for error count"""
+        try:
+            log_content = log_path.read_text()
+            # Look for error summary
+            for line in log_content.split('\n'):
+                if 'ERROR SUMMARY:' in line:
+                    # Extract error count from "ERROR SUMMARY: X errors from Y contexts"
+                    parts = line.split()
+                    if len(parts) >= 3:
+                        try:
+                            return int(parts[2])
+                        except ValueError:
+                            pass
+        except:
+            pass
+        return 0
+        
         
     def run_valgrind(self, lane: BuildLane) -> bool:
         """Run Valgrind memcheck on release build"""
@@ -413,12 +545,6 @@ class GauntletRunner:
                 elif lane.name == "ubsan":
                     count += content.count("UndefinedBehaviorSanitizer")
                     count += content.count("runtime error:")
-                elif lane.name == "msan":
-                    # Only count real errors, not uninstrumented library warnings
-                    msan_errors = content.count("MemorySanitizer")
-                    msan_errors += content.count("use-of-uninitialized-value")
-                    uninstrumented = content.count("uninstrumented")
-                    count += max(0, msan_errors - uninstrumented)
                     
             failure_counts[lane.name] = count
             
