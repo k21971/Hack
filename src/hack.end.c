@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <time.h>
 /* MODERN: Safe sprintf replacement - same interface, prevents overflow */
-#define	Sprintf(buf, ...) (void) snprintf(buf, 128, __VA_ARGS__)
+#define	Sprintf(buf, ...) (void) snprintf(buf, 200, __VA_ARGS__)  /* MODERN: Increased from 128 to 200 to prevent truncation warnings */
 extern char plname[], pl_character[];
 
 /* Forward declarations for missing functions */
