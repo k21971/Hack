@@ -100,12 +100,28 @@ const char *tmp;  /* MODERN: const to match oc_descr field type */
 int probtype(int let) {
 int i = bases[letindex(let)];
 int prob = rn2(100);
+int category_start = i;
+	/* MODERN ADDITION (2025): Safe probability calculation with bounds checking
+	 * WHY: Original could overflow when probabilities don't sum correctly
+	 * HOW: Track category boundaries and clamp to valid range
+	 * PRESERVES: Original 1984 random selection behavior within category
+	 * ADDS: Memory safety to prevent array bounds violations
+	 */
+	
+	/* Find the end of this object category */
+	int category_end = i;
+	while(category_end < NROFOBJECTS && objects[category_end].oc_olet == let && objects[category_end].oc_name != NULL) {
+		category_end++;
+	}
+	
 	/* Original 1984: while((prob -= objects[i].oc_prob) >= 0) i++; */
 	while((prob -= objects[i].oc_prob) >= 0) {
 		i++;
-		/* MODERN: Bounds check inside loop to prevent array overflow */
-		if(i >= NROFOBJECTS) {
-			panic("probtype(%c) index overflow, i=%d >= %d", let, i, NROFOBJECTS);
+		/* MODERN: Bounds check - stay within this object category */
+		if(i >= category_end || i >= NROFOBJECTS) {
+			/* If we've exhausted all objects in category, return the last valid one */
+			i = category_end - 1;
+			break;
 		}
 	}
 	if(objects[i].oc_olet != let || !objects[i].oc_name)

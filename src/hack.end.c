@@ -17,6 +17,20 @@
 #include <sys/stat.h>
 #include <time.h>
 /* MODERN: Safe sprintf replacement - same interface, prevents overflow */
+/* MODERN ADDITION (2025): Bounds-safe sprintf replacement for outentry function
+ * WHY: Original Sprintf could overflow linebuf causing crashes in topten display
+ * HOW: Calculate remaining buffer space and use snprintf with proper bounds
+ * PRESERVES: Original 1984 text formatting behavior when space available
+ * ADDS: Memory safety bounds checking to prevent buffer overflow crashes
+ */
+#define	SafeAppend(linebuf, ...) do { \
+    char *pos = eos(linebuf); \
+    size_t remaining = BUFSZ - (pos - (linebuf)); \
+    if(remaining > 1) { \
+        snprintf(pos, remaining, __VA_ARGS__); \
+    } \
+} while(0)
+
 #define	Sprintf(buf, ...) (void) snprintf(buf, 200, __VA_ARGS__)  /* MODERN: Increased from 128 to 200 to prevent truncation warnings */
 extern char plname[], pl_character[];
 
@@ -509,43 +523,47 @@ outentry(int rank, struct toptenentry *t1, int so) {
 boolean quit = FALSE, killed = FALSE, starv = FALSE;
 char linebuf[BUFSZ];
 	linebuf[0] = 0;
-	if(rank) Sprintf(eos(linebuf), "%3d", rank);
-	else Sprintf(eos(linebuf), "   ");
-	Sprintf(eos(linebuf), " %6ld %8s", t1->points, t1->name);
-	if(t1->plchar == 'X') Sprintf(eos(linebuf), " ");
-	else Sprintf(eos(linebuf), "-%c ", t1->plchar);
+	if(rank) SafeAppend(linebuf, "%3d", rank);
+	else SafeAppend(linebuf, "   ");
+	SafeAppend(linebuf, " %6ld %8s", t1->points, t1->name);
+	if(t1->plchar == 'X') SafeAppend(linebuf, " ");
+	else SafeAppend(linebuf, "-%c ", t1->plchar);
 	if(!strncmp("escaped", t1->death, 7)) {
 	  if(!strcmp(" (with amulet)", t1->death+7))
-	    Sprintf(eos(linebuf), "escaped the dungeon with amulet");
+	    SafeAppend(linebuf, "escaped the dungeon with amulet");
 	  else
-	    Sprintf(eos(linebuf), "escaped the dungeon [max level %d]",
+	    SafeAppend(linebuf, "escaped the dungeon [max level %d]",
 	      t1->maxlvl);
 	} else {
 	  if(!strncmp(t1->death,"quit",4)) {
 	    quit = TRUE;
 	    if(t1->maxhp < 3*t1->hp && t1->maxlvl < 4)
-	  	Sprintf(eos(linebuf), "cravenly gave up");
+	  	SafeAppend(linebuf, "cravenly gave up");
 	    else
-		Sprintf(eos(linebuf), "quit");
+		SafeAppend(linebuf, "quit");
 	  }
 	  else if(!strcmp(t1->death,"choked"))
-	    Sprintf(eos(linebuf), "choked on %s food",
+	    SafeAppend(linebuf, "choked on %s food",
 		(t1->sex == 'F') ? "her" : "his");
-	  else if(!strncmp(t1->death,"starv",5))
-	    Sprintf(eos(linebuf), "starved to death"), starv = TRUE;
-	  else Sprintf(eos(linebuf), "was killed"), killed = TRUE;
-	  Sprintf(eos(linebuf), " on%s level %d",
+	  else if(!strncmp(t1->death,"starv",5)) {
+	    SafeAppend(linebuf, "starved to death"); 
+	    starv = TRUE;
+	  } else {
+	    SafeAppend(linebuf, "was killed"); 
+	    killed = TRUE;
+	  }
+	  SafeAppend(linebuf, " on%s level %d",
 	    (killed || starv) ? "" : " dungeon", t1->level);
 	  if(t1->maxlvl != t1->level)
-	    Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
-	  if(quit && t1->death[4]) Sprintf(eos(linebuf), "%s", t1->death + 4);
+	    SafeAppend(linebuf, " [max %d]", t1->maxlvl);
+	  if(quit && t1->death[4]) SafeAppend(linebuf, "%s", t1->death + 4);
 	}
-	if(killed) Sprintf(eos(linebuf), " by %s%s",
+	if(killed) SafeAppend(linebuf, " by %s%s",
 	  (!strncmp(t1->death, "trick", 5) || !strncmp(t1->death, "the ", 4))
 		? "" :
 	  index(vowels,*t1->death) ? "an " : "a ",
 	  t1->death);
-	Sprintf(eos(linebuf), ".");
+	SafeAppend(linebuf, ".");
 	if(t1->maxhp) {
 	  char *bp = eos(linebuf);
 	  char hpbuf[12];  /* MODERN: Buffer size increased from 10 to 12 to prevent overflow from INT_MIN (-2147483648) */
@@ -555,7 +573,17 @@ char linebuf[BUFSZ];
 	  if(bp <= linebuf + hppos) {
 	    while(bp < linebuf + hppos) *bp++ = ' ';
 	    (void) strcpy(bp, hpbuf);
-	    Sprintf(eos(bp), " [%d]", t1->maxhp);
+	    /* MODERN ADDITION (2025): Bounds-checked append to prevent buffer overflow
+	     * WHY: Original Sprintf could write beyond linebuf end causing crash
+	     * HOW: Calculate remaining space and use snprintf with proper limit
+	     * PRESERVES: Original 1984 behavior when space available
+	     * ADDS: Memory safety bounds checking
+	     */
+	    char *append_pos = eos(bp);
+	    size_t remaining = BUFSZ - (append_pos - linebuf);
+	    if(remaining > 1) {
+	        snprintf(append_pos, remaining, " [%d]", t1->maxhp);
+	    }
 	  }
 	}
 	if(so == 0) puts(linebuf);

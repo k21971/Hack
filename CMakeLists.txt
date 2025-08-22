@@ -405,12 +405,8 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Hardened")
   endif()
 endif()
 
-# Optional: ASan/UBSan toggle (default OFF, so no scope creep)
-option(RESTOHACK_SANITIZERS "Enable Address/Undefined Sanitizers" ON)
-if(RESTOHACK_SANITIZERS)
-  target_compile_options(hack PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g)
-  target_link_options(hack PRIVATE -fsanitize=address,undefined)
-endif()
+# REMOVED: Conflicting sanitizer configuration that was overriding ENABLE_SANITIZERS
+# All sanitizer control now handled by ENABLE_SANITIZERS option above (lines 306-322)
 
 # Data files
 set(DATA_FILES rumors help hh data)

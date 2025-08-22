@@ -1,10 +1,10 @@
 # 📜 The Complete History of Hack: From Rogue to restoHack
 
-*A comprehensive chronicle of roguelike gaming's forgotten masterpiece and its 2025 resurrection*
+* A comprehensive chronicle of roguelike gaming's forgotten masterpiece and its 2025 resurrection*
 
 ## ⏱️ Timeline at a Glance
 
-```
+```mermaid
 1980 ████ ROGUE
      │    ∘ Created by Toy, Wichman, Arnold at UC Santa Cruz
      │    ∘ Establishes procedural generation + permadeath
