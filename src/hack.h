@@ -251,9 +251,9 @@ extern int dosearch(void);
 extern void gethungry(void);
 
 /* Monster interaction functions */
-extern void youswld(struct monst *mtmp, int dam, int die, char *name);
+extern void youswld(struct monst *mtmp, int dam, int die, const char *name);  /* MODERN: const because name is read-only */
 extern int wiz_hit(struct monst *mtmp);
-extern void justswld(struct monst *mtmp, char *name);
+extern void justswld(struct monst *mtmp, const char *name);  /* MODERN: const because name is read-only */
 /* MODERN: CONST-CORRECTNESS: kludge parameters are read-only */
 extern void kludge(const char *str, const char *arg);
 extern void stealgold(struct monst *mtmp);

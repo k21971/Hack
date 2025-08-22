@@ -166,7 +166,7 @@ movemon(void)
 }
 
 void
-justswld(struct monst *mtmp, char *name)
+justswld(struct monst *mtmp, const char *name)  /* MODERN: const because name is read-only */
 {
 
 	mtmp->mx = u.ux;
@@ -182,7 +182,7 @@ justswld(struct monst *mtmp, char *name)
 }
 
 void
-youswld(struct monst *mtmp, int dam, int die, char *name)
+youswld(struct monst *mtmp, int dam, int die, const char *name)  /* MODERN: const because name is read-only */
 {
 	if(mtmp != u.ustuck) return;
 	kludge("%s digests you!",name);
