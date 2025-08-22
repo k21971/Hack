@@ -262,12 +262,12 @@ int change = 0;
 	flags.cbreak = ON;
 	flags.echo = OFF;
 	/* Should use (ECHO|CRMOD) here instead of ECHO */
-	if((curttyb.echoflgs & ECHO) != ef){
+	if((curttyb.echoflgs & ECHO) != (unsigned int)ef){  /* MODERN: Cast to unsigned for flag comparison */
 		curttyb.echoflgs &= ~ECHO;
 /*		curttyb.echoflgs |= ef;					*/
 		change++;
 	}
-	if((curttyb.cbrkflgs & CBRKMASK) != cf){
+	if((curttyb.cbrkflgs & CBRKMASK) != (unsigned int)cf){  /* MODERN: Cast to unsigned for flag comparison */
 		curttyb.cbrkflgs &= ~CBRKMASK;
 		curttyb.cbrkflgs |= cf;
 #if defined(USG) || defined(MODERN_TERMIOS)

@@ -84,7 +84,7 @@ void
 addtopl(const char *s)
 {
 	curs(tlx,tly);
-	if(tlx + strlen(s) > CO) putsym('\n');
+	if(tlx + (int)strlen(s) > CO) putsym('\n');  /* MODERN: Cast strlen to int for screen coordinate math */
 	putstr(s);
 	tlx = curx;
 	tly = cury;
@@ -167,7 +167,7 @@ pline(const char *line, ...)
 	/* But messages like "You die..." deserve their own line */
 	n0 = strlen(bp);
 	if(flags.toplin == 1 && tly == 1 &&
-	    n0 + strlen(toplines) + 3 < CO-8 &&  /* leave room for --More-- */
+	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* leave room for --More-- */
 	    n0 + strlen(toplines) + 3 < BUFSZ-1 &&  /* MODERN: prevent buffer overflow */
 	    strncmp(bp, "You ", 4)) {
 		(void) strncat(toplines, "  ", BUFSZ-1-strlen(toplines));

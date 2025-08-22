@@ -73,7 +73,7 @@ startup(void)
 	if(!SO || !SE || (SG > 0)) SO = SE = 0;
 	CD = tgetstr("cd", &tbufptr);
 	set_whole_screen();		/* uses LI and CD */
-	if(tbufptr-tbuf > sizeof(tbuf)) error("TERMCAP entry too big...\n");
+	if((size_t)(tbufptr-tbuf) > sizeof(tbuf)) error("TERMCAP entry too big...\n");  /* MODERN: Cast pointer diff to size_t for size comparison */
 	free(tptr);
 }
 

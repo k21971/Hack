@@ -51,7 +51,8 @@ char ch;
 
 void init_objects(void){
 int i, j, first, last, sum, end;
-char let, *tmp;
+char let;
+const char *tmp;  /* MODERN: const to match oc_descr field type */
 	/* init base; if probs given check that they add up to 100,
 	   otherwise compute probs; shuffle descriptions */
 	end = SIZE(objects);

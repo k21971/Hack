@@ -93,8 +93,7 @@ on_scr(int x, int y)
 
 void
 tmp_at(schar x, schar y) {
-/* Original 1984: static schar prevx, prevy; */
-static unsigned char prevx, prevy; /* MODERN: unsigned to prevent buffer underflow */
+static schar prevx, prevy; /* MODERN: Keep original schar to preserve -1 sentinel logic */
 static char let;
 	if((int)x == -2){	/* change let call */
 		let = y;
@@ -108,7 +107,7 @@ static char let;
 	if(prevx >= 0 && cansee(prevx,prevy)) {
 		delay_output(50);
 		prl(prevx, prevy);	/* in case there was a monster */
-		at(prevx, prevy, levl[prevx][prevy].scrsym);
+		at(prevx, prevy, levl[(unsigned char)prevx][(unsigned char)prevy].scrsym);  /* MODERN: Cast to unsigned char for safe array indexing */
 	}
 	if(x >= 0){	/* normal call */
 		if(cansee(x,y)) at(x,y,let);
@@ -122,8 +121,7 @@ static char let;
 
 /* like the previous, but the symbols are first erased on completion */
 void
-/* Original 1984: Tmp_at(schar x, schar y) { */
-Tmp_at(unsigned char x, unsigned char y) { /* MODERN: unsigned to prevent buffer underflow */
+Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2 sentinel logic */
 static char let;
 static xchar cnt;
 static coord tc[COLNO];		/* but watch reflecting beams! */

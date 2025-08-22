@@ -65,7 +65,7 @@ makemon(struct permonst *ptr, int x, int y)
 gotmon:
 	mtmp = newmonst(ptr->pxlth);
 	*mtmp = zeromonst;	/* clear all entries in structure */
-	for(ct = 0; ct < ptr->pxlth; ct++)
+	for(ct = 0; ct < (int)ptr->pxlth; ct++)  /* MODERN: Cast pxlth to int for loop comparison */
 		((char *) &(mtmp->mextra[0]))[ct] = 0;
 	mtmp->nmon = fmon;
 	fmon = mtmp;

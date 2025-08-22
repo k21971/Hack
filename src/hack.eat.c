@@ -398,7 +398,8 @@ int tp = 0;
 		pline("You get very sick.");
 		Sick = 10 + rn2(10);
 		/* MODERN: Add bounds checking for objects array access */
-		if(otmp->otyp >= 0 && otmp->otyp < NROFOBJECTS) {
+		/* Note: otyp is uchar, so >= 0 check is redundant */
+		if(otmp->otyp < NROFOBJECTS) {
 			u.usick_cause = objects[otmp->otyp].oc_name;
 		} else {
 			u.usick_cause = "something strange";

@@ -64,7 +64,8 @@ coord cc;
 int do_mname(void){
 char buf[BUFSZ];
 coord cc;
-int cx,cy,lth,i;
+int cx,cy,lth;
+unsigned i;  /* MODERN: Match mxlth unsigned type to avoid sign-compare warning */
 struct monst *mtmp, *mtmp2;
 extern char *lmonnam();
 	cc = getpos(0, "the monster you want to name");
@@ -226,7 +227,7 @@ extern char *shkname();
 	}
 	switch(mtmp->data->mlet) {
 	case ' ':
-		{ char *gn = (char *) mtmp->mextra;
+		{ const char *gn = (char *) mtmp->mextra;  /* MODERN: const qualifier to match ghostnames[] */
 		  if(!*gn) {		/* might also look in scorefile */
 		    gn = ghostnames[rn2(SIZE(ghostnames))];
 		    if(!rn2(2)) {

@@ -57,8 +57,8 @@ void corrode_weapon(void){
 
 int chwepon(struct obj *otmp, int amount)
 {
-char *color = (amount < 0) ? "black" : "green";
-char *time;
+const char *color = (amount < 0) ? "black" : "green";  /* MODERN: const for string literals */
+const char *time;  /* MODERN: const for string literals */
 	if(!uwep || uwep->olet != WEAPON_SYM) {
 		strange_feeling(otmp,
 			(amount > 0) ? "Your hands twitch."

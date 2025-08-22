@@ -363,7 +363,8 @@ int dothrow(void)
 				}
 			} else {
 				/* MODERN: Add bounds checking for objects array access */
-				if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS) {
+				/* Note: otyp is uchar, so >= 0 check is redundant */
+				if(obj->otyp < NROFOBJECTS) {
 					miss(objects[obj->otyp].oc_name, mon);
 				} else {
 					miss("strange object", mon);
@@ -389,7 +390,8 @@ int dothrow(void)
 			if(obj->olet == GEM_SYM && mon->data->mlet == 'u' &&
 				!mon->mtame){
 			 /* MODERN: Add bounds checking for objects array access */
-			 if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS && 
+			 /* Note: otyp is uchar, so >= 0 check is redundant */
+			 if(obj->otyp < NROFOBJECTS && 
 			    obj->dknown && objects[obj->otyp].oc_name_known){
 			  if(objects[obj->otyp].g_val > 0){
 			    u.uluck += 5;

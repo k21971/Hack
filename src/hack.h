@@ -101,8 +101,7 @@ extern int rn2(int x);
 extern int rnd(int x);
 extern void setuwep(struct obj *obj);
 extern void freeinv(struct obj *obj);
-/* Original 1984: extern void Tmp_at(schar x, schar y); */
-extern void Tmp_at(unsigned char x, unsigned char y); /* MODERN: unsigned to prevent buffer underflow */
+extern void Tmp_at(schar x, schar y); /* MODERN: Keep original schar to preserve -1,-2 sentinel logic */
 extern void mnexto(struct monst *mtmp);
 extern int abon(void);
 extern void dighole(void);
