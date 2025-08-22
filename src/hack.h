@@ -189,7 +189,7 @@ extern void monstone(struct monst *mdef);
 extern void killed(struct monst *mtmp);
 extern void done_in_by(struct monst *mtmp);
 extern int d(int n, int x);               /* Dice roll function */
-extern void setan(char *str, char *buf);  /* Set article for string */
+extern void setan(const char *str, char *buf);  /* MODERN: const because str is read-only */
 extern int dbon(void);                    /* Damage bonus */
 /* MODERN: CONST-CORRECTNESS: hit message parameters are read-only */
 extern void hit(const char *str, struct monst *mtmp, const char *force);
@@ -594,7 +594,7 @@ struct you {
 #define Stoned		u.uprops[STONED].p_flgs
 #define PROP(x) (x-RIN_ADORNMENT)       /* convert ring to index in uprops */
 	unsigned umconf:1;
-	char *usick_cause;
+	const char *usick_cause;  /* MODERN: const because points to object names or string literals */
 	struct prop uprops[LAST_RING+10];
 
 	unsigned uswallow:1;		/* set if swallowed by a monster */

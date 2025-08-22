@@ -48,7 +48,7 @@ extern const char *nomovemsg;  /* MODERN: const because assigned string literals
 extern long wailmsg;
 
 #ifdef CHDIR
-static void chdirx(char *dir, boolean wr);
+static void chdirx(const char *dir, boolean wr);  /* MODERN: const because dir is read-only */
 #endif
 
 int main(int argc, char *argv[])
@@ -452,7 +452,7 @@ register int c,ct;
 		}
 		if(c != '-')
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
-		if(ct < sizeof(plname)-1) plname[ct++] = c;
+		if(ct < (int)sizeof(plname)-1) plname[ct++] = c;  /* MODERN: Cast to int to match ct type */
 	}
 	plname[ct] = 0;
 	if(ct == 0) askname();
@@ -468,7 +468,7 @@ void impossible(const char *s, int x1, int x2)
 
 #ifdef CHDIR
 static void
-chdirx(char *dir, boolean wr)
+chdirx(const char *dir, boolean wr)  /* MODERN: const because dir is read-only */
 {
 
 #ifdef SECURE

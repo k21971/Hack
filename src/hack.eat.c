@@ -58,7 +58,7 @@ int init_uhunger(void){
 }
 
 #define	TTSZ	SIZE(tintxts)
-struct { char *txt; int nut; } tintxts[] = {
+struct { const char *txt; int nut; } tintxts[] = {  /* MODERN: const because txt points to string literals */
 	{"It contains first quality peaches - what a surprise!",	40},
 	{"It contains salmon - not bad!",	60},
 	{"It contains apple juice - perhaps not what you hoped for.", 20},

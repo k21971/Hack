@@ -398,7 +398,7 @@ char *bp = xname(obj);
 }
 
 /* used only in hack.fight.c (thitu) */
-void setan(char *str, char *buf)
+void setan(const char *str, char *buf)  /* MODERN: const because str is read-only */
 {
 	if(index(vowels,*str))
 		Sprintf(buf, "an %s", str);

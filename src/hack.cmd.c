@@ -86,7 +86,7 @@ struct func_tab cmdlist[]={
 	{RING_SYM,  doprring},
 	{'$', doprgold},
 	{'#', doextcmd},
-	{0,0,0}
+	{0,0}  /* MODERN: Fixed struct initializer - func_tab only has 2 fields */
 };
 
 struct ext_func_tab extcmdlist[] = {
@@ -177,7 +177,7 @@ void rhack(char *cmd)
 	}
 	{ char expcmd[10];
 	  char *cp = expcmd;
-	  while(*cmd && cp-expcmd < sizeof(expcmd)-2) {
+	  while(*cmd && cp-expcmd < (long)sizeof(expcmd)-2) {  /* MODERN: Cast to long to match pointer arithmetic type */
 		if(*cmd >= 040 && *cmd < 0177)
 			*cp++ = *cmd++;
 		else {

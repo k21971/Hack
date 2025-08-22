@@ -16,7 +16,7 @@ extern char *CD;
 void
 swallowed(void)
 {
-	char *ulook = "|@|";
+	char ulook[] = "|@|";  /* MODERN: Use array instead of pointer to allow modification */
 	ulook[1] = u.usym;
 
 	cls();
@@ -614,7 +614,7 @@ char oldbot[100], newbot[100];
 void
 cornbot(int lth)
 {
-	if(lth < sizeof(oldbot)) {
+	if(lth < (int)sizeof(oldbot)) {  /* MODERN: Cast to int to match lth type */
 		oldbot[lth] = 0;
 		flags.botl = 1;
 	}
@@ -637,7 +637,7 @@ int len, remaining;  /* MODERN: Track buffer usage for safe sprintf */
 		"Level %-2d   Hp %3d(%d)   Ac %-2d   Str ",
 		dlevel,  u.uhp, u.uhpmax, u.uac);
 #endif /* GOLD_ON_BOTL */
-	if(len >= sizeof(newbot)) len = sizeof(newbot) - 1;
+	if(len >= (int)sizeof(newbot)) len = (int)sizeof(newbot) - 1;  /* MODERN: Cast to int to match len type */
 	remaining = sizeof(newbot) - len;
 	
 	if(u.ustr>18) {

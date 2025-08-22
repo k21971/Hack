@@ -195,14 +195,15 @@ gethdate(char *name) {
  */
 #define		MAXPATHLEN	1024
 
-char *np, *path;
+char *np;
+const char *path;  /* MODERN: const because can point to getenv() result or string literal */
 char filename[MAXPATHLEN+1];
 	if (index(name, '/') != NULL || (path = getenv("PATH")) == NULL)
 		path = "";
 
 	for (;;) {
-		if ((np = index(path, ':')) == NULL)
-			np = path + strlen(path);	/* point to end str */
+		if ((np = (char *)index(path, ':')) == NULL)  /* MODERN: Cast needed due to const path */
+			np = (char *)(path + strlen(path));	/* point to end str - MODERN: Cast needed due to const path */
 		if (np - path <= 1)			/* %% */
 			(void) strcpy(filename, name);
 		else {
