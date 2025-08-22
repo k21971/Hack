@@ -177,3 +177,6 @@ sha256sums
 SHA256SUMS
 *.sha256
 CLAUDE.md
+dev/.venv/
+dev/gauntlet-logs/
+uv.lock  # optional; commit if you want exact locking

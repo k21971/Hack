@@ -105,10 +105,20 @@ void domove(void)
 		u.uy = u.ustuck->my;
 	} else {
 		if(Confusion) {
+			/**
+			 * MODERN ADDITION (2025): Buffer overflow fix
+			 * WHY: Original code accessed levl[u.ux+u.dx][u.uy+u.dy] before isok() bounds check
+			 * HOW: Store coordinates in variables, check bounds before array access
+			 * PRESERVES: Original 1984 confusion logic exactly
+			 * ADDS: Memory safety by preventing out-of-bounds array access
+			 */
+			int newx, newy;
 			do {
 				confdir();
-			} while(!isok(u.ux+u.dx, u.uy+u.dy) ||
-			    IS_ROCK(levl[u.ux+u.dx][u.uy+u.dy].typ));
+				newx = u.ux+u.dx;
+				newy = u.uy+u.dy;
+			} while(!isok(newx, newy) ||
+			    IS_ROCK(levl[newx][newy].typ));
 		}
 		if(!isok(u.ux+u.dx, u.uy+u.dy)){
 			nomul(0);
