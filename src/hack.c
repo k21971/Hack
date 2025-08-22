@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 extern char news0();
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern const char *exclam(int force);
 extern struct obj *addinv();
 extern boolean hmon();

@@ -12,7 +12,7 @@
 #include	"hack.h"
 #include <stdio.h>
 char POISONOUS[] = "ADKSVabhks";
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern int (*afternmv)();
 extern int (*occupation)();
 extern char *occtxt;

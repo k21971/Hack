@@ -44,7 +44,7 @@ char SAVEF[PL_NSIZ + 11] = "save/";	/* save/99999player */
 char *hname;		/* name of the game (argv[0] of call) */
 char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern long wailmsg;
 
 #ifdef CHDIR

@@ -99,10 +99,13 @@ char let, *tmp;
 int probtype(int let) {
 int i = bases[letindex(let)];
 int prob = rn2(100);
-	while((prob -= objects[i].oc_prob) >= 0) i++;
-	/* MODERN: Add bounds checking before array access */
-	if(i >= NROFOBJECTS) {
-		panic("probtype(%c) index overflow, i=%d >= %d", let, i, NROFOBJECTS);
+	/* Original 1984: while((prob -= objects[i].oc_prob) >= 0) i++; */
+	while((prob -= objects[i].oc_prob) >= 0) {
+		i++;
+		/* MODERN: Bounds check inside loop to prevent array overflow */
+		if(i >= NROFOBJECTS) {
+			panic("probtype(%c) index overflow, i=%d >= %d", let, i, NROFOBJECTS);
+		}
 	}
 	if(objects[i].oc_olet != let || !objects[i].oc_name)
 		panic("probtype(%c) error, i=%d", let, i);

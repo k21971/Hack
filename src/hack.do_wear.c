@@ -11,7 +11,7 @@
 
 #include "hack.h"
 #include <stdio.h>
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern char quitchars[];
 extern char *Doname();
 

@@ -111,7 +111,7 @@ struct obj *steal(struct monst *mtmp)
 			(void) armoroff(otmp);
 			otmp->cursed = curssv;
 			if(multi < 0){
-				extern char *nomovemsg;
+				extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 				extern int (*afternmv)();
 				/*
 				multi = 0;

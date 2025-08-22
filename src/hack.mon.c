@@ -142,7 +142,7 @@ movemon(void)
 		warnlevel = SIZE(warnings)-1;
 	if(warnlevel >= 0)
 	if(warnlevel > lastwarnlev || moves > lastwarntime + 5){
-	    char *rr;
+	    const char *rr;  /* MODERN: const because assigned string literals */
 	    switch(Warning & (LEFT_RING | RIGHT_RING)){
 	    case LEFT_RING:
 		rr = "Your left ring glows";

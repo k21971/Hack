@@ -11,7 +11,7 @@
 
 #include	"hack.h"
 
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern char nul[];
 extern struct obj zeroobj;
 struct engr {
