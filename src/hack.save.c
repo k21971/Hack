@@ -380,7 +380,7 @@ int dorecover(int fd)
 	if (check_save_header(fd, &hdr)) {
 		/* New versioned format */
 		tmp = (int)sr_u32(fd);
-		if(tmp != getuid()) {
+		if(tmp != (int)getuid()) {  /* MODERN: Cast to int to match tmp variable type */
 			(void) close(fd);
 			(void) unlink(SAVEF);
 			puts("Saved game was not yours.");
@@ -416,7 +416,7 @@ int dorecover(int fd)
 		lseek(fd, save_pos, SEEK_SET);
 		
 		mread(fd, (char *) &tmp, sizeof tmp);
-		if(tmp != getuid()) {
+		if(tmp != (int)getuid()) {  /* MODERN: Cast to int to match tmp variable type */
 			(void) close(fd);
 			(void) unlink(SAVEF);
 			puts("Saved game was not yours.");

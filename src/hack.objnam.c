@@ -131,8 +131,8 @@ if(otyp < 0 || otyp >= NROFOBJECTS) {
 	return(buf);
 }
 struct objclass *ocl = &objects[otyp];
-char *an = ocl->oc_name;
-char *dn = ocl->oc_descr;
+const char *an = ocl->oc_name;  /* MODERN: const because reads from objects[] read-only fields */
+const char *dn = ocl->oc_descr;  /* MODERN: const because reads from objects[] read-only fields */
 char *un = ocl->oc_uname;
 int nn = ocl->oc_name_known;
 	switch(ocl->oc_olet) {
@@ -188,8 +188,8 @@ if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
 	      obj->otyp, NROFOBJECTS-1, obj->olet, obj->quan, obj->ox, obj->oy);
 }
 int nn = objects[obj->otyp].oc_name_known;
-char *an = objects[obj->otyp].oc_name;
-char *dn = objects[obj->otyp].oc_descr;
+const char *an = objects[obj->otyp].oc_name;  /* MODERN: const because reads from objects[] read-only fields */
+const char *dn = objects[obj->otyp].oc_descr;  /* MODERN: const because reads from objects[] read-only fields */
 char *un = objects[obj->otyp].oc_uname;
 int pl = (obj->quan != 1);
 	if(!obj->dknown && !Blind) obj->dknown = 1; /* %% doesnt belong here */
@@ -570,7 +570,7 @@ sing:
 		an = bp;
 		goto srch;
 	}
-	for(i = 0; i < sizeof(wrpsym); i++) {
+	for(i = 0; i < (int)sizeof(wrpsym); i++) {  /* MODERN: Cast to int to match loop variable type */
 		int j = strlen(wrp[i]);
 		if(!strncmp(bp, wrp[i], j)){
 			let = wrpsym[i];
