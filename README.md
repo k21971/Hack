@@ -1,11 +1,8 @@
 # restoHack: Bringing 1984 Hack Back from the Dead
 
-**restoHack** is a full-blooded resurrection of *Hack*, the 1984 roguelike that spawned *NetHack*.
-Not a remake. Not a reboot. This is *software preservation with a blowtorch and a scalpel*.
+**restoHack** is a complete restoration of *Hack*, the original 1984 roguelike that spawned *NetHack*. This is software preservation - making the original code compile, run, and dungeon-crawl exactly as it did in 1984, while modernizing the infrastructure for stability.
 
-The goal: make the original code compile, run, and dungeon-crawl exactly as it did when floppy was King.
-
-Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
+**Philosophy**: "Fix what breaks, preserve what works" - authentic 1984 gameplay with modern build system and safety improvements.
 
 📜 **[Read the Complete History of Hack →](docs/HISTORY_OF_HACK.md)**  
 *From Rogue (1980) to NetHack's rise, through decades of digital decay, to restoHack's 2025 resurrection*
@@ -58,40 +55,35 @@ cd ~/Games/restohack
 tar -xzf restoHack-static-YYYYMMDD-linux-x86_64.tar.gz
 ```
 
-**Option 1: Run immediately  (Linux)** (static binary, no dependencies):
-
-```bash
-./run-hack.sh
-```
-
-**Option 2: Build from included source** (requires cmake, gcc, ncurses):
-
-```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/hack
-```
-
-**BSD Systems:** See [📋 Build Instructions](docs/BUILD.md#platform-specific-instructions) for FreeBSD, OpenBSD, and NetBSD.
-
----
-
-## Quick Start
+## Install & Build
 
 **Requirements:** `git`, `cmake`, a C compiler, `ncurses`
 
 ```bash
 git clone https://github.com/Critlist/restoHack.git
 cd restoHack
-cmake --preset=release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ./build/hack
 ```
 
-**Alternative** (if your system doesn't support presets):
+**Alternative** (if your system supports CMake presets):
+
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
+cmake --preset=release && cmake --build build
 ```
+
+---
+
+## Quick Demo (Linux)
+
+If you just want to try it immediately without building from source:
+
+```bash
+./run-hack.sh
+```
+
+*(static binary, no dependencies required)*
 
 **For BSD systems, development builds, IDE integration, and troubleshooting:** see [**📋 Build Instructions**](docs/BUILD.md)
 
@@ -114,6 +106,7 @@ This was the guiding philosophy of 1984. While undoubtedly brilliant, the origin
 Stability was a suggestion, not a guarantee.
 
 * Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
+
 ---
 
 ## Recent Fixes
@@ -137,23 +130,27 @@ Fix what breaks, preserve what works. The original 1984 gameplay, balance, and f
 **restoHack** is built from **verified original source code** with complete provenance documentation:
 
 #### **Primary Source: FreeBSD 4.10 Games Collection**
+
 The original 1984 Hack source code was preserved in the FreeBSD games collection, which maintained Andries Brouwer's final **Hack 1.0.3** release from 1985. This represents the canonical version of historical Hack.
 
 #### **Source Recovery Process**
+
 Our preservation methodology ensures authenticity:
 
-- **Automated retrieval**: [`docs/historical/original-source/download_hack.sh`](docs/historical/original-source/download_hack.sh)
-- **Verification**: SHA-256 checksums and cross-reference validation
-- **Documentation**: Complete chain of custody from 1984 → FreeBSD → restoHack
-- **Integrity**: Every original file preserved unchanged in `docs/historical/original-source/`
+* **Automated retrieval**: [`docs/historical/original-source/download_hack.sh`](docs/historical/original-source/download_hack.sh)
+* **Verification**: SHA-256 checksums and cross-reference validation
+* **Documentation**: Complete chain of custody from 1984 → FreeBSD → restoHack
+* **Integrity**: Every original file preserved unchanged in `docs/historical/original-source/`
 
 #### **Preservation Standards**
+
 - **100% behavioral authenticity**: Every game mechanic functions exactly as in 1984
-- **Save file compatibility**: Original 1984 save files work in restoHack
-- **Statistical verification**: Random number sequences match the original precisely
-- **Cross-platform consistency**: Identical behavior on all supported systems
+* **Save file compatibility**: Original 1984 save files work in restoHack
+* **Statistical verification**: Random number sequences match the original precisely
+* **Cross-platform consistency**: Identical behavior on all supported systems
 
 #### **Modernization Documentation**
+
 Every change from the original 1984 code is meticulously documented:
 
 ```c
@@ -169,11 +166,12 @@ Every change from the original 1984 code is meticulously documented:
 No original code is deleted—it's preserved in comments alongside modern equivalents.
 
 ### Historical Context
+
 Hack 1.0.3 represents:
-- **Andries Brouwer's masterpiece**: The mathematical peak of 1980s roguelike design
-- **The bridge**: Between Rogue's simplicity and NetHack's complexity
-- **Software archaeology**: A preserved artifact of computing history
-- **Gaming heritage**: The foundation of an entire genre
+* **Andries Brouwer's masterpiece**: The mathematical peak of 1980s roguelike design
+* **The bridge**: Between Rogue's simplicity and NetHack's complexity
+* **Software archaeology**: A preserved artifact of computing history
+* **Gaming heritage**: The foundation of an entire genre
 
 For the complete story of Hack's creation, evolution, abandonment, and resurrection, see **[The Complete History of Hack](docs/HISTORY_OF_HACK.md)**.
 
