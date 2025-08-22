@@ -32,7 +32,7 @@ void topten(void);
 void outheader(void);
 void clearlocks(void);
 char *itoa(int a);
-char *ordin(int n);
+const char *ordin(int n);  /* MODERN: const because returns string literals */
 char *eos(char *s);
 void charcat(char *s, char c);
 
@@ -294,8 +294,8 @@ void topten(void){
 	int rank, rank0 = -1, rank1 = 0;
 	int occ_cnt = PERSMAX;
 	struct toptenentry *t0, *t1, *tprev;
-	char *recfile = RECORD;
-	char *reclock = "record_lock";
+	const char *recfile = RECORD;  /* MODERN: const because points to string literal */
+	const char *reclock = "record_lock";  /* MODERN: const because points to string literal */
 	int sleepct = 300;
 	FILE *rfile;
 	int flg = 0;
@@ -456,8 +456,8 @@ void topten(void){
 	    t1->hp, t1->maxhp, t1->points,
 	    t1->plchar, t1->sex, t1->name, t1->death);
 	  if(done_stopprint) continue;
-	  if(rank > flags.end_top &&
-	    (rank < rank0-flags.end_around || rank > rank0+flags.end_around)
+	  if(rank > (int)flags.end_top &&  /* MODERN: Cast to int to match rank type */
+	    (rank < rank0-(int)flags.end_around || rank > rank0+(int)flags.end_around)  /* MODERN: Cast to int to match rank type */
 	    && (!flags.end_own ||
 #ifdef PERS_IS_UID
 				  t1->uid != t0->uid ))
@@ -465,8 +465,8 @@ void topten(void){
 				  strncmp(t1->name, t0->name, NAMSZ)))
 #endif /* PERS_IS_UID */
 	  	continue;
-	  if(rank == rank0-flags.end_around &&
-	     rank0 > flags.end_top+flags.end_around+1 &&
+	  if(rank == rank0-(int)flags.end_around &&  /* MODERN: Cast to int to match rank type */
+	     rank0 > (int)flags.end_top+(int)flags.end_around+1 &&  /* MODERN: Cast to int to match rank type */
 	     !flags.end_own)
 		(void) putchar('\n');
 	  if(rank != rank0)
@@ -579,7 +579,7 @@ static char buf[12];
 	return(buf);
 }
 
-char *
+const char *  /* MODERN: const because returns string literals */
 ordin(int n) {
 int d = n%10;
 	return((d==0 || d>3 || n/10==1) ? "th" : (d==1) ? "st" :
@@ -664,7 +664,7 @@ void prscore(int argc, char **argv) {
 	int playerct;
 	int rank;
 	struct toptenentry *t1, *t2;
-	char *recfile = RECORD;
+	const char *recfile = RECORD;  /* MODERN: const because points to string literal */
 	FILE *rfile;
 	int flg = 0;
 	int i;
