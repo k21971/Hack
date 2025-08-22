@@ -192,7 +192,7 @@ target_compile_options(hack PRIVATE
     # Buffer overflow protection for save system safety
     $<$<C_COMPILER_ID:GNU>:-fstack-protector-strong>
     $<$<C_COMPILER_ID:Clang>:-fstack-protector-strong>
-    # Enable debugging symbols for crash analysis (K2/hardfought.org recommendation)
+    # Enable debugging symbols for crash analysis
     -g3
 )
 
@@ -302,7 +302,7 @@ else()
     )
 endif()
 
-# Debug builds: K2/hardfought.org recommendation for perfect debugging
+# Debug builds:
 if(ENABLE_SANITIZERS)
     # With sanitizers: use -O1 for better detection + FORTIFY_SOURCE compatibility
     target_compile_options(hack PRIVATE 
@@ -386,7 +386,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_options(hack PRIVATE -O0 -g3 -fno-omit-frame-pointer -Wwrite-strings -Wno-error)
   target_link_options(hack PRIVATE -rdynamic)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Hardened")
-  # Hardfought-ish: safe, strict, but do NOT fail on warnings
+  # safe, strict, but do NOT fail on warnings
   target_compile_options(hack PRIVATE
     -O2 -fno-omit-frame-pointer -fPIE
     -Wwrite-strings
