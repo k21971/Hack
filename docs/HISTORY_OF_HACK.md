@@ -4,7 +4,7 @@
 
 ## ⏱️ Timeline at a Glance
 
-```mermaid
+```text
 1980 ████ ROGUE
      │    ∘ Created by Toy, Wichman, Arnold at UC Santa Cruz
      │    ∘ Establishes procedural generation + permadeath

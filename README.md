@@ -72,90 +72,28 @@ cmake --build build
 ./build/hack
 ```
 
-**BSD Systems:** See [BSD Build Instructions](#bsd-build-instructions) below.
+**BSD Systems:** See [📋 Build Instructions](docs/BUILD.md#platform-specific-instructions) for FreeBSD, OpenBSD, and NetBSD.
 
 ---
 
-## Building from Source
+## Quick Start
 
-**Requirements:** `git`, `cmake`, a C compiler (`gcc` or `clang`), plus `ncurses` or `termcap`.
-
-### Standard Source Build (Release)
-
-The default method for a stable, optimized build:
+**Requirements:** `git`, `cmake`, a C compiler, `ncurses`
 
 ```bash
 git clone https://github.com/Critlist/restoHack.git
 cd restoHack
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-./hack
-```
-
-### Development Build (Debug)
-
-For hacking on the code, with debug symbols and optional sanitizers:
-
-```bash
-git clone https://github.com/Critlist/restoHack.git
-cd restoHack
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_SANITIZERS=ON
-cmake --build .
-./hack
-```
-
-### Clean Rebuild
-
-Wipes prior build artifacts before rebuilding:
-
-```bash
-rm -rf build && mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-./hack
-```
-
-### BSD Build Instructions
-
-**FreeBSD:**
-
-```bash
-# Install dependencies
-pkg install cmake gcc ncurses
-
-# Build from hybrid tarball or git clone
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --preset=release
 cmake --build build
 ./build/hack
 ```
 
-**OpenBSD:**
-
+**Alternative** (if your system doesn't support presets):
 ```bash
-# Install dependencies  
-pkg_add cmake gcc ncurses
-
-# Build with explicit compiler paths
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_C_COMPILER=/usr/local/bin/gcc
-cmake --build build
-./build/hack
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
 ```
 
-**NetBSD:**
-
-```bash
-# Install dependencies
-pkgin install cmake gcc ncurses
-
-# Use pkgsrc paths for libraries
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH=/usr/pkg
-cmake --build build  
-./build/hack
-```
+**For BSD systems, development builds, IDE integration, and troubleshooting:** see [**📋 Build Instructions**](docs/BUILD.md)
 
 ---
 
