@@ -411,7 +411,7 @@ char dirlet(int dx, int dy) {
 void buzz(int type, xchar sx, xchar sy, int dx, int dy)
 {
 	int abstype = abs(type);
-	char *fltxt = (type == -1) ? "blaze of fire" : fl[abstype];
+	const char *fltxt = (type == -1) ? "blaze of fire" : fl[abstype];  /* MODERN: const because reads from fl[] array or string literal */
 	struct rm *lev;
 	xchar range;
 	struct monst *mon;

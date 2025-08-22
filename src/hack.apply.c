@@ -15,7 +15,7 @@ static struct monst *bchit(int ddx, int ddy, int range, char sym);
 extern struct obj *addinv();
 extern struct trap *maketrap();
 extern int (*occupation)();
-extern char *occtxt;
+extern const char *occtxt;  /* MODERN: const because assigned string literals */
 extern char quitchars[];
 extern char pl_character[];
 

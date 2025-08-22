@@ -726,7 +726,7 @@ int
 dolook() {
     struct obj *otmp, *otmp0;
     struct gold *gold;
-    char *verb = Blind ? "feel" : "see";
+    const char *verb = Blind ? "feel" : "see";  /* MODERN: const because assigned string literals */
     int	ct = 0;
 
     if(!u.uswallow) {
@@ -815,7 +815,7 @@ int lose; {
  * [Bug: d$ and pickup still tell you how much it was.]
  */
 extern int (*occupation)();
-extern char *occtxt;
+extern const char *occtxt;  /* MODERN: const because assigned string literals */
 static long goldcounted;
 
 int

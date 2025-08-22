@@ -606,7 +606,7 @@ srch:
 	i = 1;
 	if(let) i = bases[letindex(let)];
 	while(i <= NROFOBJECTS && (!let || objects[i].oc_olet == let)){
-		char *zn = objects[i].oc_name;
+		const char *zn = objects[i].oc_name;  /* MODERN: const because reads from objects[] read-only fields */
 
 		if(!zn) goto nxti;
 		if(an && strcmp(an, zn))

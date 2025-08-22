@@ -30,7 +30,7 @@ extern char genocided[60], fut_geno[];
 
 int (*afternmv)();
 int (*occupation)();
-char *occtxt;			/* defined when occupation != NULL */
+const char *occtxt;		/* MODERN: const because assigned string literals */
 
 void done1(int sig);
 void hangup(int sig);

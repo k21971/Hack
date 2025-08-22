@@ -15,7 +15,7 @@ char POISONOUS[] = "ADKSVabhks";
 extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern int (*afternmv)();
 extern int (*occupation)();
-extern char *occtxt;
+extern const char *occtxt;  /* MODERN: const because assigned string literals */
 extern struct obj *splitobj(), *addinv();
 
 /* Forward declarations for functions in this file */
