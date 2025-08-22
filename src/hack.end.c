@@ -253,6 +253,10 @@ void done(const char *st1)
 #endif /* WIZARD */
 		topten();
 	if(done_stopprint) printf("\n\n");
+	
+	/* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+	cleanup_all_engravings();
+	
 	exit(0);
 }
 

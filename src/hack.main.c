@@ -117,6 +117,8 @@ int main(int argc, char *argv[])
 		chdirx(dir,0);
 #endif
 		prscore(argc, argv);
+		/* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+		cleanup_all_engravings();
 		exit(0);
 	}
 

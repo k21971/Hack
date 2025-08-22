@@ -332,3 +332,20 @@ struct engr *ept;
 	}
 	free((char *) ep);
 }
+
+/**
+ * MODERN ADDITION (2025): Memory cleanup for sanitizers
+ * WHY: LeakSanitizer detects allocated engravings as memory leaks when game exits
+ * HOW: Free all engravings in the linked list starting from head_engr
+ * PRESERVES: Original 1984 behavior (no cleanup during normal gameplay)
+ * ADDS: Modern memory hygiene for development tools
+ */
+void cleanup_all_engravings(void) {
+	struct engr *ep, *next;
+	
+	for(ep = head_engr; ep; ep = next) {
+		next = ep->nxt_engr;
+		free((char *) ep);
+	}
+	head_engr = NULL;
+}

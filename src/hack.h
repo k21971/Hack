@@ -476,6 +476,8 @@ extern void wipe_engr_at(xchar x, xchar y, xchar cnt);
 /* MODERN: CONST-CORRECTNESS: sengr_at search string is read-only */
 extern int sengr_at(const char *s, xchar x, xchar y);
 extern void del_engr(struct engr *ep);
+/* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+extern void cleanup_all_engravings(void);
 extern void bwrite(int fd, char *loc, unsigned num);
 extern void mread(int fd, char *buf, unsigned len);
 extern int mhitu(struct monst *mtmp);

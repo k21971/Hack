@@ -63,12 +63,20 @@ panic(const char *str, ...)
 void
 atl(int x, int y, int ch)
 {
-	struct rm *crm = &levl[x][y];
-
+	/**
+	 * MODERN ADDITION (2025): Move bounds check before array access
+	 * WHY: Original accessed levl[x][y] before validating bounds
+	 * HOW: Check bounds first, then access array
+	 * PRESERVES: Original 1984 error handling behavior
+	 * ADDS: Memory safety by preventing buffer overflow
+	 */
 	if(x<0 || x>COLNO-1 || y<0 || y>ROWNO-1){
 		impossible("atl(%d,%d)", x, y);
 		return;
 	}
+	
+	struct rm *crm = &levl[x][y];
+	
 	if(crm->seen && crm->scrsym == ch) return;
 	crm->scrsym = ch;
 	crm->new = 1;
@@ -210,9 +218,18 @@ docrt(void)
 
 /* Some ridiculous code to get display of @ and monsters (almost) right */
 	if(!Invisible) {
-		/* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym; levl[u.udisx][u.udisy].seen = 1; */
-		levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)].scrsym = u.usym;
-		levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen = 1; /* MODERN: safe array indexing */
+		/**
+		 * MODERN ADDITION (2025): Bounds check before array access
+		 * WHY: u.ux/u.uy can exceed array bounds causing buffer overflow
+		 * HOW: Validate coordinates before accessing levl array
+		 * PRESERVES: Original 1984 display logic
+		 * ADDS: Memory safety by preventing buffer overflow
+		 */
+		if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
+			/* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym; levl[u.udisx][u.udisy].seen = 1; */
+			levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym;
+			levl[u.udisx][u.udisy].seen = 1; /* Bounds already validated */
+		}
 		u.udispl = 1;
 	} else	u.udispl = 0;
 
@@ -300,7 +317,16 @@ pru(void)
 		u.udisy = u.uy;
 	}
 	/* Original 1984: levl[u.ux][u.uy].seen = 1; */
-	levl[(unsigned char)u.ux][(unsigned char)u.uy].seen = 1; /* MODERN: safe array indexing */
+	/**
+	 * MODERN ADDITION (2025): Bounds check before array access
+	 * WHY: u.ux/u.uy can exceed array bounds (e.g. u.ux=82 > 79)
+	 * HOW: Validate coordinates before accessing levl array
+	 * PRESERVES: Original 1984 visibility logic
+	 * ADDS: Memory safety by preventing buffer overflow
+	 */
+	if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
+		levl[u.ux][u.uy].seen = 1; /* Bounds already validated */
+	}
 }
 
 #ifndef NOWORM
