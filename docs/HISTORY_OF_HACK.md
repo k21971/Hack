@@ -22,7 +22,7 @@
      │
 1985 ████ HACK 1.0.3 (The Masterpiece)
      │    ∘ Brouwer's final version - peak of design
-     │    ∘ ~15,000 lines of optimized C code
+     │    ∘ ~19,200 lines of optimized C code
      │    ∘ Direct template for NetHack development
      │
 1987 ████ NETHACK SPLITS OFF
