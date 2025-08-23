@@ -12,39 +12,91 @@
 #include	"hack.h"
 #include <stdio.h>
 #include <string.h>
-/* MODERN ADDITION (2025): Safe string operation macros
+#include <stdint.h>
+/* MODERN ADDITION (2025): Safe string operation functions
  * WHY: Original sprintf/strcpy/strcat unsafe with potential buffer overflows
- * HOW: Replace with bounds-checked versions using available buffer space
+ * HOW: Replace with snprintf-based safe functions with proper truncation handling
  * PRESERVES: Same functionality with identical buffer layout (PREFIX + content)
- * ADDS: Buffer overflow protection for object name generation */
+ * ADDS: Buffer overflow protection + truncation detection for object name generation
+ * 
+ * SECURITY NOTES:
+ * - All functions guarantee NUL-termination
+ * - Truncation is detected and can be handled gracefully
+ * - Uses actual buffer capacity, not global macros
+ * - Safe for ASCII only (no UTF-8 multibyte considerations in 1984 codebase)
+ */
 #define SAFE_BUF_SIZE (BUFSZ - PREFIX)  /* Available space after prefix */
 
-/* Safe macros for main object name buffer */
-#define Sprintf(buf, ...) (void) snprintf(buf, SAFE_BUF_SIZE, __VA_ARGS__)
-#define Strcat(dest, src) do { \
-    size_t dest_len = strlen(dest); \
-    size_t remaining = SAFE_BUF_SIZE - dest_len; \
-    if(remaining > 1) { \
-        (void) strncat(dest, src, remaining - 1); \
-    } \
-} while(0)
-#define	Strcpy(dest, src) do { \
-    (void) strncpy(dest, src, SAFE_BUF_SIZE - 1); \
-    (dest)[SAFE_BUF_SIZE - 1] = 0; \
-} while(0)
+/* Safe string concatenation: returns 0 on success, 1 on truncation */
+/**
+ * MODERN ADDITION (2025): Enhanced safe string concatenation with memory validation
+ * 
+ * WHY: Crashes occur when src pointer is corrupted (not just NULL)
+ * HOW: Added pointer validation to detect corrupted memory addresses
+ * 
+ * PRESERVES: All original string functionality for valid pointers
+ * ADDS: Protection against crashes from corrupted object name pointers
+ */
+static inline int safe_strcat(char *dst, size_t cap, const char *src) {
+    size_t len = strnlen(dst, cap);
+    if (len >= cap) return -1; /* buffer already full/corrupted */
+    size_t remaining = cap - len;
+    
+    /* MODERN: Validate pointer is not corrupted before using in snprintf */
+    if (!src || (uintptr_t)src < 0x1000 || (uintptr_t)src > 0x7FFFFFFFFFFF) {
+        int wrote = snprintf(dst + len, remaining, "<corrupted>");
+        return (wrote >= 0 && (size_t)wrote < remaining) ? 0 : 1;
+    }
+    
+    int wrote = snprintf(dst + len, remaining, "%s", src);
+    return (wrote >= 0 && (size_t)wrote < remaining) ? 0 : 1; /* 0=ok, 1=truncated */
+}
 
-/* Safe macros for prefix buffer (smaller) */
-#define PREFIX_Strcat(dest, src) do { \
-    size_t dest_len = strlen(dest); \
-    size_t remaining = PREFIX - dest_len; \
-    if(remaining > 1) { \
-        (void) strncat(dest, src, remaining - 1); \
-    } \
-} while(0)
-#define PREFIX_Strcpy(dest, src) do { \
-    (void) strncpy(dest, src, PREFIX - 1); \
-    (dest)[PREFIX - 1] = 0; \
-} while(0)
+/**
+ * MODERN ADDITION (2025): Enhanced safe string copy with memory validation
+ * 
+ * WHY: Crashes occur when src pointer is corrupted (not just NULL)
+ * HOW: Added pointer validation to detect corrupted memory addresses
+ * 
+ * PRESERVES: All original string functionality for valid pointers
+ * ADDS: Protection against crashes from corrupted object name pointers
+ */
+static inline int safe_strcpy(char *dst, size_t cap, const char *src) {
+    if (cap == 0) return -1;
+    
+    /* MODERN: Validate pointer is not corrupted before using in snprintf */
+    if (!src || (uintptr_t)src < 0x1000 || (uintptr_t)src > 0x7FFFFFFFFFFF) {
+        int wrote = snprintf(dst, cap, "<corrupted>");
+        return (wrote >= 0 && (size_t)wrote < cap) ? 0 : 1;
+    }
+    
+    int wrote = snprintf(dst, cap, "%s", src);
+    return (wrote >= 0 && (size_t)wrote < cap) ? 0 : 1; /* 0=ok, 1=truncated */
+}
+
+/* Force ellipsis at end of string while preserving what fit */
+static inline void force_ellipsis(char *dst, size_t cap) {
+    if (cap == 0) return;
+    size_t len = strnlen(dst, cap);
+    if (len + 4 <= cap) {                /* room to append "..." */
+        dst[len++]='.'; dst[len++]='.'; dst[len++]='.'; dst[len]='\0';
+    } else if (cap >= 4) {               /* place at very end */
+        dst[cap-4]='.'; dst[cap-3]='.'; dst[cap-2]='.'; dst[cap-1]='\0';
+    } else {                             /* cap 1..3 */
+        size_t n = cap - 1;
+        for (size_t i=0; i<n; i++) dst[i]='.';
+        dst[n]='\0';
+    }
+}
+
+/* Legacy macro compatibility - now uses safe functions */
+#define Sprintf(buf, ...) (void) snprintf(buf, SAFE_BUF_SIZE, __VA_ARGS__)
+#define Strcat(dest, src) (void) safe_strcat(dest, SAFE_BUF_SIZE, src)
+#define Strcpy(dest, src) (void) safe_strcpy(dest, SAFE_BUF_SIZE, src)
+
+/* Prefix buffer operations with truncation detection */
+#define PREFIX_Strcat(dest, src) safe_strcat(dest, PREFIX, src)
+#define PREFIX_Strcpy(dest, src) safe_strcpy(dest, PREFIX, src)
 #define	PREFIX	15
 extern char *eos(char *s);
 extern int bases[];
@@ -64,7 +116,7 @@ int i = strlen(pref);
 char *
 sitoa(a) int a; {
 static char buf[13];
-	Sprintf(buf, (a < 0) ? "%d" : "+%d", a);
+	(void) snprintf(buf, sizeof(buf), (a < 0) ? "%d" : "+%d", a);
 	return(buf);
 }
 
@@ -79,8 +131,8 @@ if(otyp < 0 || otyp >= NROFOBJECTS) {
 	return(buf);
 }
 struct objclass *ocl = &objects[otyp];
-char *an = ocl->oc_name;
-char *dn = ocl->oc_descr;
+const char *an = ocl->oc_name;  /* MODERN: const because reads from objects[] read-only fields */
+const char *dn = ocl->oc_descr;  /* MODERN: const because reads from objects[] read-only fields */
 char *un = ocl->oc_uname;
 int nn = ocl->oc_name_known;
 	switch(ocl->oc_olet) {
@@ -131,13 +183,14 @@ struct obj *obj;
 static char bufr[BUFSZ];
 char *buf = &(bufr[PREFIX]);	/* leave room for "17 -3 " */
 /* MODERN: Add bounds checking for objects array access */
-if(obj->otyp < 0 || obj->otyp >= NROFOBJECTS) {
-	Strcpy(buf, "strange object");  /* Safe fallback */
-	return(buf);
+/* Note: otyp is uchar, so < 0 check is redundant */
+if(obj->otyp >= NROFOBJECTS) {
+	panic("xname: corrupted object otyp=%d (valid range: 0-%d), olet='%c', quan=%d, ox=%d, oy=%d", 
+	      obj->otyp, NROFOBJECTS-1, obj->olet, obj->quan, obj->ox, obj->oy);
 }
 int nn = objects[obj->otyp].oc_name_known;
-char *an = objects[obj->otyp].oc_name;
-char *dn = objects[obj->otyp].oc_descr;
+const char *an = objects[obj->otyp].oc_name;  /* MODERN: const because reads from objects[] read-only fields */
+const char *dn = objects[obj->otyp].oc_descr;  /* MODERN: const because reads from objects[] read-only fields */
 char *un = objects[obj->otyp].oc_uname;
 int pl = (obj->quan != 1);
 	if(!obj->dknown && !Blind) obj->dknown = 1; /* %% doesnt belong here */
@@ -161,7 +214,7 @@ int pl = (obj->quan != 1);
 			break;
 		}
 		/* fungis ? */
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->otyp == WORM_TOOTH && pl) {
 			pl = 0;
@@ -173,7 +226,7 @@ int pl = (obj->quan != 1);
 			Strcpy(buf, "crysknives");
 			break;
 		}
-		/* fall into next case */
+		/* fallthrough */
 	case ARMOR_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:
@@ -307,11 +360,15 @@ char *bp = xname(obj);
 	case ARMOR_SYM:
 		if(obj->owornmask & W_ARMOR)
 			Strcat(bp, " (being worn)");
-		/* fall into next case */
+		/* fallthrough */
 	case WEAPON_SYM:
 		if(obj->known) {
-			PREFIX_Strcat(prefix, sitoa(obj->spe));
-			PREFIX_Strcat(prefix, " ");
+			int rc = safe_strcat(prefix, sizeof(prefix), sitoa(obj->spe));
+			if(rc) {
+				force_ellipsis(prefix, sizeof(prefix));
+			} else {
+				(void) safe_strcat(prefix, sizeof(prefix), " ");
+			}
 		}
 		break;
 	case WAND_SYM:
@@ -322,8 +379,12 @@ char *bp = xname(obj);
 		if(obj->owornmask & W_RINGR) Strcat(bp, " (on right hand)");
 		if(obj->owornmask & W_RINGL) Strcat(bp, " (on left hand)");
 		if(obj->known && (objects[obj->otyp].bits & SPEC)) {
-			Strcat(prefix, sitoa(obj->spe));
-			Strcat(prefix, " ");
+			int rc = safe_strcat(prefix, sizeof(prefix), sitoa(obj->spe));
+			if(rc) {
+				force_ellipsis(prefix, sizeof(prefix));
+			} else {
+				(void) safe_strcat(prefix, sizeof(prefix), " ");
+			}
 		}
 		break;
 	}
@@ -338,7 +399,7 @@ char *bp = xname(obj);
 }
 
 /* used only in hack.fight.c (thitu) */
-void setan(char *str, char *buf)
+void setan(const char *str, char *buf)  /* MODERN: const because str is read-only */
 {
 	if(index(vowels,*str))
 		Sprintf(buf, "an %s", str);
@@ -351,7 +412,7 @@ aobjnam(otmp,verb) struct obj *otmp; char *verb; {
 char *bp = xname(otmp);
 char prefix[PREFIX];
 	if(otmp->quan != 1) {
-		Sprintf(prefix, "%u ", otmp->quan);
+		(void) snprintf(prefix, sizeof(prefix), "%u ", otmp->quan);
 		bp = strprepend(bp, prefix);
 	}
 
@@ -380,7 +441,8 @@ struct obj *obj;
 	return(s);
 }
 
-char *wrp[] = { "wand", "ring", "potion", "scroll", "gem" };
+/* MODERN: CONST-CORRECTNESS: object type name strings are read-only */
+const char *const wrp[] = { "wand", "ring", "potion", "scroll", "gem" };
 char wrpsym[] = { WAND_SYM, RING_SYM, POTION_SYM, SCROLL_SYM, GEM_SYM };
 
 struct obj *
@@ -388,7 +450,8 @@ readobjnam(bp) char *bp; {
 char *p;
 int i;
 int cnt, spe, spesgn, typ, heavy;
-char let;
+/* Original 1984: char let; */
+unsigned char let;  /* MODERN: unsigned to prevent negative array indexing vulnerability */
 char *un, *dn, *an;
 /* int the = 0; char *oname = 0; */
 	cnt = spe = spesgn = typ = heavy = 0;
@@ -462,23 +525,23 @@ char *un, *dn, *an;
 		}
 		/* remove -s or -es (boxes) or -ies (rubies, zruties) */
 		p = eos(bp);
-		if(p[-1] == 's') {
-			if(p[-2] == 'e') {
-				if(p[-3] == 'i') {
-					if(!strcmp(p-7, "cookies"))
+		if(p > bp && p[-1] == 's') {
+			if(p - bp >= 2 && p[-2] == 'e') {
+				if(p - bp >= 3 && p[-3] == 'i') {
+					if(p - bp >= 7 && !strcmp(p-7, "cookies"))
 						goto mins;
 					Strcpy(p-3, "y");
 					goto sing;
 				}
 
 				/* note: cloves / knives from clove / knife */
-				if(!strcmp(p-6, "knives")) {
+				if(p - bp >= 6 && !strcmp(p-6, "knives")) {
 					Strcpy(p-3, "fe");
 					goto sing;
 				}
 
 				/* note: nurses, axes but boxes */
-				if(!strcmp(p-5, "boxes")) {
+				if(p - bp >= 5 && !strcmp(p-5, "boxes")) {
 					p[-2] = 0;
 					goto sing;
 				}
@@ -486,11 +549,11 @@ char *un, *dn, *an;
 		mins:
 			p[-1] = 0;
 		} else {
-			if(!strcmp(p-9, "homunculi")) {
+			if(p - bp >= 9 && !strcmp(p-9, "homunculi")) {
 				Strcpy(p-1, "us"); /* !! makes string longer */
 				goto sing;
 			}
-			if(!strcmp(p-5, "teeth")) {
+			if(p - bp >= 5 && !strcmp(p-5, "teeth")) {
 				Strcpy(p-5, "tooth");
 				goto sing;
 			}
@@ -503,12 +566,12 @@ sing:
 		goto typfnd;
 	}
 	p = eos(bp);
-	if(!strcmp(p-5, " mail")){	/* Note: ring mail is not a ring ! */
+	if(p - bp >= 5 && !strcmp(p-5, " mail")){	/* Note: ring mail is not a ring ! - MODERN: bounds check */
 		let = ARMOR_SYM;
 		an = bp;
 		goto srch;
 	}
-	for(i = 0; i < sizeof(wrpsym); i++) {
+	for(i = 0; i < (int)sizeof(wrpsym); i++) {  /* MODERN: Cast to int to match loop variable type */
 		int j = strlen(wrp[i]);
 		if(!strncmp(bp, wrp[i], j)){
 			let = wrpsym[i];
@@ -517,16 +580,16 @@ sing:
 			/* else if(*bp) ?? */
 			goto srch;
 		}
-		if(!strcmp(p-j, wrp[i])){
+		if(p - bp >= j && !strcmp(p-j, wrp[i])){
 			let = wrpsym[i];
 			p -= j;
 			*p = 0;
-			if(p[-1] == ' ') p[-1] = 0;
+			if(p > bp && p[-1] == ' ') p[-1] = 0;
 			dn = bp;
 			goto srch;
 		}
 	}
-	if(!strcmp(p-6, " stone")){
+	if(p - bp >= 6 && !strcmp(p-6, " stone")){
 		p[-6] = 0;
 		let = GEM_SYM;
 		an = bp;
@@ -544,7 +607,7 @@ srch:
 	i = 1;
 	if(let) i = bases[letindex(let)];
 	while(i <= NROFOBJECTS && (!let || objects[i].oc_olet == let)){
-		char *zn = objects[i].oc_name;
+		const char *zn = objects[i].oc_name;  /* MODERN: const because reads from objects[] read-only fields */
 
 		if(!zn) goto nxti;
 		if(an && strcmp(an, zn))

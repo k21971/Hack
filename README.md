@@ -7,6 +7,11 @@ The goal: make the original code compile, run, and dungeon-crawl exactly as it d
 
 Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
+**Philosophy**: "Fix what breaks, preserve what works" - authentic 1984 gameplay with modern build system and safety improvements.
+
+📜 **[Read the Complete History of Hack →](docs/HISTORY_OF_HACK.md)**  
+*From Rogue (1980) to NetHack's rise, through decades of digital decay, to restoHack's 2025 resurrection*
+
 ---
 
 <h3 align="Left">Screenshots</h3>
@@ -41,14 +46,8 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 ### Arch Linux (AUR)
 
-your choice of helper
-
 ```bash
 yay -S restohack
-```
-
-```bash
-paru -S restohack
 ```
 
 ### Hybrid Binary+Source Tarball
@@ -61,104 +60,57 @@ cd ~/Games/restohack
 tar -xzf restoHack-static-YYYYMMDD-linux-x86_64.tar.gz
 ```
 
-**Option 1: Run immediately  (Linux)** (static binary, no dependencies):
+## Install & Build
+
+**Requirements:** `git`, `cmake`, a C compiler, `ncurses`
+
+```bash
+git clone https://github.com/Critlist/restoHack.git
+cd restoHack
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/hack
+```
+
+**Alternative** (if your system supports CMake presets):
+
+```bash
+cmake --preset=release && cmake --build build
+```
+
+---
+
+## Quick Demo (Linux)
+
+If you just want to try it immediately without building from source:
 
 ```bash
 ./run-hack.sh
 ```
 
-**Option 2: Build from included source** (requires cmake, gcc, ncurses):
+*(static binary, no dependencies required)*
 
-```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/hack
-```
-
-**BSD Systems:** See [BSD Build Instructions](#bsd-build-instructions) below.
+**For BSD systems, development builds, IDE integration, and troubleshooting:** see [**📋 Build Instructions**](docs/BUILD.md)
 
 ---
 
-## Building from Source
+## Work in Progress
 
-**Requirements:** `git`, `cmake`, a C compiler (`gcc` or `clang`), plus `ncurses` or `termcap`.
+**Current Development: v1.1 - Hardening and Safety**
 
-### Standard Source Build (Release)
+The current work-in-progress focuses on introducing comprehensive hardening and safety parameters that the original 1984 code lacked. This version emphasizes stability improvements including:
 
-The default method for a stable, optimized build:
+* Enhanced memory safety and bounds checking
+* Improved error handling and recovery mechanisms  
+* Compiler warning elimination and code hardening
+* Environment-specific adaptations for varying systems
+* Robust input validation and sanitization
 
-```bash
-git clone https://github.com/Critlist/restoHack.git
-cd restoHack
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-./hack
-```
+⚠️ **RELAX, MAN, IT COMPILES!**  
+This was the guiding philosophy of 1984. While undoubtedly brilliant, the original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose of ’80s-era K&R magic.  
+Stability was a suggestion, not a guarantee.
 
-### Development Build (Debug)
-
-For hacking on the code, with debug symbols and optional sanitizers:
-
-```bash
-git clone https://github.com/Critlist/restoHack.git
-cd restoHack
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_SANITIZERS=ON
-cmake --build .
-./hack
-```
-
-### Clean Rebuild
-
-Wipes prior build artifacts before rebuilding:
-
-```bash
-rm -rf build && mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-./hack
-```
-
-### BSD Build Instructions
-
-**FreeBSD:**
-
-```bash
-# Install dependencies
-pkg install cmake gcc ncurses
-
-# Build from hybrid tarball or git clone
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/hack
-```
-
-**OpenBSD:**
-
-```bash
-# Install dependencies  
-pkg_add cmake gcc ncurses
-
-# Build with explicit compiler paths
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_C_COMPILER=/usr/local/bin/gcc
-cmake --build build
-./build/hack
-```
-
-**NetBSD:**
-
-```bash
-# Install dependencies
-pkgin install cmake gcc ncurses
-
-# Use pkgsrc paths for libraries
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH=/usr/pkg
-cmake --build build  
-./build/hack
-```
+* Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
 
 ---
 
@@ -173,6 +125,60 @@ cmake --build build
 ## Preservation Philosophy
 
 Fix what breaks, preserve what works. The original 1984 gameplay, balance, and feel remain untouched—only the infrastructure has been made reliable for modern systems.
+
+---
+
+## Source Code Provenance
+
+### Authenticity and Chain of Custody
+
+**restoHack** is built from **verified original source code** with complete provenance documentation:
+
+#### **Primary Source: FreeBSD 4.10 Games Collection**
+
+The original 1984 Hack source code was preserved in the FreeBSD games collection, which maintained Andries Brouwer's final **Hack 1.0.3** release from 1985. This represents the canonical version of historical Hack.
+
+#### **Source Recovery Process**
+
+Our preservation methodology ensures authenticity:
+
+* **Automated retrieval**: [`docs/historical/original-source/download_hack.sh`](docs/historical/original-source/download_hack.sh)
+* **Verification**: SHA-256 checksums and cross-reference validation
+* **Documentation**: Complete chain of custody from 1984 → FreeBSD → restoHack
+* **Integrity**: Every original file preserved unchanged in `docs/historical/original-source/`
+
+#### **Preservation Standards**
+
+- **100% behavioral authenticity**: Every game mechanic functions exactly as in 1984
+* **Save file compatibility**: Original 1984 save files work in restoHack
+* **Statistical verification**: Random number sequences match the original precisely
+* **Cross-platform consistency**: Identical behavior on all supported systems
+
+#### **Modernization Documentation**
+
+Every change from the original 1984 code is meticulously documented:
+
+```c
+/**
+ * MODERN ADDITION (2025): Brief description
+ * WHY: Problem being solved
+ * HOW: Technical implementation
+ * PRESERVES: Original 1984 behavior maintained
+ * ADDS: Modern functionality provided
+ */
+```
+
+No original code is deleted—it's preserved in comments alongside modern equivalents.
+
+### Historical Context
+
+Hack 1.0.3 represents:
+* **Andries Brouwer's masterpiece**: The mathematical peak of 1980s roguelike design
+* **The bridge**: Between Rogue's simplicity and NetHack's complexity
+* **Software archaeology**: A preserved artifact of computing history
+* **Gaming heritage**: The foundation of an entire genre
+
+For the complete story of Hack's creation, evolution, abandonment, and resurrection, see **[The Complete History of Hack](docs/HISTORY_OF_HACK.md)**.
 
 ---
 

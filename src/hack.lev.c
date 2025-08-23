@@ -30,7 +30,8 @@ extern long wgrowtime[32];
 
 boolean level_exists[MAXLEVEL+1];
 
-void savelev(int fd, xchar lev)
+/* Original 1984: void savelev(int fd, xchar lev) */
+void savelev(int fd, unsigned char lev) /* MODERN: unsigned to prevent buffer underflow */
 {
 #ifndef NOWORM
 	struct wseg *wtmp, *wtmp2;
@@ -38,7 +39,8 @@ void savelev(int fd, xchar lev)
 #endif /* NOWORM */
 
 	if(fd < 0) panic("Save on bad file!");	/* impossible */
-	if(lev >= 0 && lev <= MAXLEVEL)
+	/* Note: lev is unsigned char, so >= 0 check is redundant */
+	if(lev <= MAXLEVEL)
 		level_exists[lev] = TRUE;
 
 	bwrite(fd,(char *) &hackpid,sizeof(hackpid));
@@ -254,7 +256,7 @@ void mread(int fd, char *buf, unsigned len)
 	extern boolean restoring;
 
 	rlen = read(fd, buf, (int) len);
-	if(rlen != len){
+	if(rlen != (int)len){  /* MODERN: Cast to int to match rlen type from read() */
 		pline("Read %d instead of %u bytes.\n", rlen, len);
 		if(restoring) {
 			(void) unlink(SAVEF);

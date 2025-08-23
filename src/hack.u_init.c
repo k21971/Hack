@@ -286,6 +286,7 @@ got_suffix:
 	/* make sure he can carry all he has - especially for T's */
 	while(inv_weight() > 0 && u.ustr < 118)
 		u.ustr++, u.ustrmax++;
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 int ini_inv(trop) struct trobj *trop; {
@@ -341,6 +342,7 @@ struct obj *obj;
 #endif /* PYRAMID_BUG */
 		trop++;
 	}
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 #ifdef WIZARD
@@ -367,6 +369,7 @@ int type;
 	trop->trknown = 1;
 	trop->trquan = 1;
 	ini_inv(trop);
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 #endif /* WIZARD */
 
@@ -381,6 +384,7 @@ char *p;
 			plnamesuffix();
 		}
 	}
+	return 0; /* MODERN: Return 0 - no suffix found or processed - was missing return value */
 }
 
 int role_index(pc)

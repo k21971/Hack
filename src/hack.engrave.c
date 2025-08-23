@@ -11,7 +11,7 @@
 
 #include	"hack.h"
 
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern char nul[];
 extern struct obj zeroobj;
 struct engr {
@@ -37,7 +37,7 @@ struct engr *ep = head_engr;
 	return((struct engr *) 0);
 }
 
-int sengr_at(char *s, xchar x, xchar y) {
+int sengr_at(const char *s, xchar x, xchar y) {
 struct engr *ep = engr_at(x,y);
 char *t;
 int n;
@@ -80,8 +80,18 @@ char ch;
 		}
 		while(lth && ep->engr_txt[lth-1] == ' ')
 			ep->engr_txt[--lth] = 0;
-		while(ep->engr_txt[0] == ' ')
-			ep->engr_txt++;
+		/* MODERN: Fix memory corruption - don't modify ep->engr_txt pointer!
+		 * Instead, shift the text left to remove leading spaces */
+		if(ep->engr_txt[0] == ' ') {
+			char *src = ep->engr_txt;
+			char *dst = ep->engr_txt;
+			while(*src == ' ') src++;  /* find first non-space */
+			if(*src) {
+				while((*dst++ = *src++));  /* shift text left */
+			} else {
+				*dst = 0;  /* empty string */
+			}
+		}
 		if(!ep->engr_txt[0]) del_engr(ep);
 	}
 }
@@ -106,7 +116,8 @@ struct engr *ep = engr_at(x,y);
 	}
 }
 
-void make_engr_at(int x, int y, char *s)
+/* MODERN: CONST-CORRECTNESS: make_engr_at text is read-only */
+void make_engr_at(int x, int y, const char *s)
 {
 	struct engr *ep;
 
@@ -320,4 +331,21 @@ struct engr *ept;
 	fnd:	;
 	}
 	free((char *) ep);
+}
+
+/**
+ * MODERN ADDITION (2025): Memory cleanup for sanitizers
+ * WHY: LeakSanitizer detects allocated engravings as memory leaks when game exits
+ * HOW: Free all engravings in the linked list starting from head_engr
+ * PRESERVES: Original 1984 behavior (no cleanup during normal gameplay)
+ * ADDS: Modern memory hygiene for development tools
+ */
+void cleanup_all_engravings(void) {
+	struct engr *ep, *next;
+	
+	for(ep = head_engr; ep; ep = next) {
+		next = ep->nxt_engr;
+		free((char *) ep);
+	}
+	head_engr = NULL;
 }

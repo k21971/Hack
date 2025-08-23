@@ -12,7 +12,7 @@
 #include	"hack.h"
 #include	<stdio.h>
 extern struct permonst li_dog, dog, la_dog;
-extern char *exclam(), *xname();
+extern const char *exclam(int force); extern char *xname(struct obj *);
 extern struct obj *mkobj_at();
 
 static boolean far_noise;
@@ -38,7 +38,7 @@ boolean vis;
 		char buf[BUFSZ];
 		if(mdef->mimic) seemimic(mdef);
 		if(magr->mimic) seemimic(magr);
-		(void) sprintf(buf,"%s %s", Monnam(magr),
+		(void) snprintf(buf, BUFSZ, "%s %s", Monnam(magr),  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			hit ? "hits" : "misses");
 		pline("%s %s.", buf, monnam(mdef));
 	} else {
@@ -115,7 +115,7 @@ struct monst *mon;
 }
 
 /* u is hit by sth, but not a monster */
-int thitu(int tlev, int dam, char *name)
+int thitu(int tlev, int dam, const char *name)
 {
 char buf[BUFSZ];
 	setan(name,buf);

@@ -1,9 +1,23 @@
 cmake_minimum_required(VERSION 3.16)
-project(restoHack VERSION 1.0.6 LANGUAGES C)
+project(restoHack VERSION 1.1.0 LANGUAGES C)
+
+# --- Supported build types: Debug | Release | Hardened ---
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+set(_RESTOHACK_BUILD_TYPES "Debug;Release;Hardened")
+list(FIND _RESTOHACK_BUILD_TYPES "${CMAKE_BUILD_TYPE}" _ix)
+if(_ix EQUAL -1)
+  message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}'. Use one of: ${_RESTOHACK_BUILD_TYPES}")
+endif()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Set C standard
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Ensure binaries carry a build-id for coredumpctl/gdb symbolication
+add_link_options(-Wl,--build-id)
 
 # makepkg compatibility: Remove -Werror flags that cause packaging failures
 # This handles system-injected CFLAGS from makepkg.conf that include -Werror=format-security
@@ -155,6 +169,13 @@ target_include_directories(hack PRIVATE
     ${CMAKE_BINARY_DIR}/generated
     ${CURSES_INCLUDE_DIR}
 )
+
+# Enhanced Debug profile for better postmortem analysis
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(hack PRIVATE -fno-omit-frame-pointer)
+  target_link_options(hack PRIVATE -rdynamic)
+endif()
+
 # Compiler flags
 target_compile_options(hack PRIVATE 
     $<$<C_COMPILER_ID:GNU>:-Wno-stringop-truncation>
@@ -172,14 +193,34 @@ target_compile_options(hack PRIVATE
     $<$<C_COMPILER_ID:GNU>:-fstack-protector-strong>
     $<$<C_COMPILER_ID:Clang>:-fstack-protector-strong>
     # Enable debugging symbols for crash analysis
-    -g
+    -g3
 )
 
-# Fortify source for additional buffer overflow detection (only with optimization)
-# Only enable when optimization is present (Release/RelWithDebInfo builds)
-target_compile_definitions(hack PRIVATE 
-    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:_FORTIFY_SOURCE=2>
-)
+# Fortify source for additional buffer overflow detection
+# Use FORTIFY_SOURCE=3 on glibc >=2.36, fallback to =2 for compatibility
+include(CheckCSourceCompiles)
+
+# Probe whether FORTIFY=3 actually works on this libc/toolchain
+set(_fortify_probe_src "
+#include <features.h>
+int main(void) {
+#if defined(__GLIBC__) && defined(__GLIBC_MINOR__) && (__GLIBC__*100+__GLIBC_MINOR__>=236)
+    return 0;
+#else
+    #error no_fortify3
+#endif
+}")
+
+set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+check_c_source_compiles("${_fortify_probe_src}" HAS_FORTIFY3)
+
+if(HAS_FORTIFY3)
+    message(STATUS "Using FORTIFY_SOURCE=3 for optimized builds (glibc >=2.36)")
+else()
+    message(STATUS "Using FORTIFY_SOURCE=2 (glibc <2.36 or non-glibc)")
+endif()
+
+# Optimization handled in hardening section below
 
 # Runtime path configuration - inject absolute paths to prevent hardcoded path issues
 if(DEFINED HACKDIR_OVERRIDE)
@@ -227,12 +268,64 @@ if(ENABLE_SAVE_VALIDATION)
     message(STATUS "Save file validation enabled")
 endif()
 
-# Add sanitizers for learning and debugging (optional)
-option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+# Hardening and testing options
+option(ENABLE_SANITIZERS "Address/UB sanitizers in Debug" OFF)
+option(ENABLE_FUZZING "libFuzzer targets (Clang only)" OFF)
+
+# Common hardening flags
+target_compile_options(hack PRIVATE -Wall -Wextra -fstack-protector-strong)
+
+# Stack clash protection (GCC feature)
+include(CheckCCompilerFlag)
+check_c_compiler_flag("-fstack-clash-protection" HAS_SCP)
+if(HAS_SCP)
+    target_compile_options(hack PRIVATE -fstack-clash-protection)
+    message(STATUS "Stack clash protection enabled")
+endif()
+
+# Optimized configs: O2, PIE, Fortify (3 if available, else 2)
+target_compile_options(hack PRIVATE 
+    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:-O2 -fPIE>
+)
+target_link_options(hack PRIVATE 
+    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:-pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack>
+)
+
+# Apply FORTIFY_SOURCE based on detection
+if(HAS_FORTIFY3)
+    target_compile_definitions(hack PRIVATE 
+        $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:_FORTIFY_SOURCE=3>
+    )
+else()
+    target_compile_definitions(hack PRIVATE 
+        $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:_FORTIFY_SOURCE=2>
+    )
+endif()
+
+# Debug builds:
 if(ENABLE_SANITIZERS)
-    target_compile_options(hack PRIVATE -fsanitize=address -fsanitize=undefined -g)
-    target_link_options(hack PRIVATE -fsanitize=address -fsanitize=undefined)
-    message(STATUS "Sanitizers enabled - great for learning memory safety!")
+    # With sanitizers: use -O1 for better detection + FORTIFY_SOURCE compatibility
+    target_compile_options(hack PRIVATE 
+        $<$<CONFIG:Debug>:-O1 -g3 -fsanitize=address,undefined -fno-omit-frame-pointer>
+    )
+    target_link_options(hack PRIVATE 
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+    )
+    # Enable FORTIFY_SOURCE=2 in Debug with sanitizers (has -O1)
+    target_compile_definitions(hack PRIVATE $<$<CONFIG:Debug>:_FORTIFY_SOURCE=2>)
+    message(STATUS "Sanitizers enabled - run with: ASAN_OPTIONS=detect_stack_use_after_return=1 ./hack")
+else()
+    # Pure debugging: -O0 to avoid <optimized_out> in coredumps, disable FORTIFY_SOURCE
+    target_compile_options(hack PRIVATE $<$<CONFIG:Debug>:-O0 -g3>)
+    target_compile_definitions(hack PRIVATE $<$<CONFIG:Debug>:_FORTIFY_SOURCE=0>)
+    message(STATUS "Debug build optimized for debugging (no <optimized_out>)")
+endif()
+
+# Fuzzing (Clang)
+if(ENABLE_FUZZING AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+    target_compile_options(hack PRIVATE -fsanitize=fuzzer,address -fno-omit-frame-pointer)
+    target_link_options(hack PRIVATE -fsanitize=fuzzer,address)
+    message(STATUS "Fuzzing support enabled")
 endif()
 
 # Enhanced memory sanitizers specifically for save/load operations
@@ -243,6 +336,28 @@ if(ENABLE_SAVE_SANITIZERS)
     message(STATUS "Memory sanitizers enabled for save system debugging")
 endif()
 
+# --- Hardened profile ---
+if(CMAKE_BUILD_TYPE STREQUAL "Hardened")
+  message(STATUS "Configuring Hardened build")
+
+  # Perf + debuggable backtraces
+  target_compile_options(hack PRIVATE -O2 -fno-omit-frame-pointer)
+
+  # PIE + RELRO/NOW + NX (noexecstack) — mirror your Release hardening for Hardened
+  target_compile_options(hack PRIVATE -fPIE)
+  target_link_options(hack PRIVATE -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack)
+
+  # Fortify: prefer =3 when available (fallback to 2)
+  if(HAS_FORTIFY3)
+    target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=3)
+  else()
+    target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=2)
+  endif()
+
+  # Slightly stricter but sane warnings
+  target_compile_options(hack PRIVATE -Wall -Wextra -Wswitch -Wwrite-strings -Wformat=2)
+endif()
+
 # Link libraries
 target_link_libraries(hack ${CURSES_LIBRARIES})
 if(COMPAT_LIBRARY)
@@ -251,6 +366,47 @@ endif()
 if(HAVE_LIBBSD)
     target_link_libraries(hack bsd)
 endif()
+# Always handy to inspect flags locally
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Common warnings for all builds (sane, not noisy)
+target_compile_options(hack PRIVATE
+  -Wall -Wextra -Wformat=2
+  -Wno-missing-field-initializers
+  -Wno-old-style-definition
+  -fno-common
+)
+
+# === Profiles ===
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  # General build = ship it
+  target_compile_options(hack PRIVATE -O2 -DNDEBUG)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  # Dev build = symbols + easy backtraces, warnings don’t kill flow
+  target_compile_options(hack PRIVATE -O0 -g3 -fno-omit-frame-pointer -Wwrite-strings -Wno-error)
+  target_link_options(hack PRIVATE -rdynamic)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Hardened")
+  # safe, strict, but do NOT fail on warnings
+  target_compile_options(hack PRIVATE
+    -O2 -fno-omit-frame-pointer -fPIE
+    -Wwrite-strings
+    -Wno-error
+  )
+  # Fortify (3 if toolchain supports it; harmless if ignored)
+  target_compile_definitions(hack PRIVATE _FORTIFY_SOURCE=3)
+  target_link_options(hack PRIVATE
+    -pie
+    -Wl,-z,relro,-z,now
+    -Wl,-z,noexecstack
+  )
+  # Quiet a recent Clang nit, only if relevant
+  if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 18)
+    target_compile_options(hack PRIVATE -Wno-deprecated-non-prototype)
+  endif()
+endif()
+
+# REMOVED: Conflicting sanitizer configuration that was overriding ENABLE_SANITIZERS
+# All sanitizer control now handled by ENABLE_SANITIZERS option above (lines 306-322)
 
 # Data files
 set(DATA_FILES rumors help hh data)
@@ -303,6 +459,7 @@ endif()
 
 # Ensure hack depends on the setup
 add_dependencies(hack setup_hackdir)
+
 
 # Custom clean target to remove all generated files and lock files
 add_custom_target(clean-all

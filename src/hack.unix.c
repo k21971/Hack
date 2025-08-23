@@ -73,13 +73,13 @@ static uint32_t
 secure_seed(void)
 {
 #if defined(HAVE_ARC4RANDOM_BUF)
-	uint32_t s;
+	uint32_t s = 0; /* MODERN: Initialize to prevent MSan warning */
 	arc4random_buf(&s, sizeof(s));
 	return s;
 #elif defined(HAVE_ARC4RANDOM)
 	return arc4random();
 #elif defined(HAVE_GETENTROPY)
-	uint32_t s;
+	uint32_t s = 0; /* MODERN: Initialize to prevent MSan warning */
 	if (getentropy(&s, sizeof(s)) == 0) return s;
 	/* fall through on error */
 #endif
@@ -134,10 +134,10 @@ getyear(void)
 char *
 getdatestr(void)
 {
-	static char datestr[7];
+	static char datestr[32];  /* MODERN: Buffer increased to handle worst-case snprintf output safely */
 	struct tm *lt = getlt();
 
-	(void) snprintf(datestr, sizeof(datestr), "%02d%02d%02d",
+	(void) snprintf(datestr, sizeof(datestr), "%02d%02d%02d",  /* MODERN: Safe sprintf replacement with adequate buffer */
 		lt->tm_year % 100, lt->tm_mon + 1, lt->tm_mday);
 	return(datestr);
 }
@@ -195,14 +195,15 @@ gethdate(char *name) {
  */
 #define		MAXPATHLEN	1024
 
-char *np, *path;
+char *np;
+const char *path;  /* MODERN: const because can point to getenv() result or string literal */
 char filename[MAXPATHLEN+1];
 	if (index(name, '/') != NULL || (path = getenv("PATH")) == NULL)
 		path = "";
 
 	for (;;) {
-		if ((np = index(path, ':')) == NULL)
-			np = path + strlen(path);	/* point to end str */
+		if ((np = (char *)index(path, ':')) == NULL)  /* MODERN: Cast needed due to const path */
+			np = (char *)(path + strlen(path));	/* point to end str - MODERN: Cast needed due to const path */
 		if (np - path <= 1)			/* %% */
 			(void) strcpy(filename, name);
 		else {

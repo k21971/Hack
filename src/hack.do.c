@@ -20,7 +20,7 @@ extern boolean hmon();
 extern boolean level_exists[];
 extern struct monst youmonst;
 extern char *Doname();
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 
 static int drop();
 
@@ -167,7 +167,8 @@ void goto_level(int newlevel, boolean at_stairs)
 		maxdlevel = dlevel;
 	glo(dlevel);
 
-	if(!level_exists[dlevel])
+	/* Original 1984: if(!level_exists[dlevel]) */
+	if(!level_exists[(unsigned char)dlevel]) /* MODERN: safe array indexing */
 		mklev();
 	else {
 		extern int hackpid;
@@ -217,8 +218,9 @@ void goto_level(int newlevel, boolean at_stairs)
 	    do {
 		u.ux = rnd(COLNO-1);
 		u.uy = rn2(ROWNO);
-	    } while(levl[u.ux][u.uy].typ != ROOM ||
-			m_at(u.ux,u.uy));
+	    /* Original 1984: } while(levl[u.ux][u.uy].typ != ROOM || m_at(u.ux,u.uy)); */
+	    } while(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ != ROOM ||
+			m_at(u.ux,u.uy)); /* MODERN: safe array indexing */
 	    if(Punished){
 		if(uwep != uball && !up /* %% */ && rn2(5)){
 			pline("The iron ball falls on your head.");
@@ -361,7 +363,8 @@ int dothrow(void)
 				}
 			} else {
 				/* MODERN: Add bounds checking for objects array access */
-				if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS) {
+				/* Note: otyp is uchar, so >= 0 check is redundant */
+				if(obj->otyp < NROFOBJECTS) {
 					miss(objects[obj->otyp].oc_name, mon);
 				} else {
 					miss("strange object", mon);
@@ -387,7 +390,8 @@ int dothrow(void)
 			if(obj->olet == GEM_SYM && mon->data->mlet == 'u' &&
 				!mon->mtame){
 			 /* MODERN: Add bounds checking for objects array access */
-			 if(obj->otyp >= 0 && obj->otyp < NROFOBJECTS && 
+			 /* Note: otyp is uchar, so >= 0 check is redundant */
+			 if(obj->otyp < NROFOBJECTS && 
 			    obj->dknown && objects[obj->otyp].oc_name_known){
 			  if(objects[obj->otyp].g_val > 0){
 			    u.uluck += 5;

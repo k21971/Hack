@@ -17,12 +17,16 @@
 /* Function prototypes */
 extern int bwrite(int fd, char *buf, int len);
 extern int mread(int fd, char *buf, int len);
-extern void error(char *s, ...);
-extern void panic(char *str, ...);
+/* MODERN: CONST-CORRECTNESS: error message is read-only */
+extern void error(const char *s, ...);
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+extern void panic(const char *str, ...);
 extern int rn2(int x);
 extern void *alloc(unsigned lth);
-extern void cornline(int mode, char *text);
-extern void pline(char *line, ...);
+/* MODERN: CONST-CORRECTNESS: cornline text is read-only */
+extern void cornline(int mode, const char *text);
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+extern void pline(const char *line, ...);
 extern char *typename(int otyp);
 
 /* Forward declarations for functions defined in this file */
@@ -47,7 +51,8 @@ char ch;
 
 void init_objects(void){
 int i, j, first, last, sum, end;
-char let, *tmp;
+char let;
+const char *tmp;  /* MODERN: const to match oc_descr field type */
 	/* init base; if probs given check that they add up to 100,
 	   otherwise compute probs; shuffle descriptions */
 	end = SIZE(objects);
@@ -95,7 +100,30 @@ char let, *tmp;
 int probtype(int let) {
 int i = bases[letindex(let)];
 int prob = rn2(100);
-	while((prob -= objects[i].oc_prob) >= 0) i++;
+int category_start = i;
+	/* MODERN ADDITION (2025): Safe probability calculation with bounds checking
+	 * WHY: Original could overflow when probabilities don't sum correctly
+	 * HOW: Track category boundaries and clamp to valid range
+	 * PRESERVES: Original 1984 random selection behavior within category
+	 * ADDS: Memory safety to prevent array bounds violations
+	 */
+	
+	/* Find the end of this object category */
+	int category_end = i;
+	while(category_end < NROFOBJECTS && objects[category_end].oc_olet == let && objects[category_end].oc_name != NULL) {
+		category_end++;
+	}
+	
+	/* Original 1984: while((prob -= objects[i].oc_prob) >= 0) i++; */
+	while((prob -= objects[i].oc_prob) >= 0) {
+		i++;
+		/* MODERN: Bounds check - stay within this object category */
+		if(i >= category_end || i >= NROFOBJECTS) {
+			/* If we've exhausted all objects in category, return the last valid one */
+			i = category_end - 1;
+			break;
+		}
+	}
 	if(objects[i].oc_olet != let || !objects[i].oc_name)
 		panic("probtype(%c) error, i=%d", let, i);
 	return(i);

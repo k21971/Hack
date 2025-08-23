@@ -31,8 +31,11 @@ struct you u;
 struct monst youmonst;	/* dummy; used as return value for boomhit */
 
 xchar dlevel = 1;
-xchar xupstair, yupstair, xdnstair, ydnstair;
-char *save_cm = 0, *killer, *nomovemsg;
+/* Original 1984: xchar xupstair, yupstair, xdnstair, ydnstair; */
+unsigned char xupstair, yupstair, xdnstair, ydnstair; /* MODERN: unsigned to prevent buffer underflow */
+char *save_cm = 0;
+const char *nomovemsg;  /* MODERN: const because assigned string literals */
+const char *killer;  /* MODERN: CONST-CORRECTNESS: killer points to read-only death reasons */
 
 long moves = 1;
 long wailmsg = 0;
@@ -42,7 +45,8 @@ char genocided[60];
 char fut_geno[60];
 
 xchar curx,cury;
-xchar seelx, seehx, seely, seehy;	/* corners of lit room */
+/* Original 1984: xchar seelx, seehx, seely, seehy; */
+unsigned char seelx, seehx, seely, seehy;	/* corners of lit room - MODERN: unsigned to prevent buffer underflow */
 
 coord bhitpos;
 

@@ -12,10 +12,10 @@
 #include	"hack.h"
 #include <stdio.h>
 char POISONOUS[] = "ADKSVabhks";
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern int (*afternmv)();
 extern int (*occupation)();
-extern char *occtxt;
+extern const char *occtxt;  /* MODERN: const because assigned string literals */
 extern struct obj *splitobj(), *addinv();
 
 /* Forward declarations for functions in this file */
@@ -40,7 +40,8 @@ int unfaint(void);
 #define FAINTED		5
 #define STARVED		6
 
-char *hu_stat[] = {
+/* MODERN: CONST-CORRECTNESS: hunger status strings are read-only */
+const char *const hu_stat[] = {
 	"Satiated",
 	"        ",
 	"Hungry  ",
@@ -57,13 +58,13 @@ int init_uhunger(void){
 }
 
 #define	TTSZ	SIZE(tintxts)
-struct { char *txt; int nut; } tintxts[] = {
-	"It contains first quality peaches - what a surprise!",	40,
-	"It contains salmon - not bad!",	60,
-	"It contains apple juice - perhaps not what you hoped for.", 20,
-	"It contains some nondescript substance, tasting awfully.", 500,
-	"It contains rotten meat. You vomit.", -50,
-	"It turns out to be empty.",	0
+struct { const char *txt; int nut; } tintxts[] = {  /* MODERN: const because txt points to string literals */
+	{"It contains first quality peaches - what a surprise!",	40},
+	{"It contains salmon - not bad!",	60},
+	{"It contains apple juice - perhaps not what you hoped for.", 20},
+	{"It contains some nondescript substance, tasting awfully.", 500},
+	{"It contains rotten meat. You vomit.", -50},
+	{"It turns out to be empty.",	0}
 };
 
 static struct {
@@ -181,7 +182,7 @@ gotit:
 		return(1);
 	}
 	/* MODERN: Add bounds checking for objects array access */
-	if(otmp->otyp < 0 || otmp->otyp >= NROFOBJECTS) {
+	if(otmp->otyp >= NROFOBJECTS) {
 		pline("Strange food indeed!");
 		return(0);  /* Cannot eat unknown object type */
 	}
@@ -279,7 +280,7 @@ gotit:
 eatx:
 	if(multi<0 && !nomovemsg){
 		static char msgbuf[BUFSZ];
-		(void) sprintf(msgbuf, "You finished eating the %s.",
+		(void) snprintf(msgbuf, BUFSZ, "You finished eating the %s.",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 				ftmp->oc_name);
 		nomovemsg = msgbuf;
 	}
@@ -397,7 +398,8 @@ int tp = 0;
 		pline("You get very sick.");
 		Sick = 10 + rn2(10);
 		/* MODERN: Add bounds checking for objects array access */
-		if(otmp->otyp >= 0 && otmp->otyp < NROFOBJECTS) {
+		/* Note: otyp is uchar, so >= 0 check is redundant */
+		if(otmp->otyp < NROFOBJECTS) {
 			u.usick_cause = objects[otmp->otyp].oc_name;
 		} else {
 			u.usick_cause = "something strange";
@@ -427,11 +429,11 @@ int tp = 0;
 	case 'n':
 		u.uhp = u.uhpmax;
 		flags.botl = 1;
-		/* fall into next case */
+		/* FALLTHROUGH */
 	case '@':
 		pline("You cannibal! You will be sorry for this!");
 		/* not tp++; */
-		/* fall into next case */
+		/* FALLTHROUGH */
 	case 'd':
 		Aggravate_monster |= INTRINSIC;
 		break;
@@ -444,12 +446,12 @@ int tp = 0;
 			Invis |= INTRINSIC;
 			See_invisible |= INTRINSIC;
 		}
-		/* fall into next case */
+		/* FALLTHROUGH */
 	case 'y':
 #ifdef QUEST
 		u.uhorizon++;
 #endif /* QUEST */
-		/* fall into next case */
+		/* fallthrough */
 	case 'B':
 		Confusion = 50;
 		break;
@@ -471,7 +473,7 @@ int tp = 0;
 		pline("You turn to stone.");
 		killer = "dead cockatrice";
 		done("died");
-		/* NOTREACHED */
+		/* FALLTHROUGH */
 	case 'a':
 	  if(Stoned) {
 	      pline("What a pity - you just destroyed a future piece of art!");

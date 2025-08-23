@@ -9,13 +9,14 @@
 #include "hack.h"
 xchar scrlx, scrhx, scrly, scrhy;	/* corners of new area on screen */
 
-extern char *hu_stat[];	/* in eat.c */
+/* MODERN: CONST-CORRECTNESS: match hu_stat[] definition (read-only string table) */
+extern const char *const hu_stat[];	/* in eat.c */
 extern char *CD;
 
 void
 swallowed(void)
 {
-	char *ulook = "|@|";
+	char ulook[] = "|@|";  /* MODERN: Use array instead of pointer to allow modification */
 	ulook[1] = u.usym;
 
 	cls();
@@ -38,7 +39,8 @@ swallowed(void)
 boolean panicking;
 
 void
-panic(char *str, ...)
+/* MODERN: CONST-CORRECTNESS: panic message is read-only */
+panic(const char *str, ...)
 {
 	if(panicking++) exit(1);    /* avoid loops - this should never happen*/
 	home();
@@ -61,12 +63,20 @@ panic(char *str, ...)
 void
 atl(int x, int y, int ch)
 {
-	struct rm *crm = &levl[x][y];
-
+	/**
+	 * MODERN ADDITION (2025): Move bounds check before array access
+	 * WHY: Original accessed levl[x][y] before validating bounds
+	 * HOW: Check bounds first, then access array
+	 * PRESERVES: Original 1984 error handling behavior
+	 * ADDS: Memory safety by preventing buffer overflow
+	 */
 	if(x<0 || x>COLNO-1 || y<0 || y>ROWNO-1){
 		impossible("atl(%d,%d)", x, y);
 		return;
 	}
+	
+	struct rm *crm = &levl[x][y];
+	
 	if(crm->seen && crm->scrsym == ch) return;
 	crm->scrsym = ch;
 	crm->new = 1;
@@ -91,7 +101,7 @@ on_scr(int x, int y)
 
 void
 tmp_at(schar x, schar y) {
-static schar prevx, prevy;
+static schar prevx, prevy; /* MODERN: Keep original schar to preserve -1 sentinel logic */
 static char let;
 	if((int)x == -2){	/* change let call */
 		let = y;
@@ -105,7 +115,7 @@ static char let;
 	if(prevx >= 0 && cansee(prevx,prevy)) {
 		delay_output(50);
 		prl(prevx, prevy);	/* in case there was a monster */
-		at(prevx, prevy, levl[prevx][prevy].scrsym);
+		at(prevx, prevy, levl[(unsigned char)prevx][(unsigned char)prevy].scrsym);  /* MODERN: Cast to unsigned char for safe array indexing */
 	}
 	if(x >= 0){	/* normal call */
 		if(cansee(x,y)) at(x,y,let);
@@ -119,7 +129,7 @@ static char let;
 
 /* like the previous, but the symbols are first erased on completion */
 void
-Tmp_at(schar x, schar y) {
+Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2 sentinel logic */
 static char let;
 static xchar cnt;
 static coord tc[COLNO];		/* but watch reflecting beams! */
@@ -132,10 +142,10 @@ int xx,yy;
 		}
 		/* close call (do not distinguish y==0 and y==-1) */
 		while(cnt--) {
-			xx = tc[cnt].x;
-			yy = tc[cnt].y;
+			xx = tc[(unsigned char)cnt].x; /* MODERN: Cast to unsigned char for safe array indexing */
+			yy = tc[(unsigned char)cnt].y; /* MODERN: Cast to unsigned char for safe array indexing */
 			prl(xx, yy);
-			at(xx, yy, levl[xx][yy].scrsym);
+			at(xx, yy, levl[(unsigned char)xx][(unsigned char)yy].scrsym); /* MODERN: Cast to unsigned char for safe array indexing */
 		}
 		cnt = let = 0;	/* superfluous */
 		return;
@@ -148,10 +158,10 @@ int xx,yy;
 	if(cansee(x,y)) {
 		if(cnt) delay_output(50);
 		at(x,y,let);
-		tc[cnt].x = x;
-		tc[cnt].y = y;
+		tc[(unsigned char)cnt].x = x; /* MODERN: Cast to unsigned char for safe array indexing */
+		tc[(unsigned char)cnt].y = y; /* MODERN: Cast to unsigned char for safe array indexing */
 		if(++cnt >= COLNO) panic("Tmp_at overflow?");
-		levl[x][y].new = 0;	/* prevent pline-nscr erasing --- */
+		levl[(unsigned char)x][(unsigned char)y].new = 0;	/* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char for safe array indexing */
 	}
 }
 
@@ -208,8 +218,18 @@ docrt(void)
 
 /* Some ridiculous code to get display of @ and monsters (almost) right */
 	if(!Invisible) {
-		levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym;
-		levl[u.udisx][u.udisy].seen = 1;
+		/**
+		 * MODERN ADDITION (2025): Bounds check before array access
+		 * WHY: u.ux/u.uy can exceed array bounds causing buffer overflow
+		 * HOW: Validate coordinates before accessing levl array
+		 * PRESERVES: Original 1984 display logic
+		 * ADDS: Memory safety by preventing buffer overflow
+		 */
+		if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
+			/* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym; levl[u.udisx][u.udisy].seen = 1; */
+			levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)].scrsym = u.usym;
+			levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen = 1; /* Bounds already validated */
+		}
 		u.udispl = 1;
 	} else	u.udispl = 0;
 
@@ -296,7 +316,17 @@ pru(void)
 		u.udisx = u.ux;
 		u.udisy = u.uy;
 	}
-	levl[u.ux][u.uy].seen = 1;
+	/* Original 1984: levl[u.ux][u.uy].seen = 1; */
+	/**
+	 * MODERN ADDITION (2025): Bounds check before array access
+	 * WHY: u.ux/u.uy can exceed array bounds (e.g. u.ux=82 > 79)
+	 * HOW: Validate coordinates before accessing levl array
+	 * PRESERVES: Original 1984 visibility logic
+	 * ADDS: Memory safety by preventing buffer overflow
+	 */
+	if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
+		levl[(unsigned char)u.ux][(unsigned char)u.uy].seen = 1; /* Bounds already validated */
+	}
 }
 
 #ifndef NOWORM
@@ -319,8 +349,9 @@ prl(int x, int y)
 	}
 	if(!isok(x,y)) return;
 	room = &levl[x][y];
+	/* Original 1984: if((!room->typ) || (IS_ROCK(room->typ) && levl[u.ux][u.uy].typ == CORR)) */
 	if((!room->typ) ||
-	   (IS_ROCK(room->typ) && levl[u.ux][u.uy].typ == CORR))
+	   (IS_ROCK(room->typ) && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR)) /* MODERN: safe array indexing */
 		return;
 	if((mtmp = m_at(x,y)) && !mtmp->mhide &&
 		(!mtmp->minvis || See_invisible)) {
@@ -349,7 +380,8 @@ prl(int x, int y)
 }
 
 char
-news0(xchar x, xchar y)
+/* Original 1984: news0(xchar x, xchar y) */
+news0(unsigned char x, unsigned char y) /* MODERN: unsigned to prevent buffer underflow */
 {
 	struct obj *otmp;
 	struct trap *ttmp;
@@ -548,7 +580,7 @@ struct monst *mtmp;
 	for(mtmp = fmon; mtmp; mtmp = mtmp->nmon){
 		if(mtmp->data->mlet == ';')
 			mtmp->minvis = (u.ustuck != mtmp &&
-					levl[mtmp->mx][mtmp->my].typ == POOL);
+					levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ == POOL); /* MODERN: Cast to unsigned char for safe array indexing */
 		pmon(mtmp);
 #ifndef NOWORM
 		if(mtmp->wormno) wormsee(mtmp->wormno);
@@ -606,7 +638,7 @@ char oldbot[100], newbot[100];
 void
 cornbot(int lth)
 {
-	if(lth < sizeof(oldbot)) {
+	if(lth < (int)sizeof(oldbot)) {  /* MODERN: Cast to int to match lth type */
 		oldbot[lth] = 0;
 		flags.botl = 1;
 	}
@@ -629,7 +661,7 @@ int len, remaining;  /* MODERN: Track buffer usage for safe sprintf */
 		"Level %-2d   Hp %3d(%d)   Ac %-2d   Str ",
 		dlevel,  u.uhp, u.uhpmax, u.uac);
 #endif /* GOLD_ON_BOTL */
-	if(len >= sizeof(newbot)) len = sizeof(newbot) - 1;
+	if(len >= (int)sizeof(newbot)) len = (int)sizeof(newbot) - 1;  /* MODERN: Cast to int to match len type */
 	remaining = sizeof(newbot) - len;
 	
 	if(u.ustr>18) {

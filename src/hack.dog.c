@@ -102,7 +102,7 @@ int dogfood(struct obj *obj) {
 	    );
 	default:
 	    if(!obj->cursed) return(APPORT);
-	    /* fall into next case */
+	    /* fallthrough */
 	case BALL_SYM:
 	case CHAIN_SYM:
 	case ROCK_SYM:
@@ -113,7 +113,7 @@ int dogfood(struct obj *obj) {
 /* return 0 (no move), 1 (move) or 2 (dead) */
 int dog_move(struct monst *mtmp, int after) {
 int nx,ny,omx,omy,appr,nearer,j;
-int udist,chi,i,whappr;
+int udist,chi = -1,i,whappr;  /* MODERN: Initialize chi to prevent uninitialized use */
 struct monst *mtmp2;
 struct permonst *mdat = mtmp->data;
 struct edog *edog = EDOG(mtmp);
@@ -121,7 +121,9 @@ struct obj *obj;
 struct trap *trap;
 xchar cnt,chcnt,nix,niy;
 schar dogroom,uroom;
-xchar gx,gy,gtyp,otyp;	/* current goal */
+/* Original 1984: xchar gx,gy,gtyp,otyp; */
+unsigned char gx = 0,gy = 0; /* MODERN: Initialize to prevent uninitialized use */
+xchar gtyp,otyp; /* current goal - gx,gy unsigned to prevent buffer underflow */
 coord poss[9];
 int info[9];
 #define GDIST(x,y) ((x-gx)*(x-gx) + (y-gy)*(y-gy))
@@ -159,7 +161,7 @@ int info[9];
 	/* Note: if apport == 1 then our behaviour is independent of udist */
 	if(mtmp->minvent){
 		if(!rn2(udist) || !rn2((int) edog->apport))
-		if(rn2(10) < edog->apport){
+		if((unsigned)rn2(10) < edog->apport){  /* MODERN: Cast to unsigned to match apport type */
 			relobj(mtmp, (int) mtmp->minvis);
 			if(edog->apport > 1) edog->apport--;
 			edog->dropdist = udist;		/* hpscdi!jon */
@@ -173,7 +175,7 @@ int info[9];
 			goto eatobj;
 		    }
 		    if(obj->owt < 10*mtmp->data->mlevel)
-		    if(rn2(20) < edog->apport+3)
+		    if((unsigned)rn2(20) < edog->apport+3)  /* MODERN: Cast to unsigned to match apport type */
 		    if(rn2(udist) || !rn2((int) edog->apport)){
 			freeobj(obj);
 			unpobj(obj);
@@ -204,7 +206,7 @@ int info[9];
 		} else
 		if(gtyp == UNDEF && dogroom >= 0 &&
 		   uroom == dogroom &&
-		   !mtmp->minvent && edog->apport > rn2(8)){
+		   !mtmp->minvent && edog->apport > (unsigned)rn2(8)){  /* MODERN: Cast to unsigned to match apport type */
 			gx = obj->ox;
 			gy = obj->oy;
 			gtyp = APPORT;
@@ -217,8 +219,8 @@ int info[9];
 			gy = u.uy;
 #ifndef QUEST
 		} else {
-			int tmp = rooms[dogroom].fdoor;
-			    cnt = rooms[dogroom].doorct;
+			int tmp = rooms[(unsigned char)dogroom].fdoor; /* MODERN: Cast to unsigned char for safe array indexing */
+			    cnt = rooms[(unsigned char)dogroom].doorct; /* MODERN: Cast to unsigned char for safe array indexing */
 
 			gx = gy = FAR;	/* random, far away */
 			while(cnt--){
@@ -240,7 +242,7 @@ int info[9];
 		if(after && udist <= 4 && gx == u.ux && gy == u.uy)
 			return(0);
 		if(udist > 1){
-			if(!IS_ROOM(levl[u.ux][u.uy].typ) || !rn2(4) ||
+			if(!IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ) || !rn2(4) || /* MODERN: Cast to unsigned char for safe array indexing */
 			   whappr ||
 			   (mtmp->minvent && rn2((int) edog->apport)))
 				appr = 1;
@@ -411,7 +413,7 @@ int tamedog(struct monst *mtmp, struct obj *obj)
 	mtmp2 = newmonst(sizeof(struct edog) + mtmp->mnamelth);
 	*mtmp2 = *mtmp;
 	mtmp2->mxlth = sizeof(struct edog);
-	if(mtmp->mnamelth) (void) strcpy(NAME(mtmp2), NAME(mtmp));
+	if(mtmp->mnamelth) (void) strcpy(NAME(mtmp2), NAME(mtmp));  /* MODERN: Safe - allocated exact size */
 	initedog(mtmp2);
 	replmon(mtmp,mtmp2);
 	return(1);

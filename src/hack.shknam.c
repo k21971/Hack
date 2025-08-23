@@ -4,7 +4,8 @@
 
 #include "hack.h"
 
-char *shkliquors[] = {
+/* MODERN: CONST-CORRECTNESS: shkliquors is a read-only array of string literals */
+const char *const shkliquors[] = {
 	/* Ukraine */
 	"Njezjin", "Tsjernigof", "Gomel", "Ossipewsk", "Gorlowka",
 	/* N. Russia */
@@ -19,7 +20,8 @@ char *shkliquors[] = {
 	0
 };
 
-char *shkbooks[] = {
+/* MODERN: CONST-CORRECTNESS: shkbooks is a read-only array of string literals */
+const char *const shkbooks[] = {
 	/* Eire */
 	"Skibbereen", "Kanturk", "Rath Luirc", "Ennistymon", "Lahinch",
 	"Loughrea", "Croagh", "Maumakeogh", "Ballyjamesduff",
@@ -31,7 +33,8 @@ char *shkbooks[] = {
 	0
 };
 
-char *shkarmors[] = {
+/* MODERN: CONST-CORRECTNESS: shkarmors is a read-only array of string literals */
+const char *const shkarmors[] = {
 	/* Turquie */
 	"Demirci", "Kalecik", "Boyabai", "Yildizeli", "Gaziantep",
 	"Siirt", "Akhalataki", "Tirebolu", "Aksaray", "Ermenak",
@@ -42,7 +45,8 @@ char *shkarmors[] = {
 	0
 };
 
-char *shkwands[] = {
+/* MODERN: CONST-CORRECTNESS: shkwands is a read-only array of string literals */
+const char *const shkwands[] = {
 	/* Wales */
 	"Yr Wyddgrug", "Trallwng", "Mallwyd", "Pontarfynach",
 	"Rhaeader", "Llandrindod", "Llanfair-ym-muallt",
@@ -56,7 +60,8 @@ char *shkwands[] = {
 	0
 };
 
-char *shkrings[] = {
+/* MODERN: CONST-CORRECTNESS: shkrings is a read-only array of string literals */
+const char *const shkrings[] = {
 	/* Hollandse familienamen */
 	"Feyfer", "Flugi", "Gheel", "Havic", "Haynin", "Hoboken",
 	"Imbyze", "Juyn", "Kinsky", "Massis", "Matray", "Moy",
@@ -69,7 +74,8 @@ char *shkrings[] = {
 	0
 };
 
-char *shkfoods[] = {
+/* MODERN: CONST-CORRECTNESS: food shop owner names are read-only */
+const char *const shkfoods[] = {
 	/* Indonesia */
 	"Djasinga", "Tjibarusa", "Tjiwidej", "Pengalengan",
 	"Bandjar", "Parbalingga", "Bojolali", "Sarangan",
@@ -81,7 +87,8 @@ char *shkfoods[] = {
 	0
 };
 
-char *shkweapons[] = {
+/* MODERN: CONST-CORRECTNESS: shkweapons is a read-only array of string literals */
+const char *const shkweapons[] = {
 	/* Perigord */
 	"Voulgezac", "Rouffiac", "Lerignac", "Touverac", "Guizengeard",
 	"Melac", "Neuvicq", "Vanzac", "Picq", "Urignac", "Corignac",
@@ -92,27 +99,16 @@ char *shkweapons[] = {
 	0
 };
 
-char *shkgeneral[] = {
-	/* Suriname */
-	"Hebiwerie", "Possogroenoe", "Asidonhopo", "Manlobbi",
-	"Adjama", "Pakka Pakka", "Kabalebo", "Wonotobo",
-	"Akalapi", "Sipaliwini",
-	/* Greenland */
-	"Annootok", "Upernavik", "Angmagssalik",
-	/* N. Canada */
-	"Aklavik", "Inuvik", "Tuktoyaktuk",
-	"Chicoutimi", "Ouiatchouane", "Chibougamau",
-	"Matagami", "Kipawa", "Kinojevis",
-	"Abitibi", "Maganasipi",
-	/* Iceland */
-	"Akureyri", "Kopasker", "Budereyri", "Akranes", "Bordeyri",
-	"Holmavik",
+/* MODERN: CONST-CORRECTNESS: shkgeneral is a read-only array of string literals */
+const char *const shkgeneral[] = {
+	"stuff", "things", "goods", "provisions", "implements",
 	0
 };
 
 struct shk_nx {
 	char x;
-	char **xn;
+	/* MODERN: CONST-CORRECTNESS: shopkeeper name arrays are read-only */
+	const char *const *xn;
 } shk_nx[] = {
 	{ POTION_SYM,	shkliquors },
 	{ SCROLL_SYM,	shkbooks },
@@ -125,7 +121,8 @@ struct shk_nx {
 };
 void findname(char *nampt, char let) {
 struct shk_nx *p = shk_nx;
-char **q;
+/* MODERN: CONST-CORRECTNESS: shopkeeper name arrays are read-only */
+const char *const *q;
 int i;
 	while(p->x && p->x != let) p++;
 	q = p->xn;

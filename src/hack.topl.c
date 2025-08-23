@@ -32,7 +32,8 @@ doredotopl(void)
 	if(!last_redone_topl)
 		last_redone_topl = old_toplines;
 	if(last_redone_topl){
-		(void) strcpy(toplines, last_redone_topl->topl_text);
+		(void) strncpy(toplines, last_redone_topl->topl_text, BUFSZ-1);
+		toplines[BUFSZ-1] = '\0';  /* MODERN: Ensure null termination */
 	}
 	redotoplin();
 	return(0);
@@ -66,7 +67,7 @@ int cnt = OTLMAX;
 		alloc((unsigned)(strlen(toplines) + sizeof(struct topl) + 1));
 	tl->next_topl = old_toplines;
 	tl->topl_text = (char *)(tl + 1);
-	(void) strcpy(tl->topl_text, toplines);
+	(void) strcpy(tl->topl_text, toplines);  /* MODERN: Safe - allocated exact size */
 	old_toplines = tl;
 	while(cnt && tl){
 		cnt--;
@@ -79,10 +80,11 @@ int cnt = OTLMAX;
 }
 
 void
-addtopl(char *s)
+/* MODERN: CONST-CORRECTNESS: addtopl message is read-only */
+addtopl(const char *s)
 {
 	curs(tlx,tly);
-	if(tlx + strlen(s) > CO) putsym('\n');
+	if(tlx + (int)strlen(s) > CO) putsym('\n');  /* MODERN: Cast strlen to int for screen coordinate math */
 	putstr(s);
 	tlx = curx;
 	tly = cury;
@@ -90,11 +92,13 @@ addtopl(char *s)
 }
 
 void
-xmore(char *s)	/* allowed chars besides space/return */
+/* MODERN: CONST-CORRECTNESS: xmore message is read-only */
+xmore(const char *s)	/* allowed chars besides space/return */
 {
 	if(flags.toplin) {
 		curs(tlx, tly);
-		if(tlx + 8 > CO) putsym('\n'), tly++;
+		/* Original 1984: if(tlx + 8 > CO) putsym('\n'), tly++; */
+		if(tlx + 8 > CO) putsym('\n');  /* MODERN: Removed redundant tly++ - putsym('\n') already increments tly in line 225 */
 	}
 
 	if(flags.standout)
@@ -119,7 +123,8 @@ more(void)
 }
 
 void
-cmore(char *s)
+/* MODERN: CONST-CORRECTNESS: cmore message is read-only */
+cmore(const char *s)
 {
 	xmore(s);
 }
@@ -138,7 +143,8 @@ clrlin(void)
 
 /*VARARGS1*/
 void
-pline(char *line, ...)
+/* MODERN: CONST-CORRECTNESS: pline message is read-only */
+pline(const char *line, ...)
 {
 	char pbuf[BUFSZ];
 	char *bp = pbuf, *tl;
@@ -146,9 +152,12 @@ pline(char *line, ...)
 	va_list args;
 
 	if(!line || !*line) return;
-	if(!index(line, '%')) (void) strcpy(pbuf,line); else {
+	if(!index(line, '%')) {
+		(void) strncpy(pbuf, line, BUFSZ-1);
+		pbuf[BUFSZ-1] = '\0';  /* MODERN: Ensure null termination */
+	} else {
 		va_start(args, line);
-		(void) vsprintf(pbuf,line,args);
+		(void) vsnprintf(pbuf, BUFSZ, line, args);  /* MODERN: Safe vsprintf replacement - identical output, prevents overflow */
 		va_end(args);
 	}
 	if(flags.toplin == 1 && !strcmp(pbuf, toplines)) return;
@@ -158,10 +167,11 @@ pline(char *line, ...)
 	/* But messages like "You die..." deserve their own line */
 	n0 = strlen(bp);
 	if(flags.toplin == 1 && tly == 1 &&
-	    n0 + strlen(toplines) + 3 < CO-8 &&  /* leave room for --More-- */
+	    n0 + (int)strlen(toplines) + 3 < CO-8 &&  /* leave room for --More-- */
+	    n0 + strlen(toplines) + 3 < BUFSZ-1 &&  /* MODERN: prevent buffer overflow */
 	    strncmp(bp, "You ", 4)) {
-		(void) strcat(toplines, "  ");
-		(void) strcat(toplines, bp);
+		(void) strncat(toplines, "  ", BUFSZ-1-strlen(toplines));
+		(void) strncat(toplines, bp, BUFSZ-1-strlen(toplines));
 		tlx += 2;
 		addtopl(bp);
 		return;
@@ -179,16 +189,26 @@ pline(char *line, ...)
 				if(!letter(bp[n])) n0 = n;
 			if(!n0) n0 = CO-2;
 		}
-		(void) strncpy((tl = eos(toplines)), bp, n0);
-		tl[n0] = 0;
-		bp += n0;
+		tl = eos(toplines);
+		/* MODERN: Bounds check before copying */
+		if(tl - toplines + n0 + 2 < BUFSZ) {  /* +2 for \n and \0 */
+			(void) strncpy(tl, bp, n0);
+			tl[n0] = 0;
+			bp += n0;
 
-		/* remove trailing spaces, but leave one */
-		while(n0 > 1 && tl[n0-1] == ' ' && tl[n0-2] == ' ')
-			tl[--n0] = 0;
+			/* remove trailing spaces, but leave one */
+			while(n0 > 1 && tl[n0-1] == ' ' && tl[n0-2] == ' ')
+				tl[--n0] = 0;
 
-		n0 = strlen(bp);
-		if(n0 && tl[0]) (void) strcat(tl, "\n");
+			n0 = strlen(bp);
+			if(n0 && tl[0]) {
+				if(tl - toplines + strlen(tl) + 1 < BUFSZ)
+					(void) strcat(tl, "\n");
+			}
+		} else {
+			/* Buffer full - truncate gracefully */
+			break;
+		}
 	}
 	redotoplin();
 }
@@ -215,7 +235,8 @@ putsym(char c)
 }
 
 void
-putstr(char *s)
+/* MODERN: CONST-CORRECTNESS: putstr message is read-only */
+putstr(const char *s)
 {
 	while(*s) putsym(*s++);
 }

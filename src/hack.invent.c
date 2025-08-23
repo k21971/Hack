@@ -306,8 +306,7 @@ long q;
  *	&zeroobj		explicitly no object (as in w-).
  */
 struct obj *
-getobj(let,word)
-char *let,*word;
+getobj(const char *let, const char *word)
 {
 	struct obj *otmp;
 	char ilet,ilet1,ilet2;
@@ -460,9 +459,7 @@ ckunpaid(otmp) struct obj *otmp; {
 /* interactive version of getobj - used for Drop and Identify */
 /* return the number of times fn was called successfully */
 int
-ggetobj(word, fn, max)
-char *word;
-int (*fn)(struct obj *),  max;
+ggetobj(const char *word, int (*fn)(struct obj *), int max)
 {
 char buf[BUFSZ];
 char *ip;
@@ -562,6 +559,7 @@ int cnt = 0;
 		switch(sym){
 		case 'a':
 			allflag = 1;
+			/* fallthrough */
 		case 'y':
 			cnt += (*fn)(otmp);
 			if(--max == 0) goto ret;
@@ -606,7 +604,7 @@ char let;
 {
 	static char li[BUFSZ];
 
-	(void) sprintf(li, "%c - %s.",
+	(void) snprintf(li, BUFSZ, "%c - %s.",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		flags.invlet_constant ? obj->invlet : let,
 		doname(obj));
 	return(li);
@@ -726,9 +724,9 @@ dotypeinv ()				/* free after Robert Viduya */
 /* look at what is here */
 int
 dolook() {
-    struct obj *otmp, *otmp0;
-    struct gold *gold;
-    char *verb = Blind ? "feel" : "see";
+    struct obj *otmp, *otmp0 = NULL;  /* MODERN: Initialize to prevent uninitialized use */
+    struct gold *gold = NULL;  /* MODERN: Initialize to prevent uninitialized use */
+    const char *verb = Blind ? "feel" : "see";  /* MODERN: const because assigned string literals */
     int	ct = 0;
 
     if(!u.uswallow) {
@@ -765,7 +763,7 @@ dolook() {
     if(gold) {
 	char gbuf[30];
 
-	(void) sprintf(gbuf, "%ld gold piece%s",
+	(void) snprintf(gbuf, sizeof(gbuf), "%ld gold piece%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		gold->amount, plur(gold->amount));
 	if(!ct++)
 	    pline("You %s here %s.", verb, gbuf);
@@ -817,7 +815,7 @@ int lose; {
  * [Bug: d$ and pickup still tell you how much it was.]
  */
 extern int (*occupation)();
-extern char *occtxt;
+extern const char *occtxt;  /* MODERN: const because assigned string literals */
 static long goldcounted;
 
 int

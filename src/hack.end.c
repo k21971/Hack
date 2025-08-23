@@ -16,21 +16,37 @@
 /* MODERN ADDITION (2025): Added for stale lock detection - stat() and time() */
 #include <sys/stat.h>
 #include <time.h>
-#define	Sprintf	(void) sprintf
+/* MODERN: Safe sprintf replacement - same interface, prevents overflow */
+/* MODERN ADDITION (2025): Bounds-safe sprintf replacement for outentry function
+ * WHY: Original Sprintf could overflow linebuf causing crashes in topten display
+ * HOW: Calculate remaining buffer space and use snprintf with proper bounds
+ * PRESERVES: Original 1984 text formatting behavior when space available
+ * ADDS: Memory safety bounds checking to prevent buffer overflow crashes
+ */
+#define	SafeAppend(linebuf, ...) do { \
+    char *pos = eos(linebuf); \
+    size_t remaining = BUFSZ - (pos - (linebuf)); \
+    if(remaining > 1) { \
+        snprintf(pos, remaining, __VA_ARGS__); \
+    } \
+} while(0)
+
+#define	Sprintf(buf, ...) (void) snprintf(buf, 200, __VA_ARGS__)  /* MODERN: Increased from 128 to 200 to prevent truncation warnings */
 extern char plname[], pl_character[];
 
 /* Forward declarations for missing functions */
 extern void paybill(void);
 extern void savebones(void);
 extern void outrip(void);
-extern void settty(char *);
+/* MODERN: CONST-CORRECTNESS: settty message is read-only */
+extern void settty(const char *);
 
 /* Forward declarations for functions in this file */
 void topten(void);
 void outheader(void);
 void clearlocks(void);
 char *itoa(int a);
-char *ordin(int n);
+const char *ordin(int n);  /* MODERN: const because returns string literals */
 char *eos(char *s);
 void charcat(char *s, char c);
 
@@ -49,10 +65,12 @@ int doquit(void)
 	}
 	done("quit");
 	/* NOTREACHED */
+	return 1; /* MODERN: Never reached but required for return-type correctness */
 }
 
 void done1(int sig)
 {
+	(void)sig;
 	doquit();
 }
 
@@ -61,6 +79,7 @@ int done_hup;
 
 void
 done_intr(int sig){
+	(void)sig;
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -80,8 +99,20 @@ static char buf[BUFSZ];
 		Sprintf(buf, "the ghost of %s", (char *) mtmp->mextra);
 		killer = buf;
 	} else if(mtmp->mnamelth) {
-		Sprintf(buf, "%s called %s",
-			mtmp->data->mname, NAME(mtmp));
+		/**
+		 * MODERN ADDITION (2025): Bounds checking for NAME() macro in death messages
+		 * 
+		 * WHY: NAME(mtmp) uses mxlth offset - corruption could access invalid memory in death screen
+		 * HOW: Validate mxlth before using NAME() macro
+		 * 
+		 * PRESERVES: All original death message functionality
+		 * ADDS: Protection against crash during death from corrupted monster names
+		 */
+		if(mtmp->mxlth > 1024) {  /* MODERN: Sanity check for corrupted mxlth */
+			Sprintf(buf, "%s called <corrupted name>", mtmp->data->mname);
+		} else {
+			Sprintf(buf, "%s called %s", mtmp->data->mname, NAME(mtmp));
+		}
 		killer = buf;
 	} else if(mtmp->minvis) {
 		Sprintf(buf, "invisible %s", mtmp->data->mname);
@@ -93,7 +124,8 @@ static char buf[BUFSZ];
 /* called with arg "died", "drowned", "escaped", "quit", "choked", "panicked",
    "burned", "starved" or "tricked" */
 /* Be careful not to call panic from here! */
-void done(char *st1)
+/* MODERN: CONST-CORRECTNESS: death reason string is read-only */
+void done(const char *st1)
 {
 
 #ifdef WIZARD
@@ -221,12 +253,24 @@ void done(char *st1)
 #endif /* WIZARD */
 		topten();
 	if(done_stopprint) printf("\n\n");
+	
+	/* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+	cleanup_all_engravings();
+	
 	exit(0);
 }
 
-#define newttentry() (struct toptenentry *) alloc(sizeof(struct toptenentry))
-#define	NAMSZ	8
-#define	DTHSZ	40
+/**
+ * MODERN ADDITION (2025): Expanded buffer sizes for modern systems
+ * 
+ * WHY: Original 8-character name limit insufficient for modern usernames
+ * WHAT: NAMSZ expanded from 8 to 64, DTHSZ increased to 128 for longer death messages
+ * 
+ * PRESERVES: All original functionality and file format compatibility
+ * ADDS: Protection against buffer overflows from long usernames/death messages
+ */
+#define	NAMSZ	64		/* MODERN: Expanded from 8 to handle modern usernames */
+#define	DTHSZ	128		/* MODERN: Expanded from 40 to prevent death message truncation */
 #define	PERSMAX	1
 #define	POINTSMIN	1	/* must be > 0 */
 #define	ENTRYMAX	100	/* must be >= 10 */
@@ -243,16 +287,33 @@ struct toptenentry {
 	char date[7];		/* yymmdd */
 } *tt_head;
 
+/* MODERN: Static arena allocator to prevent memory leaks */
+static struct toptenentry arena[ENTRYMAX + 2];  /* +2 for t0 and safety margin */
+static int arena_used = 0;
+
+static void reset_topten_arena(void) {
+	arena_used = 0;
+	memset(arena, 0, sizeof(arena));
+}
+
+struct toptenentry *newttentry(void) {
+	if(arena_used >= ENTRYMAX + 2) {
+		panic("topten arena exhausted");
+	}
+	return &arena[arena_used++];
+}
+
 /* Forward declaration after struct definition */
 int outentry(int rank, struct toptenentry *t1, int so);
 
 void topten(void){
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	int uid = getuid();
 	int rank, rank0 = -1, rank1 = 0;
 	int occ_cnt = PERSMAX;
 	struct toptenentry *t0, *t1, *tprev;
-	char *recfile = RECORD;
-	char *reclock = "record_lock";
+	const char *recfile = RECORD;  /* MODERN: const because points to string literal */
+	const char *reclock = "record_lock";  /* MODERN: const because points to string literal */
 	int sleepct = 300;
 	FILE *rfile;
 	int flg = 0;
@@ -330,7 +391,8 @@ void topten(void){
 	(t0->name)[NAMSZ] = 0;
 	(void) strncpy(t0->death, killer, DTHSZ);
 	(t0->death)[DTHSZ] = 0;
-	(void) strcpy(t0->date, getdatestr());
+	(void) strncpy(t0->date, getdatestr(), sizeof(t0->date) - 1);  /* MODERN: Safe bounded copy */
+	t0->date[sizeof(t0->date) - 1] = '\0';  /* MODERN: Ensure null termination */
 
 	/* assure minimum number of points */
 	if(t0->points < POINTSMIN)
@@ -412,8 +474,8 @@ void topten(void){
 	    t1->hp, t1->maxhp, t1->points,
 	    t1->plchar, t1->sex, t1->name, t1->death);
 	  if(done_stopprint) continue;
-	  if(rank > flags.end_top &&
-	    (rank < rank0-flags.end_around || rank > rank0+flags.end_around)
+	  if(rank > (int)flags.end_top &&  /* MODERN: Cast to int to match rank type */
+	    (rank < rank0-(int)flags.end_around || rank > rank0+(int)flags.end_around)  /* MODERN: Cast to int to match rank type */
 	    && (!flags.end_own ||
 #ifdef PERS_IS_UID
 				  t1->uid != t0->uid ))
@@ -421,8 +483,8 @@ void topten(void){
 				  strncmp(t1->name, t0->name, NAMSZ)))
 #endif /* PERS_IS_UID */
 	  	continue;
-	  if(rank == rank0-flags.end_around &&
-	     rank0 > flags.end_top+flags.end_around+1 &&
+	  if(rank == rank0-(int)flags.end_around &&  /* MODERN: Cast to int to match rank type */
+	     rank0 > (int)flags.end_top+(int)flags.end_around+1 &&  /* MODERN: Cast to int to match rank type */
 	     !flags.end_own)
 		(void) putchar('\n');
 	  if(rank != rank0)
@@ -440,6 +502,8 @@ void topten(void){
 		(void) outentry(0, t0, 1);
 	(void) fclose(rfile);
 unlock:
+	/* TODO: Revisit memory cleanup - current cleanup causes use-after-free errors */
+	/* Original 1984 code had no cleanup as program exits immediately after topten() */
 #ifdef ENABLE_MODERN_LOCKING
 	modern_unlock_record();
 #else
@@ -463,53 +527,67 @@ outentry(int rank, struct toptenentry *t1, int so) {
 boolean quit = FALSE, killed = FALSE, starv = FALSE;
 char linebuf[BUFSZ];
 	linebuf[0] = 0;
-	if(rank) Sprintf(eos(linebuf), "%3d", rank);
-	else Sprintf(eos(linebuf), "   ");
-	Sprintf(eos(linebuf), " %6ld %8s", t1->points, t1->name);
-	if(t1->plchar == 'X') Sprintf(eos(linebuf), " ");
-	else Sprintf(eos(linebuf), "-%c ", t1->plchar);
+	if(rank) SafeAppend(linebuf, "%3d", rank);
+	else SafeAppend(linebuf, "   ");
+	SafeAppend(linebuf, " %6ld %8s", t1->points, t1->name);
+	if(t1->plchar == 'X') SafeAppend(linebuf, " ");
+	else SafeAppend(linebuf, "-%c ", t1->plchar);
 	if(!strncmp("escaped", t1->death, 7)) {
 	  if(!strcmp(" (with amulet)", t1->death+7))
-	    Sprintf(eos(linebuf), "escaped the dungeon with amulet");
+	    SafeAppend(linebuf, "escaped the dungeon with amulet");
 	  else
-	    Sprintf(eos(linebuf), "escaped the dungeon [max level %d]",
+	    SafeAppend(linebuf, "escaped the dungeon [max level %d]",
 	      t1->maxlvl);
 	} else {
 	  if(!strncmp(t1->death,"quit",4)) {
 	    quit = TRUE;
 	    if(t1->maxhp < 3*t1->hp && t1->maxlvl < 4)
-	  	Sprintf(eos(linebuf), "cravenly gave up");
+	  	SafeAppend(linebuf, "cravenly gave up");
 	    else
-		Sprintf(eos(linebuf), "quit");
+		SafeAppend(linebuf, "quit");
 	  }
 	  else if(!strcmp(t1->death,"choked"))
-	    Sprintf(eos(linebuf), "choked on %s food",
+	    SafeAppend(linebuf, "choked on %s food",
 		(t1->sex == 'F') ? "her" : "his");
-	  else if(!strncmp(t1->death,"starv",5))
-	    Sprintf(eos(linebuf), "starved to death"), starv = TRUE;
-	  else Sprintf(eos(linebuf), "was killed"), killed = TRUE;
-	  Sprintf(eos(linebuf), " on%s level %d",
+	  else if(!strncmp(t1->death,"starv",5)) {
+	    SafeAppend(linebuf, "starved to death"); 
+	    starv = TRUE;
+	  } else {
+	    SafeAppend(linebuf, "was killed"); 
+	    killed = TRUE;
+	  }
+	  SafeAppend(linebuf, " on%s level %d",
 	    (killed || starv) ? "" : " dungeon", t1->level);
 	  if(t1->maxlvl != t1->level)
-	    Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
-	  if(quit && t1->death[4]) Sprintf(eos(linebuf), "%s", t1->death + 4);
+	    SafeAppend(linebuf, " [max %d]", t1->maxlvl);
+	  if(quit && t1->death[4]) SafeAppend(linebuf, "%s", t1->death + 4);
 	}
-	if(killed) Sprintf(eos(linebuf), " by %s%s",
+	if(killed) SafeAppend(linebuf, " by %s%s",
 	  (!strncmp(t1->death, "trick", 5) || !strncmp(t1->death, "the ", 4))
 		? "" :
 	  index(vowels,*t1->death) ? "an " : "a ",
 	  t1->death);
-	Sprintf(eos(linebuf), ".");
+	SafeAppend(linebuf, ".");
 	if(t1->maxhp) {
 	  char *bp = eos(linebuf);
-	  char hpbuf[10];
+	  char hpbuf[12];  /* MODERN: Buffer size increased from 10 to 12 to prevent overflow from INT_MIN (-2147483648) */
 	  int hppos;
-	  Sprintf(hpbuf, "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");
+	  snprintf(hpbuf, sizeof(hpbuf), "%s", (t1->hp > 0) ? itoa(t1->hp) : "-");  /* MODERN: Safe sprintf replacement to prevent buffer overflow */
 	  hppos = COLNO - 7 - strlen(hpbuf);
 	  if(bp <= linebuf + hppos) {
 	    while(bp < linebuf + hppos) *bp++ = ' ';
 	    (void) strcpy(bp, hpbuf);
-	    Sprintf(eos(bp), " [%d]", t1->maxhp);
+	    /* MODERN ADDITION (2025): Bounds-checked append to prevent buffer overflow
+	     * WHY: Original Sprintf could write beyond linebuf end causing crash
+	     * HOW: Calculate remaining space and use snprintf with proper limit
+	     * PRESERVES: Original 1984 behavior when space available
+	     * ADDS: Memory safety bounds checking
+	     */
+	    char *append_pos = eos(bp);
+	    size_t remaining = BUFSZ - (append_pos - linebuf);
+	    if(remaining > 1) {
+	        snprintf(append_pos, remaining, " [%d]", t1->maxhp);
+	    }
 	  }
 	}
 	if(so == 0) puts(linebuf);
@@ -529,11 +607,11 @@ char linebuf[BUFSZ];
 char *
 itoa(int a) {
 static char buf[12];
-	Sprintf(buf,"%d",a);
+	snprintf(buf, sizeof(buf), "%d", a);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	return(buf);
 }
 
-char *
+const char *  /* MODERN: const because returns string literals */
 ordin(int n) {
 int d = n%10;
 	return((d==0 || d>3 || n/10==1) ? "th" : (d==1) ? "st" :
@@ -543,6 +621,9 @@ int d = n%10;
 void clearlocks(void){
 int x;
 	(void) signal(SIGHUP,SIG_IGN);
+	
+	/* MODERN ADDITION (2025): Clean up memory for sanitizers */
+	cleanup_all_engravings();
 	
 #ifdef ENABLE_MODERN_LOCKING
 	/* MODERN ADDITION (2025): Clean up flock()-based locks */
@@ -572,6 +653,7 @@ int x;
  */
 void modern_cleanup_handler(int sig)
 {
+	(void)sig;
 	/* Ignore further interrupts during cleanup */
 	(void) signal(SIGINT, SIG_IGN);
 	(void) signal(SIGTERM, SIG_IGN);
@@ -611,12 +693,13 @@ void charcat(char *s, char c) {
  * if argc == -1).
  */
 void prscore(int argc, char **argv) {
+	reset_topten_arena();  /* MODERN: Reset arena for fresh allocation */
 	extern char *hname;
 	char **players;
 	int playerct;
 	int rank;
 	struct toptenentry *t1, *t2;
-	char *recfile = RECORD;
+	const char *recfile = RECORD;  /* MODERN: const because points to string literal */
 	FILE *rfile;
 	int flg = 0;
 	int i;

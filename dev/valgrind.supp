@@ -1,0 +1,93 @@
+# Valgrind suppressions for restoHack
+# Ignore system library leaks that are not our responsibility
+
+# ncurses library leaks - terminal handling
+{
+   ncurses_malloc
+   Memcheck:Leak
+   ...
+   obj:*/libncurses*
+}
+
+{
+   ncurses_tinfo
+   Memcheck:Leak
+   ...
+   obj:*/libtinfo*  
+}
+
+{
+   ncurses_setupterm
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:setupterm
+}
+
+{
+   ncurses_newterm
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:newterm
+}
+
+# glibc dynamic loading - not our leaks
+{
+   glibc_dlopen
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_dl_*
+}
+
+{
+   glibc_locale
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:*locale*
+}
+
+# Termcap/terminfo database loading
+{
+   termcap_buffer
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:tgetent
+}
+
+{
+   termcap_tgetstr
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:tgetstr
+}
+
+# System getenv and environment handling
+{
+   getenv_malloc
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:getenv
+}
+
+# Still reachable blocks in glibc - not actual leaks
+{
+   glibc_still_reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:*/libc-*
+}
+
+{
+   glibc_still_reachable_ld
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:*/ld-*
+}

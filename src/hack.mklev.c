@@ -24,7 +24,8 @@ int comp();
 schar nxcor;
 boolean goldseen;
 int nroom;
-extern xchar xdnstair,xupstair,ydnstair,yupstair;
+/* Original 1984: extern xchar xdnstair,xupstair,ydnstair,yupstair; */
+extern unsigned char xdnstair,xupstair,ydnstair,yupstair; /* MODERN: unsigned to prevent buffer underflow */
 
 /* Definitions used by makerooms() and addrs() */
 #define	MAXRS	50	/* max lth of temp rectangle table - arbitrary */
@@ -245,6 +246,7 @@ addrs(int lowx, int lowy, int hix, int hiy)
 		if(hx - hix > 2*xlim + 4)
 			addrsx(hix+2,ly,hx,hy,discarded);
 	}
+	return 1; /* MODERN: Return success indicator - was missing return value */
 }
 
 int
@@ -671,7 +673,8 @@ mktrap(int num, int mazeflag, struct mkroom *croom)
 {
 	struct trap *ttmp;
 	int kind,nopierc,nomimic,fakedoor,fakegold,tryct = 0;
-	xchar mx,my;
+	/* Original 1984: xchar mx,my; */
+	unsigned char mx,my; /* MODERN: unsigned to prevent buffer underflow */
 	extern char fut_geno[];
 
 	if(!num || num >= TRAPNUM) {

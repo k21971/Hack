@@ -14,7 +14,16 @@
 extern char plname[];
 
 coord
-getpos(int force, char *goal) {
+/**
+ * MODERN ADDITION (2025): const-qualified goal parameter
+ * 
+ * WHY: goal parameter is never modified, only displayed to user
+ * HOW: Changed char *goal to const char *goal for const-correctness
+ * 
+ * PRESERVES: All original positioning functionality
+ * ADDS: Type safety for string literals passed as goal
+ */
+getpos(int force, const char *goal) {
 int cx,cy,i,c;
 extern char sdir[];		/* defined in hack.c */
 extern schar xdir[], ydir[];	/* idem */
@@ -55,7 +64,8 @@ coord cc;
 int do_mname(void){
 char buf[BUFSZ];
 coord cc;
-int cx,cy,lth,i;
+int cx,cy,lth;
+unsigned i;  /* MODERN: Match mxlth unsigned type to avoid sign-compare warning */
 struct monst *mtmp, *mtmp2;
 extern char *lmonnam();
 	cc = getpos(0, "the monster you want to name");
@@ -94,6 +104,21 @@ extern char *lmonnam();
 	for(i=0; i<mtmp->mxlth; i++)
 		((char *) mtmp2->mextra)[i] = ((char *) mtmp->mextra)[i];
 	mtmp2->mnamelth = lth;
+	
+	/**
+	 * MODERN ADDITION (2025): Bounds checking for NAME() macro access
+	 * 
+	 * WHY: NAME(mtmp) macro uses pointer arithmetic with mxlth offset - if corrupted could write to arbitrary memory
+	 * HOW: Validate mxlth is within reasonable bounds before pointer arithmetic
+	 * 
+	 * PRESERVES: All original monster naming functionality for valid cases
+	 * ADDS: Protection against memory corruption from invalid mxlth values
+	 */
+	if(mtmp2->mxlth > 1024) {  /* MODERN: Sanity check - mxlth should never be this large */
+		impossible("monster mxlth corruption detected: %u", mtmp2->mxlth, 0);
+		monfree(mtmp2);
+		return(1);
+	}
 	(void) strcpy(NAME(mtmp2), buf);
 	replmon(mtmp,mtmp2);
 	return(1);
@@ -184,7 +209,7 @@ void docall(struct obj *obj)
 	*str1 = str;
 }
 
-char *ghostnames[] = {		/* these names should have length < PL_NSIZ */
+const char *const ghostnames[] = {  /* these names should have length < PL_NSIZ */
 	"adri", "andries", "andreas", "bert", "david", "dirk", "emile",
 	"frans", "fred", "greg", "hether", "jay", "john", "jon", "kay",
 	"kenny", "maud", "michiel", "mike", "peter", "robert", "ron",
@@ -202,13 +227,17 @@ extern char *shkname();
 	}
 	switch(mtmp->data->mlet) {
 	case ' ':
-		{ char *gn = (char *) mtmp->mextra;
+		{ const char *gn = (char *) mtmp->mextra;  /* MODERN: const qualifier to match ghostnames[] */
 		  if(!*gn) {		/* might also look in scorefile */
 		    gn = ghostnames[rn2(SIZE(ghostnames))];
-		    if(!rn2(2)) (void)
-		      strcpy((char *) mtmp->mextra, !rn2(5) ? plname : gn);
+		    if(!rn2(2)) {
+		      /* MODERN: Safe copy with bounds check for ghost names */
+		      const char *name = !rn2(5) ? plname : gn;
+		      (void) strncpy((char *) mtmp->mextra, name, PL_NSIZ-1);
+		      ((char *) mtmp->mextra)[PL_NSIZ-1] = '\0';
+		    }
 		  }
-		  (void) sprintf(buf, "%s's ghost", gn);
+		  (void) snprintf(buf, BUFSZ, "%s's ghost", gn);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 		}
 		break;
 	case '@':
@@ -216,15 +245,23 @@ extern char *shkname();
 			(void) strcpy(buf, shkname(mtmp));
 			break;
 		}
-		/* fall into next case */
+		/* FALLTHROUGH */
 	default:
-		(void) sprintf(buf, "the %s%s",
+		(void) snprintf(buf, BUFSZ, "the %s%s",  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 			mtmp->minvis ? "invisible " : "",
 			mtmp->data->mname);
 	}
 	if(vb && mtmp->mnamelth) {
-		(void) strcat(buf, " called ");
-		(void) strcat(buf, NAME(mtmp));
+		/* MODERN: Safe concatenation with bounds checking */
+		size_t buflen = strlen(buf);
+		if(buflen + 8 < BUFSZ) {  /* " called " = 8 chars */
+			(void) strcat(buf, " called ");
+			buflen += 8;
+			if(buflen < BUFSZ-1) {
+				(void) strncat(buf, NAME(mtmp), BUFSZ-1-buflen);
+				buf[BUFSZ-1] = '\0';
+			}
+		}
 	}
 	return(buf);
 }
@@ -246,18 +283,18 @@ char *bp = monnam(mtmp);
 }
 
 char *
-amonnam(struct monst *mtmp, char *adj)
+amonnam(struct monst *mtmp, const char *adj)
 {
 	char *bp = monnam(mtmp);
-	static char buf[BUFSZ];		/* MODERN: Static buffer reuse issue - overwrites on each call */
+	static char buf[BUFSZ + 64];	/* MODERN: Extra space for adj + static buffer reuse issue */
 
 	if(!strncmp(bp, "the ", 4)) bp += 4;
-	(void) snprintf(buf, BUFSZ, "the %s %s", adj, bp);  /* MODERN: Safe sprintf */
+	(void) snprintf(buf, sizeof(buf), "the %s %s", adj, bp);  /* MODERN: Safe sprintf with correct buffer size */
 	return(buf);
 }
 
 char *
-Amonnam(struct monst *mtmp, char *adj)
+Amonnam(struct monst *mtmp, const char *adj)
 {
 	char *bp = amonnam(mtmp,adj);
 

@@ -26,73 +26,73 @@ int dosuspend();
 #endif /* SUSPEND */
 
 struct func_tab cmdlist[]={
-	'\020', doredotopl,
-	'\022', doredraw,
-	'\024', dotele,
+	{'\020', doredotopl},
+	{'\022', doredraw},
+	{'\024', dotele},
 #ifdef SUSPEND
-	'\032', dosuspend,
+	{'\032', dosuspend},
 #endif /* SUSPEND */
-	'a', doapply,
+	{'a', doapply},
 /*	'A' : UNUSED */
 /*	'b', 'B' : go sw */
-	'c', ddocall,
-	'C', do_mname,
-	'd', dodrop,
-	'D', doddrop,
-	'e', doeat,
-	'E', doengrave,
+	{'c', ddocall},
+	{'C', do_mname},
+	{'d', dodrop},
+	{'D', doddrop},
+	{'e', doeat},
+	{'E', doengrave},
 /*	'f', 'F' : multiple go (might become 'fight') */
 /*	'g', 'G' : UNUSED */
 /*	'h', 'H' : go west */
-	'I', dotypeinv,		/* Robert Viduya */
-	'i', ddoinv,
+	{'I', dotypeinv},		/* Robert Viduya */
+	{'i', ddoinv},
 /*	'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' : move commands */
 /*	'o', doopen,	*/
-	'O', doset,
-	'p', dopay,
-	'P', dowearring,
-	'q', dodrink,
-	'Q', doquit,
-	'r', doread,
-	'R', doremring,
-	's', dosearch,
-	'S', dosave,
-	't', dothrow,
-	'T', doremarm,
+	{'O', doset},
+	{'p', dopay},
+	{'P', dowearring},
+	{'q', dodrink},
+	{'Q', doquit},
+	{'r', doread},
+	{'R', doremring},
+	{'s', dosearch},
+	{'S', dosave},
+	{'t', dothrow},
+	{'T', doremarm},
 /*	'u', 'U' : go ne */
-	'v', doversion,
+	{'v', doversion},
 /*	'V' : UNUSED */
-	'w', dowield,
-	'W', doweararm,
+	{'w', dowield},
+	{'W', doweararm},
 /*	'x', 'X' : UNUSED */
 /*	'y', 'Y' : go nw */
-	'z', dozap,
+	{'z', dozap},
 /*	'Z' : UNUSED */
-	'<', doup,
-	'>', dodown,
-	'/', dowhatis,
-	'?', dohelp,
+	{'<', doup},
+	{'>', dodown},
+	{'/', dowhatis},
+	{'?', dohelp},
 #ifdef SHELL
-	'!', dosh,
+	{'!', dosh},
 #endif /* SHELL */
-	'.', donull,
-	' ', donull,
-	',', dopickup,
-	':', dolook,
-	'^', doidtrap,
-	'\\', dodiscovered,		/* Robert Viduya */
-	 WEAPON_SYM,  doprwep,
-	 ARMOR_SYM,  doprarm,
-	 RING_SYM,  doprring,
-	'$', doprgold,
-	'#', doextcmd,
-	0,0,0
+	{'.', donull},
+	{' ', donull},
+	{',', dopickup},
+	{':', dolook},
+	{'^', doidtrap},
+	{'\\', dodiscovered},		/* Robert Viduya */
+	{WEAPON_SYM,  doprwep},
+	{ARMOR_SYM,  doprarm},
+	{RING_SYM,  doprring},
+	{'$', doprgold},
+	{'#', doextcmd},
+	{0,0}  /* MODERN: Fixed struct initializer - func_tab only has 2 fields */
 };
 
 struct ext_func_tab extcmdlist[] = {
-	"dip", dodip,
-	"pray", dopray,
-	(char *) 0, donull
+	{"dip", dodip},
+	{"pray", dopray},
+	{(char *) 0, donull}
 };
 
 extern char *parse(), quitchars[];
@@ -177,7 +177,7 @@ void rhack(char *cmd)
 	}
 	{ char expcmd[10];
 	  char *cp = expcmd;
-	  while(*cmd && cp-expcmd < sizeof(expcmd)-2) {
+	  while(*cmd && cp-expcmd < (long)sizeof(expcmd)-2) {  /* MODERN: Cast to long to match pointer arithmetic type */
 		if(*cmd >= 040 && *cmd < 0177)
 			*cp++ = *cmd++;
 		else {

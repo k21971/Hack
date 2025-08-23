@@ -11,7 +11,7 @@
 
 #include "hack.h"
 #include <stdio.h>
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern char quitchars[];
 extern char *Doname();
 
@@ -71,10 +71,8 @@ int doremring(void) {
 			/* might look at morc here %% */
 		}
 	}
-	/* NOTREACHED */
-#ifdef lint
+	/* MODERN: Return 0 if no valid action taken - was only under lint */
 	return(0);
-#endif /* lint */
 }
 
 int dorr(struct obj *otmp) {

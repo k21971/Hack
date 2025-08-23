@@ -30,7 +30,7 @@ extern char genocided[60], fut_geno[];
 
 int (*afternmv)();
 int (*occupation)();
-char *occtxt;			/* defined when occupation != NULL */
+const char *occtxt;		/* MODERN: const because assigned string literals */
 
 void done1(int sig);
 void hangup(int sig);
@@ -44,11 +44,11 @@ char SAVEF[PL_NSIZ + 11] = "save/";	/* save/99999player */
 char *hname;		/* name of the game (argv[0] of call) */
 char obuf[BUFSIZ];	/* BUFSIZ is defined in stdio.h */
 
-extern char *nomovemsg;
+extern const char *nomovemsg;  /* MODERN: const because assigned string literals */
 extern long wailmsg;
 
 #ifdef CHDIR
-static void chdirx(char *dir, boolean wr);
+static void chdirx(const char *dir, boolean wr);  /* MODERN: const because dir is read-only */
 #endif
 
 int main(int argc, char *argv[])
@@ -117,6 +117,8 @@ int main(int argc, char *argv[])
 		chdirx(dir,0);
 #endif
 		prscore(argc, argv);
+		/* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+		cleanup_all_engravings();
 		exit(0);
 	}
 
@@ -204,7 +206,7 @@ int main(int argc, char *argv[])
 	getmailstatus();
 #endif
 #ifdef WIZARD
-	if(wizard) (void) strcpy(plname, "wizard"); else
+	if(wizard) (void) strncpy(plname, "wizard", PL_NSIZ-1), plname[PL_NSIZ-1] = '\0'; else
 #endif
 	if(!*plname || !strncmp(plname, "player", 4)
 		    || !strncmp(plname, "games", 4))
@@ -221,8 +223,10 @@ int main(int argc, char *argv[])
 		 */
 		(void) signal(SIGQUIT,SIG_IGN);
 		(void) signal(SIGINT,SIG_IGN);
-		if(!locknum)
-			(void) strcpy(lock,plname);
+		if(!locknum) {
+			(void) strncpy(lock, plname, PL_NSIZ+4-1);
+			lock[PL_NSIZ+4-1] = '\0';  /* MODERN: Ensure null termination */
+		}
 #ifdef ENABLE_MODERN_LOCKING
 		/* MODERN ADDITION (2025): Clean up any stale locks on startup */
 		modern_cleanup_locks();
@@ -231,7 +235,8 @@ int main(int argc, char *argv[])
 #ifdef WIZARD
 	} else {
 		char *sfoo;
-		(void) strcpy(lock,plname);
+		(void) strncpy(lock, plname, PL_NSIZ+4-1);
+		lock[PL_NSIZ+4-1] = '\0';  /* MODERN: Ensure null termination */
 		if(sfoo = getenv("MAGIC")) 
 			while(*sfoo) {
 				switch(*sfoo++) {
@@ -252,12 +257,13 @@ int main(int argc, char *argv[])
 				*gp = 0;
 			} else
 				(void) strncpy(genocided, sfoo, sizeof(genocided)-1);
-			(void) strcpy(fut_geno, genocided);
+			(void) strncpy(fut_geno, genocided, 60-1);
+			fut_geno[60-1] = '\0';  /* MODERN: Ensure null termination */
 		}
 	}
 #endif
 	setftty();
-	(void) sprintf(SAVEF, "save/%d%s", getuid(), plname);
+	(void) snprintf(SAVEF, sizeof(SAVEF), "save/%d%s", getuid(), plname);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 	regularize(SAVEF+5);		/* avoid . or / in name */
 	if((fd = open(SAVEF,0)) >= 0 &&
 	   (uptodate(fd) || unlink(SAVEF) == 666)) {
@@ -426,7 +432,7 @@ void glo(int foo)
 
 	tf = lock;
 	while(*tf && *tf != '.') tf++;
-	(void) sprintf(tf, ".%d", foo);
+	(void) snprintf(tf, (PL_NSIZ+4) - (tf - lock), ".%d", foo);  /* MODERN: Safe sprintf replacement - identical output, prevents overflow */
 }
 
 /*
@@ -448,14 +454,15 @@ register int c,ct;
 		}
 		if(c != '-')
 		if(c < 'A' || (c > 'Z' && c < 'a') || c > 'z') c = '_';
-		if(ct < sizeof(plname)-1) plname[ct++] = c;
+		if(ct < (int)sizeof(plname)-1) plname[ct++] = c;  /* MODERN: Cast to int to match ct type */
 	}
 	plname[ct] = 0;
 	if(ct == 0) askname();
 }
 
 /*VARARGS1*/
-void impossible(char *s, int x1, int x2)
+/* MODERN: CONST-CORRECTNESS: impossible message is read-only */
+void impossible(const char *s, int x1, int x2)
 {
 	pline(s,x1,x2);
 	pline("Program in disorder - perhaps you'd better Quit.");
@@ -463,7 +470,7 @@ void impossible(char *s, int x1, int x2)
 
 #ifdef CHDIR
 static void
-chdirx(char *dir, boolean wr)
+chdirx(const char *dir, boolean wr)  /* MODERN: const because dir is read-only */
 {
 
 #ifdef SECURE

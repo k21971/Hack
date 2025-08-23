@@ -334,7 +334,7 @@ int doread(void) {
 		return(1);
 	case SCR_MAGIC_MAPPING:
 	    {	struct rm *lev;
-		int num, zx, zy;
+		int num = 0, zx, zy; /* MODERN: Initialize to prevent uninitialized use */
 
 		known = TRUE;
 		pline("On this scroll %s a map!",
@@ -380,7 +380,7 @@ int doread(void) {
 		break;
 	    }
 	case SCR_FIRE:
-	    {	int num;
+	    {	int num = 0; /* MODERN: Initialize to prevent uninitialized use */
 		struct monst *mtmp;
 
 		known = TRUE;
@@ -458,8 +458,8 @@ void litroom(boolean on)
 	/* first produce the text (provided he is not blind) */
 	if(Blind) goto do_it;
 	if(!on) {
-		if(u.uswallow || !xdnstair || levl[u.ux][u.uy].typ == CORR ||
-		    !levl[u.ux][u.uy].lit) {
+		if(u.uswallow || !xdnstair || levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR ||
+		    !levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: Cast to unsigned char for safe array indexing */
 			pline("It seems even darker in here than before.");
 			return;
 		} else
@@ -477,10 +477,10 @@ void litroom(boolean on)
 		pline("The cave lights up around you, then fades.");
 		return;
 #else /* QUEST */
-		if(levl[u.ux][u.uy].typ == CORR) {
+		if(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR) { /* MODERN: Cast to unsigned char for safe array indexing */
 		    pline("The corridor lights up around you, then fades.");
 		    return;
-		} else if(levl[u.ux][u.uy].lit) {
+		} else if(levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: Cast to unsigned char for safe array indexing */
 		    pline("The light here seems better now.");
 		    return;
 		} else
@@ -492,14 +492,14 @@ do_it:
 #ifdef QUEST
 	return;
 #else /* QUEST */
-	if(levl[u.ux][u.uy].lit == on)
+	if(levl[(unsigned char)u.ux][(unsigned char)u.uy].lit == on) /* MODERN: Cast to unsigned char for safe array indexing */
 		return;
-	if(levl[u.ux][u.uy].typ == DOOR) {
-		if(IS_ROOM(levl[u.ux][u.uy+1].typ)) zy = u.uy+1;
-		else if(IS_ROOM(levl[u.ux][u.uy-1].typ)) zy = u.uy-1;
+	if(levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == DOOR) { /* MODERN: Cast to unsigned char for safe array indexing */
+		if(IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy+1)].typ)) zy = u.uy+1; /* MODERN: Cast to unsigned char for safe array indexing */
+		else if(IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy-1)].typ)) zy = u.uy-1; /* MODERN: Cast to unsigned char for safe array indexing */
 		else zy = u.uy;
-		if(IS_ROOM(levl[u.ux+1][u.uy].typ)) zx = u.ux+1;
-		else if(IS_ROOM(levl[u.ux-1][u.uy].typ)) zx = u.ux-1;
+		if(IS_ROOM(levl[(unsigned char)(u.ux+1)][(unsigned char)u.uy].typ)) zx = u.ux+1; /* MODERN: Cast to unsigned char for safe array indexing */
+		else if(IS_ROOM(levl[(unsigned char)(u.ux-1)][(unsigned char)u.uy].typ)) zx = u.ux-1; /* MODERN: Cast to unsigned char for safe array indexing */
 		else zx = u.ux;
 	} else {
 		zx = u.ux;
