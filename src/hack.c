@@ -687,7 +687,7 @@ void setsee(void)
 		return;
 	}
 	/* Original 1984: if(!levl[u.ux][u.uy].lit) { */
-	if(!levl[u.ux][u.uy].lit) { /* Bounds already checked above */
+	if(!levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* Bounds already checked above */
 		seelx = u.ux-1;
 		seehx = u.ux+1;
 		seely = u.uy-1;
@@ -695,17 +695,17 @@ void setsee(void)
 	} else {
 		/* Original 1984: for(seelx = u.ux; levl[seelx-1][u.uy].lit; seelx--); etc. */
 		/* MODERN: Add bounds checking to prevent array access beyond levl bounds */
-		for(seelx = u.ux; seelx > 1 && levl[seelx-1][u.uy].lit; seelx--);
-		for(seehx = u.ux; seehx < COLNO-2 && levl[seehx+1][u.uy].lit; seehx++);
-		for(seely = u.uy; seely > 1 && levl[u.ux][seely-1].lit; seely--);
-		for(seehy = u.uy; seehy < ROWNO-2 && levl[u.ux][seehy+1].lit; seehy++);
+		for(seelx = u.ux; seelx > 1 && levl[seelx-1][(unsigned char)u.uy].lit; seelx--);
+		for(seehx = u.ux; seehx < COLNO-2 && levl[seehx+1][(unsigned char)u.uy].lit; seehx++);
+		for(seely = u.uy; seely > 1 && levl[(unsigned char)u.ux][seely-1].lit; seely--);
+		for(seehy = u.uy; seehy < ROWNO-2 && levl[(unsigned char)u.ux][seehy+1].lit; seehy++);
 	}
 	for(y = seely; y <= seehy; y++)
 		for(x = seelx; x <= seehx; x++) {
 			prl(x,y);
 	}
 	/* Original 1984: if(!levl[u.ux][u.uy].lit) seehx = 0; */
-	if(!levl[u.ux][u.uy].lit) seehx = 0; /* Bounds already validated above */
+	if(!levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) seehx = 0; /* Bounds already validated above */
 	else {
 	    if(seely == u.uy) for(x = u.ux-1; x <= u.ux+1; x++) prl(x,seely-1);
 	    if(seehy == u.uy) for(x = u.ux-1; x <= u.ux+1; x++) prl(x,seehy+1);

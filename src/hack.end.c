@@ -622,6 +622,9 @@ void clearlocks(void){
 int x;
 	(void) signal(SIGHUP,SIG_IGN);
 	
+	/* MODERN ADDITION (2025): Clean up memory for sanitizers */
+	cleanup_all_engravings();
+	
 #ifdef ENABLE_MODERN_LOCKING
 	/* MODERN ADDITION (2025): Clean up flock()-based locks */
 	modern_unlock_game();

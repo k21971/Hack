@@ -227,8 +227,8 @@ docrt(void)
 		 */
 		if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
 			/* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym; levl[u.udisx][u.udisy].seen = 1; */
-			levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym = u.usym;
-			levl[u.udisx][u.udisy].seen = 1; /* Bounds already validated */
+			levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)].scrsym = u.usym;
+			levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen = 1; /* Bounds already validated */
 		}
 		u.udispl = 1;
 	} else	u.udispl = 0;
@@ -325,7 +325,7 @@ pru(void)
 	 * ADDS: Memory safety by preventing buffer overflow
 	 */
 	if(u.ux >= 1 && u.ux <= COLNO-1 && u.uy >= 0 && u.uy <= ROWNO-1) {
-		levl[u.ux][u.uy].seen = 1; /* Bounds already validated */
+		levl[(unsigned char)u.ux][(unsigned char)u.uy].seen = 1; /* Bounds already validated */
 	}
 }
 
