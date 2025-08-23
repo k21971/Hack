@@ -18,6 +18,11 @@
 #include <fcntl.h>     /* for open */
 #include "hack.h"
 
+/* MODERN ADDITION (2025): Terminal size globals for resize protection */
+extern int CO, LI;  /* Defined in hack.termcap.c */
+extern void startup(void);  /* Re-initialize termcap - hack.termcap.c */
+extern void docrt(void);    /* Complete screen redraw - hack.pri.c */
+
 #ifdef QUEST
 #define	gamename	"quest"
 #else
@@ -34,6 +39,33 @@ const char *occtxt;		/* MODERN: const because assigned string literals */
 
 void done1(int sig);
 void hangup(int sig);
+
+/**
+ * MODERN ADDITION (2025): Terminal resize protection handler
+ * 
+ * WHY: 1984 Hack assumes fixed terminal size during gameplay. When terminals
+ * resize mid-game (window manager events, Steam closing, etc.), the display
+ * coordinate system becomes corrupted, causing map rendering bugs, cursor
+ * positioning errors, and potential buffer overruns in screen output routines.
+ * 
+ * HOW: SIGWINCH handler detects terminal resize events and either:
+ * 1. Forces a complete screen redraw with updated terminal dimensions, or
+ * 2. Pauses the game with a warning until terminal size is restored
+ * Uses termcap to re-query terminal size and validates against minimum requirements.
+ * 
+ * PRESERVES: Original 1984 display logic and coordinate system unchanged.
+ * All existing screen positioning, cursor movement, and drawing routines work
+ * identically when terminal size is stable.
+ * 
+ * ADDS: Modern terminal resize resilience. Prevents display corruption from
+ * dynamic terminal sizing in modern window managers. Maintains game state
+ * integrity during resize events.
+ */
+static volatile int resize_pending = 0;
+static int original_CO = 0, original_LI = 0;
+
+void handle_resize(int sig);
+void check_resize(void);
 
 int hackpid;				/* current pid */
 int locknum;				/* max num of players */
@@ -139,6 +171,12 @@ int main(int argc, char *argv[])
 	(void) signal(SIGTERM, hangup);
 	/* MODERN ADDITION (2025): Handle Ctrl+\ quit signal for complete coverage */
 	(void) signal(SIGQUIT, hangup);
+#ifdef SIGWINCH
+	/* MODERN ADDITION (2025): Terminal resize protection - see handle_resize() */
+	(void) signal(SIGWINCH, handle_resize);
+	original_CO = CO;  /* Store initial terminal size for validation */
+	original_LI = LI;
+#endif
 
 	/*
 	 * Find the creation date of this game,
@@ -387,6 +425,11 @@ not_recovered:
 		}
 		if(flags.botl || flags.botlx) bot();
 
+#ifdef SIGWINCH
+		/* MODERN ADDITION (2025): Check for pending terminal resize */
+		check_resize();
+#endif
+
 		flags.move = 1;
 
 		if(multi >= 0 && occupation) {
@@ -538,5 +581,76 @@ void stop_occupation(void)
 	if(occupation) {
 		pline("You stop %s.", occtxt);
 		occupation = 0;
+	}
+}
+
+/**
+ * MODERN ADDITION (2025): Terminal resize signal handler implementation
+ * 
+ * Handles SIGWINCH events to prevent display corruption when terminal
+ * is resized during gameplay. See full documentation at function declaration.
+ */
+void handle_resize(int sig)
+{
+	/* Set volatile flag - main loop will handle actual resize */
+	resize_pending = 1;
+	
+	/* Re-register handler (some systems need this) */
+#ifdef SIGWINCH
+	signal(SIGWINCH, handle_resize);
+#endif
+	
+	/* Signal handler should be minimal - just set flag */
+	(void)sig;  /* Suppress unused parameter warning */
+}
+
+/**
+ * MODERN ADDITION (2025): Check and handle pending terminal resize
+ * 
+ * Called from main game loop to safely handle terminal resize events.
+ * This approach avoids doing complex operations in signal handler context.
+ */
+void check_resize(void)
+{
+	if (!resize_pending) return;
+	
+	/* Query current terminal size */
+	int new_CO, new_LI;
+	startup();  /* Re-read termcap values */
+	new_CO = CO;
+	new_LI = LI;
+	
+	/* Check if size actually changed */
+	if (new_CO == original_CO && new_LI == original_LI) {
+		/* False alarm or size restored - continue normally */
+		resize_pending = 0;
+		return;
+	}
+	
+	/* Terminal size changed - handle it */
+	if (new_CO < COLNO || new_LI < ROWNO+2) {
+		/* Terminal too small - pause game */
+		cls();
+		printf("\n\nTERMINAL TOO SMALL!\n");
+		printf("Current: %dx%d, Required: %dx%d\n", new_CO, new_LI, COLNO, ROWNO+2);
+		printf("Please resize terminal and press any key...");
+		getchar();
+		/* Re-check after user input */
+		startup();
+		if (CO >= COLNO && LI >= ROWNO+2) {
+			/* Size is now adequate */
+			docrt();  /* Full screen redraw */
+			resize_pending = 0;
+		}
+		/* If still too small, will re-prompt on next check */
+	} else {
+		/* Terminal size acceptable but changed - redraw everything */
+		docrt();
+		pline("[Terminal resized to %dx%d - display refreshed]", new_CO, new_LI);
+		resize_pending = 0;
+		
+		/* Update stored size for next comparison */
+		original_CO = new_CO;
+		original_LI = new_LI;
 	}
 }
