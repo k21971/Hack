@@ -1,6 +1,11 @@
 # restoHack: Bringing 1984 Hack Back from the Dead
 
-**restoHack** is a complete restoration of *Hack*, the original 1984 roguelike that spawned *NetHack*. This is software preservation - making the original code compile, run, and dungeon-crawl exactly as it did in 1984, while modernizing the infrastructure for stability.
+**restoHack** is a full-blooded resurrection of *Hack*, the 1984 roguelike that spawned *NetHack*.
+Not a remake. Not a reboot. This is *software preservation with a blowtorch and a scalpel*.
+
+The goal: make the original code compile, run, and dungeon-crawl exactly as it did when floppy was King.
+
+Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 **Philosophy**: "Fix what breaks, preserve what works" - authentic 1984 gameplay with modern build system and safety improvements.
 
