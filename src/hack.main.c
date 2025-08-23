@@ -237,14 +237,14 @@ int main(int argc, char *argv[])
 		char *sfoo;
 		(void) strncpy(lock, plname, PL_NSIZ+4-1);
 		lock[PL_NSIZ+4-1] = '\0';  /* MODERN: Ensure null termination */
-		if(sfoo = getenv("MAGIC")) 
+		if((sfoo = getenv("MAGIC"))) 
 			while(*sfoo) {
 				switch(*sfoo++) {
 				case 'n': (void) srandom(*sfoo++);
 					break;
 				}
 			}
-		if(sfoo = getenv("GENOCIDED")){
+		if((sfoo = getenv("GENOCIDED"))){
 			if(*sfoo == '!'){
 				struct permonst *pm = mons;
 				char *gp = genocided;

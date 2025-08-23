@@ -158,7 +158,7 @@ int x,y;
 	struct gold *gold;
 	long amount = (num ? num : 1 + (rnd(dlevel+2) * rnd(30)));
 
-	if(gold = g_at(x,y))
+	if((gold = g_at(x,y)))
 		gold->amount += amount;
 	else {
 		gold = newgold();
