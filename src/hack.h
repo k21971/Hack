@@ -67,6 +67,9 @@ typedef struct {
   ((otyp) >= 0 && (otyp) < NROFOBJECTS ? (otyp) : STRANGE_OBJECT)
 #define SAFE_OBJECTS(otyp) objects[SAFE_OBJ(otyp)]
 
+/* MODERN: Safe levl[][] access with bounds checking */
+#define SAFE_LEVL_TYP(x,y) (isok((x),(y)) ? levl[(x)][(y)].typ : STONE)
+
 #include "def.mkroom.h"
 #include "def.permonst.h"
 #include "def.rm.h"

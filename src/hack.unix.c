@@ -162,6 +162,18 @@ void gethdate(char *name) {
   /* char *np; */ /* MODERN ADDITION (2025): Commented out to avoid
                      redeclaration with PATH version */
 
+  /* MODERN: Validate argv[0] length to prevent buffer overflow */
+  if (!name || strlen(name) > 256) {
+    error("Invalid executable name provided.");
+    return;
+  }
+  
+  /* MODERN: Extract basename only - no directory traversal allowed */
+  const char *basename = strrchr(name, '/');
+  if (basename) {
+    name = (char *)(basename + 1);  /* Use only the executable name */
+  }
+
 #if 0
 	name = "/usr/games/hide/hack";
 	if(stat(name, &hbuf))
@@ -176,6 +188,12 @@ void gethdate(char *name) {
  * <sys/types.h> again, so that the compiler sees these typedefs twice.
  */
 #define MAXPATHLEN 1024
+
+  /* MODERN: Additional name validation after basename extraction */
+  if (strlen(name) > 64) {  /* Reasonable executable name limit */
+    error("Executable name too long.");
+    return;
+  }
 
   char *np;
   const char *path; /* MODERN: const because can point to getenv() result or
@@ -192,9 +210,25 @@ void gethdate(char *name) {
     if (np - path <= 1)                   /* %% */
       (void)strcpy(filename, name);
     else {
-      (void)strncpy(filename, path, np - path);
-      filename[np - path] = '/';
-      (void)strcpy(filename + (np - path) + 1, name);
+      /* MODERN: Safe path construction with bounds checking */
+      size_t path_len = np - path;
+      size_t name_len = strlen(name);
+      
+      /* Ensure we have space for path + '/' + name + '\0' */
+      if (path_len + 1 + name_len + 1 > MAXPATHLEN) {
+        continue; /* Skip this path entry if it would overflow */
+      }
+      
+      (void)strncpy(filename, path, path_len);
+      filename[path_len] = '/';
+      filename[path_len + 1] = '\0';  /* MODERN: Ensure null termination */
+      
+      /* MODERN: Use snprintf for final copy with bounds checking */
+      int ret = snprintf(filename + path_len + 1, 
+                        MAXPATHLEN - path_len - 1, "%s", name);
+      if (ret < 0 || ret >= (int)(MAXPATHLEN - path_len - 1)) {
+        continue; /* Skip this path entry on truncation */
+      }
     }
     if (stat(filename, &hbuf) == 0)
       return;

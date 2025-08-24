@@ -76,9 +76,10 @@ int dosearch(void) {
     pline("What are you looking for? The exit?");
     return (1);
   } else
-    for (x = (unsigned char)(u.ux - 1); x < (unsigned char)(u.ux + 2); x++)
-      for (y = (unsigned char)(u.uy - 1); y < (unsigned char)(u.uy + 2); y++)
-        if (x != (unsigned char)u.ux || y != (unsigned char)u.uy) {
+    /* MODERN: Safe coordinate iteration with bounds checking */
+    for (x = u.ux - 1; x <= u.ux + 1; x++)
+      for (y = u.uy - 1; y <= u.uy + 1; y++)
+        if ((x != u.ux || y != u.uy) && isok(x, y)) {
           if (levl[x][y].typ == SDOOR) {
             if (rn2(7))
               continue;

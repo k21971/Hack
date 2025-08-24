@@ -474,6 +474,16 @@ install(TARGETS hack DESTINATION bin)
 install(FILES ${DATA_FILES} DESTINATION share/hack)
 install(FILES man/hack.6 DESTINATION share/man/man6)
 
+# ---- Security Options ----
+option(CLANG_STRICT "Enable draconian warnings under Clang" OFF)
+if(CLANG_STRICT AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+  target_compile_options(hack PRIVATE 
+    -Weverything -Werror
+    -Wno-poison-system-directories
+    -Wno-padded -Wno-cast-align -Wno-disabled-macro-expansion
+  )
+endif()
+
 # ---- Packaging (optional) ----
 option(RESTOHACK_ENABLE_PACKAGE "Enable CPack packaging" ON)
 

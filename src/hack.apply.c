@@ -205,7 +205,8 @@ static struct monst *bchit(int ddx, int ddy, int range, char sym) {
     bchy += ddy;
     if ((mtmp = m_at(bchx, bchy)))
       break;
-    if (!ZAP_POS(levl[bchx][bchy].typ)) {
+    /* MODERN: Add bounds checking before levl access */
+    if (!isok(bchx, bchy) || !ZAP_POS(levl[bchx][bchy].typ)) {
       bchx -= ddx;
       bchy -= ddy;
       break;

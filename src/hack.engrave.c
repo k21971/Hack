@@ -254,8 +254,16 @@ int doengrave(void) {
     multi = -len;
   } break;
   }
-  if (oep)
-    len += strlen(oep->engr_txt) + spct;
+  if (oep) {
+    /* MODERN: Check for integer overflow in allocation size calculation */
+    size_t existing_len = strlen(oep->engr_txt);
+    size_t total_needed = (size_t)len + existing_len + spct;
+    if (total_needed > 32767) { /* Reasonable limit for engraving length */
+      pline("The combined engraving would be too long.");
+      return (0);
+    }
+    len += existing_len + spct;
+  }
   ep = (struct engr *)alloc((unsigned)(sizeof(struct engr) + len + 1));
   ep->nxt_engr = head_engr;
   head_engr = ep;

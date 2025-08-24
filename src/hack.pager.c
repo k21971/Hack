@@ -79,7 +79,7 @@ int dowhatis(void) {
             buf[0] = q;
             (void)strncpy(buf + 1, "       ", 7);
           }
-          pline(buf);
+          pline("%s", buf); /* MODERN: Fix format string vulnerability */
           if (ep[-1] == ';') {
             pline("More info? ");
             if (readchar() == 'y') {
@@ -260,7 +260,7 @@ void cornline(int mode, const char *text) {
 
   /* --- now we really do it --- */
   if (mode == 2 && linect == 1) /* topline only */
-    pline(texthead->line_text);
+    pline("%s", texthead->line_text); /* MODERN: Fix format string vulnerability */
   else if (mode == 2) {
     int curline, lth;
 

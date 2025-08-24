@@ -106,6 +106,7 @@ int do_mname(void) {
   for (i = 0; i < mtmp->mxlth; i++)
     ((char *)mtmp2->mextra)[i] = ((char *)mtmp->mextra)[i];
   mtmp2->mnamelth = lth;
+  /* MODERN: Critical fix - mxlth stays the same so NAME() macro works correctly */
 
   /**
    * MODERN ADDITION (2025): Bounds checking for NAME() macro access
@@ -210,7 +211,7 @@ void docall(struct obj *obj) {
     return;
   str = newstring(strlen(buf) + 1);
   (void)strcpy(str, buf);
-  str1 = &(objects[obj->otyp].oc_uname);
+  str1 = &(SAFE_OBJECTS(obj->otyp).oc_uname); /* MODERN: Bounds-checked object access */
   if (*str1)
     free(*str1);
   *str1 = str;
