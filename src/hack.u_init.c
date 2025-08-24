@@ -11,7 +11,7 @@
  */
 
 #include "hack.h"
-#include <signal.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #define Strcpy (void)strcpy
@@ -385,9 +385,8 @@ int plnamesuffix() {
                return value */
 }
 
-int role_index(pc)
-char pc;
-{ /* must be called only from u_init() */
+int role_index(char pc) /* ANSI C conversion from K&R style */
+{                       /* must be called only from u_init() */
   /* so that rolesyms[] is defined */
   char *cp;
 

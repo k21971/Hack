@@ -11,7 +11,7 @@
 
 #include "hack.h"
 /* def.mkroom.h already included via hack.h */
-#include <stdio.h>
+
 #include <unistd.h>
 extern struct monst *restmonchn();
 extern struct obj *restobjchn();

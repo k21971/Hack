@@ -618,9 +618,7 @@ void prinv(obj) struct obj *obj;
   pline(xprname(obj, obj_to_let(obj)));
 }
 
-static char *xprname(obj, let)
-struct obj *obj;
-char let;
+static char *xprname(struct obj *obj, char let) /* ANSI C conversion from K&R style */
 {
   static char li[BUFSZ];
 
@@ -924,8 +922,7 @@ int doprring() {
   return (0);
 }
 
-int digit(c)
-char c;
+int digit(char c) /* ANSI C conversion from K&R style */
 {
   return (c >= '0' && c <= '9');
 }
