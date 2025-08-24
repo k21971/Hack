@@ -2,15 +2,15 @@
 /* def.func_tab.h - version 1.0.2 */
 
 struct func_tab {
-	char f_char;
-	int (*f_funct)();
+  char f_char;
+  int (*f_funct)();
 };
 
 extern struct func_tab cmdlist[];
 
 struct ext_func_tab {
-	const char *ef_txt;  /* MODERN: const because points to string literals */
-	int (*ef_funct)();
+  const char *ef_txt; /* MODERN: const because points to string literals */
+  int (*ef_funct)();
 };
 
 extern struct ext_func_tab extcmdlist[];

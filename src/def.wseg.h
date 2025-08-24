@@ -4,10 +4,10 @@
 #ifndef NOWORM
 /* worm structure */
 struct wseg {
-	struct wseg *nseg;
-	xchar wx,wy;
-	unsigned wdispl:1;
+  struct wseg *nseg;
+  xchar wx, wy;
+  unsigned wdispl : 1;
 };
 
-#define newseg()	(struct wseg *) alloc(sizeof(struct wseg))
+#define newseg() (struct wseg *)alloc(sizeof(struct wseg))
 #endif /* NOWORM */

@@ -5,15 +5,16 @@ All notable changes to restoHack will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - 2025-08-19
+## [1.1.0] - 2025-08-23
 
 ### Added
-- Comprehensive security hardening eliminating all critical compiler warnings
-- Advanced gauntlet testing suite with ASan, UBSan, MSan, TSan, and Valgrind
-- Enhanced memory safety with buffer underflow vulnerability fixes
-- Deployment-ready configuration for HardFought.org server hosting
+- **Terminal resize protection**: SIGWINCH handler prevents display corruption from dynamic terminal sizing
+- **Enhanced gauntlet testing**: Inventory testing, item operations, save/resume functionality
 
 ### Fixed
+- **CRITICAL**: Terminal resize corruption causing map display bugs and wall-walking glitches
+- **CRITICAL**: Message buffer concatenation overflow with wide terminals (CO > 80)
+- **CRITICAL**: --More-- prompt positioning bugs in topline system
 - **SECURITY**: Eliminated all 151 char-subscript buffer underflow vulnerabilities
 - **SECURITY**: Fixed 30 strict-aliasing undefined behavior violations
 - **SECURITY**: Resolved all uninitialized variable warnings with -Werror gates

@@ -2,8 +2,8 @@
 /* hack.h - version 1.0.3 */
 
 #include "config.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Modern debugging overlay - non-invasive logging for learning */
 #ifdef DEBUG_LEARNING
@@ -15,60 +15,64 @@
 #endif
 
 /* Visibility macros for learning module boundaries */
-#define EXPORT      /* Function should be visible outside this module */
-#define INTERNAL    /* Function is internal to this module only */
-#define API         /* Part of the game's public API */
+#define EXPORT   /* Function should be visible outside this module */
+#define INTERNAL /* Function is internal to this module only */
+#define API      /* Part of the game's public API */
 
 /* K&R compatibility and learning warnings */
 #ifdef DEBUG_LEARNING
-#define CHAR_BEHAVIOR_WARNING() \
-    HACK_LOG("WARNING: char signedness may differ from K&R original\n")
-#define POINTER_ARITHMETIC_CHECK(ptr) \
-    HACK_LOG("Pointer arithmetic at %s:%d - verify bounds\n", __FILE__, __LINE__)
+#define CHAR_BEHAVIOR_WARNING()                                                \
+  HACK_LOG("WARNING: char signedness may differ from K&R original\n")
+#define POINTER_ARITHMETIC_CHECK(ptr)                                          \
+  HACK_LOG("Pointer arithmetic at %s:%d - verify bounds\n", __FILE__, __LINE__)
 #else
 #define CHAR_BEHAVIOR_WARNING() ((void)0)
 #define POINTER_ARITHMETIC_CHECK(ptr) ((void)0)
 #endif
 
 #ifndef BSD
-#define	index	strchr
-#define	rindex	strrchr
+#define index strchr
+#define rindex strrchr
 #endif /* BSD */
 
-#define	Null(type)	((struct type *) 0)
+#define Null(type) ((struct type *)0)
 
-#include	"def.objclass.h"
+#include "def.objclass.h"
 
 /* Original 1984: typedef struct { xchar x,y; } coord; */
 typedef struct {
-	unsigned char x,y; /* MODERN: unsigned to prevent buffer underflow */
+  unsigned char x, y; /* MODERN: unsigned to prevent buffer underflow */
 } coord;
 
-#include	"def.monst.h"	/* uses coord */
-#include	"def.gold.h"
-#include	"def.trap.h"
-#include	"def.obj.h"
-#include	"def.flag.h"
+#include "def.flag.h"
+#include "def.gold.h"
+#include "def.monst.h" /* uses coord */
+#include "def.obj.h"
+#include "def.trap.h"
 
-#define	plur(x)	(((x) == 1) ? "" : "s")
+#define plur(x) (((x) == 1) ? "" : "s")
 
-#define	BUFSZ	256	/* for getlin buffers */
-#define	PL_NSIZ	32	/* name of player, ghost, shopkeeper */
+#define BUFSZ 256  /* for getlin buffers */
+#define PL_NSIZ 32 /* name of player, ghost, shopkeeper */
 
 /**
  * MODERN ADDITION (2025): Safe object array access macros
- * 
+ *
  * WHY: Original code accesses objects[] array without bounds checking
  * HOW: Inline bounds check with fallback to STRANGE_OBJECT (index 0)
  * PRESERVES: Same functionality when indices are valid
  * ADDS: Protection against array bounds violations and segfaults
  */
-#define SAFE_OBJ(otyp) ((otyp) >= 0 && (otyp) < NROFOBJECTS ? (otyp) : STRANGE_OBJECT)
+#define SAFE_OBJ(otyp)                                                         \
+  ((otyp) >= 0 && (otyp) < NROFOBJECTS ? (otyp) : STRANGE_OBJECT)
 #define SAFE_OBJECTS(otyp) objects[SAFE_OBJ(otyp)]
 
-#include	"def.rm.h"
-#include	"def.permonst.h"
-#include	"def.mkroom.h"
+/* MODERN: Safe levl[][] access with bounds checking */
+#define SAFE_LEVL_TYP(x,y) (isok((x),(y)) ? levl[(x)][(y)].typ : STONE)
+
+#include "def.mkroom.h"
+#include "def.permonst.h"
+#include "def.rm.h"
 
 extern void *alloc(unsigned lth);
 /* MODERN: CONST-CORRECTNESS: panic message is read-only */
@@ -101,7 +105,9 @@ extern int rn2(int x);
 extern int rnd(int x);
 extern void setuwep(struct obj *obj);
 extern void freeinv(struct obj *obj);
-extern void Tmp_at(schar x, schar y); /* MODERN: Keep original schar to preserve -1,-2 sentinel logic */
+extern void Tmp_at(
+    schar x,
+    schar y); /* MODERN: Keep original schar to preserve -1,-2 sentinel logic */
 extern void mnexto(struct monst *mtmp);
 extern int abon(void);
 extern void dighole(void);
@@ -111,13 +117,16 @@ extern int rn1(int x, int y);
 extern void fracture_rock(struct obj *obj);
 
 /* PLAYER SYSTEM PROTOTYPES - from studying hack.u_init.c */
-/* K&R OBJECT CREATION SYSTEM - Forward declarations for authentic 1984 functions */
-extern struct obj *mkobj(int let);        /* Create object by symbol */
-extern struct obj *mksobj(int otyp);      /* Create object by type */
-extern struct obj *mkobj_at(int let, int x, int y);  /* Create object at position */
-extern struct obj *mksobj_at(int otyp, int x, int y); /* Create specific object at position */
-extern int letter(int c);                 /* Check if character is a letter */
-extern int probtype(int let);             /* Get probable object type from symbol */
+/* K&R OBJECT CREATION SYSTEM - Forward declarations for authentic 1984
+ * functions */
+extern struct obj *mkobj(int let);   /* Create object by symbol */
+extern struct obj *mksobj(int otyp); /* Create object by type */
+extern struct obj *mkobj_at(int let, int x,
+                            int y); /* Create object at position */
+extern struct obj *mksobj_at(int otyp, int x,
+                             int y); /* Create specific object at position */
+extern int letter(int c);            /* Check if character is a letter */
+extern int probtype(int let);        /* Get probable object type from symbol */
 /* addinv() - K&R function, implicitly declared */
 extern int weight(struct obj *obj);
 extern void setworn(struct obj *obj, long mask);
@@ -128,20 +137,20 @@ extern void bell(void);
 
 /* CHARACTER INITIALIZATION STRUCTURES AND FUNCTIONS */
 struct trobj {
-	uchar trotyp;
-	schar trspe;
-	char trolet;
-	Bitfield(trquan,6);
-	Bitfield(trknown,1);
+  uchar trotyp;
+  schar trspe;
+  char trolet;
+  Bitfield(trquan, 6);
+  Bitfield(trknown, 1);
 };
 
-extern int role_index(char pc);           /* Find role index by character */
-extern int ini_inv(struct trobj *);       /* Initialize starting inventory */
-extern int wiz_inv(void);                 /* Wizard starting items */
+extern int role_index(char pc);     /* Find role index by character */
+extern int ini_inv(struct trobj *); /* Initialize starting inventory */
+extern int wiz_inv(void);           /* Wizard starting items */
 
 /* TERMINAL FUNCTION PROTOTYPES - Forward declarations for hack.termcap.c */
 extern void xputs(char *s);
-extern int xputc(int c); 
+extern int xputc(int c);
 extern void cmov(int x, int y);
 extern void nocmov(int x, int y);
 extern void home(void);
@@ -187,9 +196,10 @@ extern void mondied(struct monst *mdef);
 extern void monstone(struct monst *mdef);
 extern void killed(struct monst *mtmp);
 extern void done_in_by(struct monst *mtmp);
-extern int d(int n, int x);               /* Dice roll function */
-extern void setan(const char *str, char *buf);  /* MODERN: const because str is read-only */
-extern int dbon(void);                    /* Damage bonus */
+extern int d(int n, int x); /* Dice roll function */
+extern void setan(const char *str,
+                  char *buf); /* MODERN: const because str is read-only */
+extern int dbon(void);        /* Damage bonus */
 /* MODERN: CONST-CORRECTNESS: hit message parameters are read-only */
 extern void hit(const char *str, struct monst *mtmp, const char *force);
 extern void u_wipe_engr(int cnt);
@@ -250,9 +260,13 @@ extern int dosearch(void);
 extern void gethungry(void);
 
 /* Monster interaction functions */
-extern void youswld(struct monst *mtmp, int dam, int die, const char *name);  /* MODERN: const because name is read-only */
+extern void
+youswld(struct monst *mtmp, int dam, int die,
+        const char *name); /* MODERN: const because name is read-only */
 extern int wiz_hit(struct monst *mtmp);
-extern void justswld(struct monst *mtmp, const char *name);  /* MODERN: const because name is read-only */
+extern void
+justswld(struct monst *mtmp,
+         const char *name); /* MODERN: const because name is read-only */
 /* MODERN: CONST-CORRECTNESS: kludge parameters are read-only */
 extern void kludge(const char *str, const char *arg);
 extern void stealgold(struct monst *mtmp);
@@ -289,7 +303,8 @@ extern int identify(struct obj *otmp);
 extern int monstersym(char ch);
 extern int chwepon(struct obj *otmp, int amount);
 extern void charcat(char *s, char c);
-extern struct monst *bhit(int ddx, int ddy, int range, char sym, int (*fhitm)(), int (*fhito)(), struct obj *obj);
+extern struct monst *bhit(int ddx, int ddy, int range, char sym, int (*fhitm)(),
+                          int (*fhito)(), struct obj *obj);
 extern struct monst *boomhit(int dx, int dy);
 /* MODERN: CONST-CORRECTNESS: exclam returns read-only string literals */
 extern const char *exclam(int force);
@@ -396,7 +411,8 @@ extern void addtobill(struct obj *obj);
 extern void done1(int sig);
 extern int doquit(void);
 extern void hangup(int sig);
-/* MODERN ADDITION (2025): Enhanced signal handlers for window manager compatibility */
+/* MODERN ADDITION (2025): Enhanced signal handlers for window manager
+ * compatibility */
 extern void modern_cleanup_handler(int sig);
 extern void modern_save_handler(int sig);
 
@@ -444,7 +460,9 @@ extern void getret(void);
 extern void set_whole_screen(void);
 
 /* Original 1984: extern xchar xdnstair, ydnstair, xupstair, yupstair; */
-extern unsigned char xdnstair, ydnstair, xupstair, yupstair; /* stairs up and down - MODERN: unsigned to prevent buffer underflow */
+extern unsigned char xdnstair, ydnstair, xupstair,
+    yupstair; /* stairs up and down - MODERN: unsigned to prevent buffer
+                 underflow */
 
 extern xchar dlevel;
 
@@ -468,7 +486,9 @@ extern void unplacebc(void);
 extern void keepdogs(void);
 extern void seeoff(int mode);
 /* Original 1984: extern void savelev(int fd, xchar lev); */
-extern void savelev(int fd, unsigned char lev); /* MODERN: unsigned to prevent buffer underflow */
+extern void
+savelev(int fd,
+        unsigned char lev); /* MODERN: unsigned to prevent buffer underflow */
 
 /* FORWARD DECLARATIONS FOR hack.mon.c */
 struct engr;
@@ -521,123 +541,134 @@ extern void wormdead(struct monst *mtmp);
 extern void wormhit(struct monst *mtmp);
 extern void cutworm(struct monst *mtmp, xchar x, xchar y, uchar weptyp);
 
-#define	newstring(x)	(char *) alloc((unsigned)(x))
+#define newstring(x) (char *)alloc((unsigned)(x))
 #include "hack.onames.h"
 
 #define ON 1
 #define OFF 0
 
-extern struct obj *invent, *uwep, *uarm, *uarm2, *uarmh, *uarms, *uarmg,
-	*uleft, *uright, *fcobj;
-extern struct obj *uchain;	/* defined iff PUNISHED */
-extern struct obj *uball;	/* defined if PUNISHED */
+extern struct obj *invent, *uwep, *uarm, *uarm2, *uarmh, *uarms, *uarmg, *uleft,
+    *uright, *fcobj;
+extern struct obj *uchain; /* defined iff PUNISHED */
+extern struct obj *uball;  /* defined if PUNISHED */
 extern struct obj *o_at(int x, int y), *sobj_at(int n, int x, int y);
 
 struct prop {
-#define	TIMEOUT		007777	/* mask */
-#define	LEFT_RING	W_RINGL	/* 010000L */
-#define	RIGHT_RING	W_RINGR	/* 020000L */
-#define	INTRINSIC	040000L
-#define	LEFT_SIDE	LEFT_RING
-#define	RIGHT_SIDE	RIGHT_RING
-#define	BOTH_SIDES	(LEFT_SIDE | RIGHT_SIDE)
-	long p_flgs;
-	int (*p_tofn)();	/* called after timeout */
+#define TIMEOUT 007777     /* mask */
+#define LEFT_RING W_RINGL  /* 010000L */
+#define RIGHT_RING W_RINGR /* 020000L */
+#define INTRINSIC 040000L
+#define LEFT_SIDE LEFT_RING
+#define RIGHT_SIDE RIGHT_RING
+#define BOTH_SIDES (LEFT_SIDE | RIGHT_SIDE)
+  long p_flgs;
+  int (*p_tofn)(); /* called after timeout */
 };
 
 struct you {
-	xchar ux, uy;
-	schar dx, dy, dz;	/* direction of move (or zap or ... ) */
+  xchar ux, uy;
+  schar dx, dy, dz; /* direction of move (or zap or ... ) */
 #ifdef QUEST
-	schar di;		/* direction of FF */
-	xchar ux0, uy0;		/* initial position FF */
-#endif /* QUEST */
-	xchar udisx, udisy;	/* last display pos */
-	char usym;		/* usually '@' */
-	schar uluck;
-#define	LUCKMAX		10	/* on moonlit nights 11 */
-#define	LUCKMIN		(-10)
-	int last_str_turn:3;	/* 0: none, 1: half turn, 2: full turn */
-				/* +: turn right, -: turn left */
-	unsigned udispl:1;	/* @ on display */
-	unsigned ulevel:4;	/* 1 - 14 */
+  schar di;           /* direction of FF */
+  xchar ux0, uy0;     /* initial position FF */
+#endif                /* QUEST */
+  xchar udisx, udisy; /* last display pos */
+  char usym;          /* usually '@' */
+  schar uluck;
+#define LUCKMAX 10 /* on moonlit nights 11 */
+#define LUCKMIN (-10)
+  int last_str_turn : 3; /* 0: none, 1: half turn, 2: full turn */
+                         /* +: turn right, -: turn left */
+  unsigned udispl : 1;   /* @ on display */
+  unsigned ulevel : 4;   /* 1 - 14 */
 #ifdef QUEST
-	unsigned uhorizon:7;
-#endif /* QUEST */
-	unsigned utrap:3;	/* trap timeout */
-	unsigned utraptype:1;	/* defined if utrap nonzero */
-#define	TT_BEARTRAP	0
-#define	TT_PIT		1
-	unsigned uinshop:6;	/* used only in shk.c - (roomno+1) of shop */
-
+  unsigned uhorizon : 7;
+#endif                    /* QUEST */
+  unsigned utrap : 3;     /* trap timeout */
+  unsigned utraptype : 1; /* defined if utrap nonzero */
+#define TT_BEARTRAP 0
+#define TT_PIT 1
+  unsigned uinshop : 6; /* used only in shk.c - (roomno+1) of shop */
 
 /* perhaps these #define's should also be generated by makedefs */
-#define	TELEPAT		LAST_RING		/* not a ring */
-#define	Telepat		u.uprops[TELEPAT].p_flgs
-#define	FAST		(LAST_RING+1)		/* not a ring */
-#define	Fast		u.uprops[FAST].p_flgs
-#define	CONFUSION	(LAST_RING+2)		/* not a ring */
-#define	Confusion	u.uprops[CONFUSION].p_flgs
-#define	INVIS		(LAST_RING+3)		/* not a ring */
-#define	Invis		u.uprops[INVIS].p_flgs
-#define Invisible	(Invis && !See_invisible)
-#define	GLIB		(LAST_RING+4)		/* not a ring */
-#define	Glib		u.uprops[GLIB].p_flgs
-#define	PUNISHED	(LAST_RING+5)		/* not a ring */
-#define	Punished	u.uprops[PUNISHED].p_flgs
-#define	SICK		(LAST_RING+6)		/* not a ring */
-#define	Sick		u.uprops[SICK].p_flgs
-#define	BLIND		(LAST_RING+7)		/* not a ring */
-#define	Blind		u.uprops[BLIND].p_flgs
-#define	WOUNDED_LEGS	(LAST_RING+8)		/* not a ring */
-#define Wounded_legs	u.uprops[WOUNDED_LEGS].p_flgs
-#define STONED		(LAST_RING+9)		/* not a ring */
-#define Stoned		u.uprops[STONED].p_flgs
-#define PROP(x) (x-RIN_ADORNMENT)       /* convert ring to index in uprops */
-	unsigned umconf:1;
-	const char *usick_cause;  /* MODERN: const because points to object names or string literals */
-	struct prop uprops[LAST_RING+10];
+#define TELEPAT LAST_RING /* not a ring */
+#define Telepat u.uprops[TELEPAT].p_flgs
+#define FAST (LAST_RING + 1) /* not a ring */
+#define Fast u.uprops[FAST].p_flgs
+#define CONFUSION (LAST_RING + 2) /* not a ring */
+#define Confusion u.uprops[CONFUSION].p_flgs
+#define INVIS (LAST_RING + 3) /* not a ring */
+#define Invis u.uprops[INVIS].p_flgs
+#define Invisible (Invis && !See_invisible)
+#define GLIB (LAST_RING + 4) /* not a ring */
+#define Glib u.uprops[GLIB].p_flgs
+#define PUNISHED (LAST_RING + 5) /* not a ring */
+#define Punished u.uprops[PUNISHED].p_flgs
+#define SICK (LAST_RING + 6) /* not a ring */
+#define Sick u.uprops[SICK].p_flgs
+#define BLIND (LAST_RING + 7) /* not a ring */
+#define Blind u.uprops[BLIND].p_flgs
+#define WOUNDED_LEGS (LAST_RING + 8) /* not a ring */
+#define Wounded_legs u.uprops[WOUNDED_LEGS].p_flgs
+#define STONED (LAST_RING + 9) /* not a ring */
+#define Stoned u.uprops[STONED].p_flgs
+#define PROP(x) (x - RIN_ADORNMENT) /* convert ring to index in uprops */
+  unsigned umconf : 1;
+  const char *usick_cause; /* MODERN: const because points to object names or
+                              string literals */
+  struct prop uprops[LAST_RING + 10];
 
-	unsigned uswallow:1;		/* set if swallowed by a monster */
-	unsigned uswldtim:4;		/* time you have been swallowed */
-	unsigned uhs:3;			/* hunger state - see hack.eat.c */
-	schar ustr,ustrmax;
-	schar udaminc;
-	schar uac;
-	int uhp,uhpmax;
-	long int ugold,ugold0,uexp,urexp;
-	int uhunger;			/* refd only in eat.c and shk.c */
-	int uinvault;
-	struct monst *ustuck;
-	int nr_killed[CMNUM+2];		/* used for experience bookkeeping */
+  unsigned uswallow : 1; /* set if swallowed by a monster */
+  unsigned uswldtim : 4; /* time you have been swallowed */
+  unsigned uhs : 3;      /* hunger state - see hack.eat.c */
+  schar ustr, ustrmax;
+  schar udaminc;
+  schar uac;
+  int uhp, uhpmax;
+  long int ugold, ugold0, uexp, urexp;
+  int uhunger; /* refd only in eat.c and shk.c */
+  int uinvault;
+  struct monst *ustuck;
+  int nr_killed[CMNUM + 2]; /* used for experience bookkeeping */
 };
 
 extern struct you u;
 
-/* MODERN: CONST-CORRECTNESS: match traps[] definition (read-only string table) */
+/* MODERN: CONST-CORRECTNESS: match traps[] definition (read-only string table)
+ */
 extern const char *const traps[];
 extern char *aobjnam();
 extern char readchar();
 
 /* inventory system functions */
-extern struct obj *addinv(struct obj *obj), *splitobj(struct obj *otmp, int cnt);
-extern int assigninvlet(struct obj *otmp), carried(struct obj *obj), carrying(int type);
+extern struct obj *addinv(struct obj *obj),
+    *splitobj(struct obj *otmp, int cnt);
+extern int assigninvlet(struct obj *otmp), carried(struct obj *obj),
+    carrying(int type);
 extern char obj_to_let(struct obj *obj);
-extern void useup(struct obj *obj), freeinv(struct obj *obj), delobj(struct obj *obj), freeobj(struct obj *obj); 
-extern void freegold(struct gold *gold), deltrap(struct trap *trap), stackobj(struct obj *obj);
+extern void useup(struct obj *obj), freeinv(struct obj *obj),
+    delobj(struct obj *obj), freeobj(struct obj *obj);
+extern void freegold(struct gold *gold), deltrap(struct trap *trap),
+    stackobj(struct obj *obj);
 extern void prinv(struct obj *obj), doinv(char *lets);
 extern int ddoinv(), dotypeinv(), dolook();
-extern int merged(struct obj *otmp, struct obj *obj, int lose), countgold(), doprgold(), doprwep(), doprarm(), doprring();
+extern int merged(struct obj *otmp, struct obj *obj, int lose), countgold(),
+    doprgold(), doprwep(), doprarm(), doprring();
 /* MODERN: CONST-CORRECTNESS: ggetobj word parameter is read-only */
-extern int digit(char c), ckunpaid(struct obj *otmp), ggetobj(const char *word, int (*fn)(struct obj *), int max);
-extern int askchain(struct obj *objchn, char *olets, int allflag, int (*fn)(struct obj *), int (*ckfn)(struct obj *), int max);
+extern int digit(char c), ckunpaid(struct obj *otmp),
+    ggetobj(const char *word, int (*fn)(struct obj *), int max);
+extern int askchain(struct obj *objchn, char *olets, int allflag,
+                    int (*fn)(struct obj *), int (*ckfn)(struct obj *),
+                    int max);
 /* MODERN: CONST-CORRECTNESS: getobj parameters are read-only */
-extern struct obj *getobj(const char *let, const char *word), *o_on(unsigned int id, struct obj *objchn), *mkgoldobj(long q);
+extern struct obj *getobj(const char *let, const char *word),
+    *o_on(unsigned int id, struct obj *objchn), *mkgoldobj(long q);
 extern struct monst *m_at(int x, int y);
 extern struct trap *t_at(int x, int y);
 extern struct gold *g_at(int x, int y);
 extern struct wseg *m_atseg;
-extern void setnotworn(struct obj *obj), obfree(struct obj *obj, struct obj *other), unpobj(struct obj *obj);
+extern void setnotworn(struct obj *obj),
+    obfree(struct obj *obj, struct obj *other), unpobj(struct obj *obj);
 /* MODERN: CONST-CORRECTNESS: cornline text is read-only */
 extern void cornline(int mode, const char *text);
 extern int doinvbill(int mode);
@@ -647,18 +678,21 @@ extern char *doname(struct obj *obj);
 extern char vowels[];
 
 /* hack.do.c function prototypes */
-extern int dodown(void), doup(void), donull(void), dopray(void), dothrow(void), doddrop(void);
+extern int dodown(void), doup(void), donull(void), dopray(void), dothrow(void),
+    doddrop(void);
 extern void goto_level(int newlevel, boolean at_stairs);
 extern void dropx(struct obj *obj), dropy(struct obj *obj);
 extern void more_experienced(int exp, int rexp);
 extern void set_wounded_legs(long side, int timex), heal_legs(void);
 
-extern xchar curx,cury;	/* cursor location on screen */
+extern xchar curx, cury; /* cursor location on screen */
 
-extern coord bhitpos;	/* place where thrown weapon falls to the ground */
+extern coord bhitpos; /* place where thrown weapon falls to the ground */
 
 /* Original 1984: extern xchar seehx,seelx,seehy,seely; */
-extern unsigned char seehx,seelx,seehy,seely; /* where to see - MODERN: unsigned to prevent buffer underflow vulnerability */
+extern unsigned char seehx, seelx, seehy,
+    seely; /* where to see - MODERN: unsigned to prevent buffer underflow
+              vulnerability */
 /* MODERN: CONST-CORRECTNESS: killer points to read-only death reasons */
 extern char *save_cm;
 extern const char *killer;
@@ -669,13 +703,12 @@ extern long moves;
 
 extern int multi;
 
-
 extern char lock[];
 
+#define DIST(x1, y1, x2, y2)                                                   \
+  (((x1) - (x2)) * ((x1) - (x2)) + ((y1) - (y2)) * ((y1) - (y2)))
 
-#define DIST(x1,y1,x2,y2)       (((x1)-(x2))*((x1)-(x2)) + ((y1)-(y2))*((y1)-(y2)))
-
-#define	PL_CSIZ		20	/* sizeof pl_character */
-#define	MAX_CARR_CAP	120	/* so that boulders can be heavier */
-#define	MAXLEVEL	40
-#define	FAR	(COLNO+2)	/* position outside screen */
+#define PL_CSIZ 20       /* sizeof pl_character */
+#define MAX_CARR_CAP 120 /* so that boulders can be heavier */
+#define MAXLEVEL 40
+#define FAR (COLNO + 2) /* position outside screen */
