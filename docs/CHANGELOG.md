@@ -9,12 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Terminal resize protection**: SIGWINCH handler prevents display corruption from dynamic terminal sizing
-- **Enhanced gauntlet testing**: Inventory testing, item operations, save/resume functionality 
-- **File-based wizard logging**: HACK_WIZLOG environment variable for clean debug output
-- Comprehensive security hardening eliminating all critical compiler warnings
-- Advanced gauntlet testing suite with ASan, UBSan, MSan, TSan, and Valgrind
-- Enhanced memory safety with buffer underflow vulnerability fixes
-- Deployment-ready configuration for HardFought.org server hosting
+- **Enhanced gauntlet testing**: Inventory testing, item operations, save/resume functionality
 
 ### Fixed
 - **CRITICAL**: Terminal resize corruption causing map display bugs and wall-walking glitches

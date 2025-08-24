@@ -10,19 +10,20 @@
      │    ∘ Establishes procedural generation + permadeath
      │    ∘ ASCII graphics, turn-based gameplay
      │
-1982 ████ HACK (Fenlason Era)
-     │    ∘ Jay Fenlason expands Rogue concept
+1982-1984 ░░░ HACK DEVELOPMENT (Fenlason Era)
+     │    ∘ Jay Fenlason begins development after 1982 USENIX conference  
      │    ∘ Adds shops, complex inventory, rule-driven monster behaviors
-     │    ∘ Wizard Mode present in early Hack (likely introduced by Fenlason's team and refined in later versions)
+     │    ∘ First distributed on 1984 USENIX tape alongside JOVE editor
+     │    ∘ Wizard Mode present in early Hack (likely introduced by Fenlason's team)
      │
 1984 ████ HACK 1.0 (Brouwer Takes Control)
-     │    ∘ Andries Brouwer assumes development
+     │    ∘ Andries Brouwer assumes development (December 1984)
      │    ∘ Mathematical approach to game balance
-     │    ∘ 46 monster types with rule-driven behaviors
+     │    ∘ 58 monster types with rule-driven behaviors
      │
 1985 ████ HACK 1.0.3 (The Masterpiece)
      │    ∘ Brouwer's final version - peak of design
-     │    ∘ ~19,200 lines of optimized C code
+     │    ∘ 19,239 lines of optimized C code (verified from source)
      │    ∘ Direct template for NetHack development
      │
 1987 ████ NETHACK SPLITS OFF
@@ -99,7 +100,7 @@ Rogue emerged during the golden age of Unix development at universities. It spre
 
 ### The Visionaries
 
-**Jay Fenlason**, working with **Kenny Woodland**, **Mike Thome**, and **Jon Payne**, looked at Rogue and saw untapped potential. Their question: "What if we made it *more*?"
+**Jay Fenlason**, working with **Kenny Woodland**, **Mike Thome**, and **Jon Payne**, looked at Rogue and saw untapped potential. Development began shortly after the 1982 USENIX conference where Rogue's creators spoke, but **the exact timeline and content of the original Hack remains uncertain** - multiple variants existed and "the exact content of the original Hack is not known for sure" (NetHack Wiki).
 
 ### Revolutionary Innovations
 
@@ -155,7 +156,7 @@ Hack spread like wildfire through:
 - **Hobbyist BBSs** and early online communities
 - **Source code sharing** that encouraged variants and modifications
 
-By 1983, Hack had become the definitive roguelike experience.
+By the early-to-mid 1980s, Hack had become a prominent roguelike experience, though **the exact timeline of its spread remains unclear** from available sources.
 
 ---
 
@@ -163,14 +164,14 @@ By 1983, Hack had become the definitive roguelike experience.
 
 ### The Master Takes Control
 
-In 1984, **Andries Brouwer**, a Dutch mathematician and programmer, assumed development of Hack. This marked the beginning of Hack's most productive and innovative period.
+In late 1984, **Andries Brouwer**, a Dutch mathematician and programmer, assumed development of Hack, releasing version 1.0 to Usenet in December 1984. This marked the beginning of Hack's most productive and innovative period.
 
 ### Mathematical Precision Meets Game Design
 
 Brouwer approached Hack like a complex system requiring mathematical rigor:
 
-#### **Massive Content Expansion**
-- **Monster variety**: Expanded from ~30 to 46 distinct creature types
+#### **Massive Content Expansion**  
+- **Monster variety**: Expanded to 58 distinct creature types (verified from source)
 - **Dungeon features**: Altars, fountains, thrones, sinks with complex interactions
 - **Magic system**: Dozens of spells, wands, and magical effects
 - **Environmental storytelling**: Every room could tell a story
@@ -192,8 +193,8 @@ Brouwer treated game balance as a mathematical discipline:
 
 Brouwer's final version represented the pinnacle of 1980s game design:
 
-#### **Technical Excellence**
-- **~15,000 lines** of meticulously crafted C code
+#### **Technical Excellence**  
+- **19,239 lines** of meticulously crafted C code (exact count from preserved source)
 - **Modular architecture** with clean separation of concerns
 - **Custom data structures** optimized for limited hardware
 - **Memory efficiency** enabling complex gameplay in 64KB RAM
@@ -209,7 +210,7 @@ Brouwer's final version represented the pinnacle of 1980s game design:
 By 1985, Hack had gained significant influence in academic computing environments:
 
 #### **Academic Integration**
-- **Computer science students** sometimes examined Hack's data structures informally, often as code-reading or programming practice rather than formal coursework
+- **Computer science students** may have examined Hack's data structures informally as programming practice, though specific documented evidence of this is limited
 
 #### **Community Development**
 - **Strategy guides** circulated through academic networks
