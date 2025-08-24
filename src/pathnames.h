@@ -33,20 +33,20 @@
  *	@(#)pathnames.h	8.1 (Berkeley) 5/31/93
  */
 
-#define	_PATH_MAIL	"/usr/bin/mail"
-#define	_PATH_QUEST	"/var/games/questdir"
+#define _PATH_MAIL "/usr/bin/mail"
+#define _PATH_QUEST "/var/games/questdir"
 /**
  * MODERN ADDITION (2025): Local development path for hackdir
- * 
- * WHY: Original 1984 path was "/usr/games/lib/hackdir" requiring system installation.
- * For development and educational use, we need a local directory that can be created
- * and managed without root privileges or system-wide installation.
- * 
+ *
+ * WHY: Original 1984 path was "/usr/games/lib/hackdir" requiring system
+ * installation. For development and educational use, we need a local directory
+ * that can be created and managed without root privileges or system-wide
+ * installation.
+ *
  * HOW: Changed from system path to current directory relative path "./hackdir"
  * allowing the game to run from the build directory with local data files.
- * 
+ *
  * PRESERVES: All original file structure and game data organization
  * ADDS: Development-friendly local execution without system installation
  */
-#define	_PATH_HACK	"./hackdir"
-
+#define _PATH_HACK "./hackdir"

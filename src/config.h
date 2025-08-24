@@ -3,11 +3,11 @@
 
 #include "pathnames.h"
 
-#ifndef CONFIG	/* make sure the compiler doesnt see the typedefs twice */
+#ifndef CONFIG /* make sure the compiler doesnt see the typedefs twice */
 
-#define	CONFIG
-#define	UNIX		/* delete if no fork(), exec() available */
-#define	CHDIR		/* delete if no chdir() available */
+#define CONFIG
+#define UNIX  /* delete if no fork(), exec() available */
+#define CHDIR /* delete if no chdir() available */
 
 /*
  * Some include files are in a different place under SYSV
@@ -21,26 +21,26 @@
  * Also, the code for suspend and various ioctls is only given for BSD4.2
  * (I do not have access to a SYSV system.)
  */
-#define BSD		/* delete this line on System V */
+#define BSD /* delete this line on System V */
 
-/* #define STUPID */	/* avoid some complicated expressions if
-			   your C compiler chokes on them */
-/* #define PYRAMID_BUG */	/* avoid a bug on the Pyramid */
-/* #define NOWAITINCLUDE */	/* neither <wait.h> nor <sys/wait.h> exists */
+/* #define STUPID */        /* avoid some complicated expressions if
+                               your C compiler chokes on them */
+/* #define PYRAMID_BUG */   /* avoid a bug on the Pyramid */
+/* #define NOWAITINCLUDE */ /* neither <wait.h> nor <sys/wait.h> exists */
 
-#define WIZARD  "mjh"	/* the person allowed to use the -D option */
-#define RECORD	"record"/* the file containing the list of topscorers */
-#define	NEWS	"news"	/* the file containing the latest hack news */
-#define	HELP	"help"	/* the file containing a description of the commands */
-#define	SHELP	"hh"	/* abbreviated form of the same */
-#define	RUMORFILE	"rumors"	/* a file with fortune cookies */
-#define	DATAFILE	"data"	/* a file giving the meaning of symbols used */
-#define	FMASK	0660	/* file creation mask */
-#define	HLOCK	"perm"	/* an empty file used for locking purposes */
-#define LLOCK	"safelock"	/* link to previous */
+#define WIZARD "mjh"    /* the person allowed to use the -D option */
+#define RECORD "record" /* the file containing the list of topscorers */
+#define NEWS "news"     /* the file containing the latest hack news */
+#define HELP "help"     /* the file containing a description of the commands */
+#define SHELP "hh"      /* abbreviated form of the same */
+#define RUMORFILE "rumors" /* a file with fortune cookies */
+#define DATAFILE "data"    /* a file giving the meaning of symbols used */
+#define FMASK 0660         /* file creation mask */
+#define HLOCK "perm"       /* an empty file used for locking purposes */
+#define LLOCK "safelock"   /* link to previous */
 
 /* MODERN ADDITION (2025): Enable modern flock()-based locking */
-#define ENABLE_MODERN_LOCKING	1
+#define ENABLE_MODERN_LOCKING 1
 
 #ifdef UNIX
 /*
@@ -59,16 +59,15 @@
  * A stat system call is done on the mailbox every MAILCKFREQ moves.
  */
 /* #define	MAIL */
-#define	DEF_MAILREADER	_PATH_MAIL		/* or e.g. /bin/mail */
-#define	MAILCKFREQ	100
+#define DEF_MAILREADER _PATH_MAIL /* or e.g. /bin/mail */
+#define MAILCKFREQ 100
 
-
-#define SHELL		/* do not delete the '!' command */
+#define SHELL /* do not delete the '!' command */
 
 #ifdef BSD
-#define	SUSPEND		/* let ^Z suspend the game */
-#endif /* BSD */
-#endif /* UNIX */
+#define SUSPEND /* let ^Z suspend the game */
+#endif          /* BSD */
+#endif          /* UNIX */
 
 #ifdef CHDIR
 /*
@@ -77,8 +76,8 @@
  */
 #ifdef QUEST
 #define HACKDIR _PATH_QUEST
-#else /* QUEST */
-/* #define HACKDIR	_PATH_HACK */  /* Defined by build system */
+#else  /* QUEST */
+/* #define HACKDIR	_PATH_HACK */ /* Defined by build system */
 #endif /* QUEST */
 
 /*
@@ -88,7 +87,7 @@
  * since the user might create files in a directory of his choice.
  * Of course SECURE is meaningful only if HACKDIR is defined.
  */
-#define SECURE			/* do setuid(getuid()) after chdir() */
+#define SECURE /* do setuid(getuid()) after chdir() */
 
 /*
  * If it is desirable to limit the number of people that can play Hack
@@ -98,8 +97,8 @@
 #endif /* CHDIR */
 
 /* size of terminal screen is (at least) (ROWNO+2) by COLNO */
-#define	COLNO	80
-#define	ROWNO	22
+#define COLNO 80
+#define ROWNO 22
 
 /*
  * small signed integers (8 bits suffice)
@@ -107,7 +106,7 @@
  * will do when you have signed characters; otherwise use
  *	typedef	short int schar;
  */
-typedef	char	schar;
+typedef char schar;
 
 /*
  * small unsigned integers (8 bits suffice - but 7 bits do not)
@@ -116,17 +115,17 @@ typedef	char	schar;
  * will be satisfactory if you have an "unsigned char" type; otherwise use
  *	typedef unsigned short int uchar;
  */
-typedef	unsigned char	uchar;
+typedef unsigned char uchar;
 
 /*
  * small integers in the range 0 - 127, usually coordinates
  * although they are nonnegative they must not be declared unsigned
  * since otherwise comparisons with signed quantities are done incorrectly
  */
-typedef schar	xchar;
-typedef	xchar	boolean;		/* 0 or 1 */
-#define	TRUE	1
-#define	FALSE	0
+typedef schar xchar;
+typedef xchar boolean; /* 0 or 1 */
+#define TRUE 1
+#define FALSE 0
 
 /*
  * Declaration of bitfields in various structs; if your C compiler
@@ -135,8 +134,8 @@ typedef	xchar	boolean;		/* 0 or 1 */
  *	#define Bitfield(x,n)	uchar x
  * since the bitfields used never have more than 7 bits. (Most have 1 bit.)
  */
-#define	Bitfield(x,n)	unsigned x:n
+#define Bitfield(x, n) unsigned x : n
 
-#define	SIZE(x)	(int)(sizeof(x) / sizeof(x[0]))
+#define SIZE(x) (int)(sizeof(x) / sizeof(x[0]))
 
 #endif /* CONFIG */

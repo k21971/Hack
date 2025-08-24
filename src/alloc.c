@@ -1,34 +1,35 @@
 /* alloc.c - version 1.0.2 */
 /* $FreeBSD$ */
 
-/* 
+/*
  * Memory allocation utilities for 1984 Hack - safe malloc/free wrappers
  * Original 1984 source: docs/historical/original-source/alloc.c
- * 
+ *
  * Key modernizations: ANSI C function signatures, enhanced type safety
  */
 
-#include <stdlib.h>
 #include "hack.h"
+#include <stdlib.h>
 
 #ifdef LINT
 
 /*
    a ridiculous definition, suppressing
-	"possible pointer alignment problem" for (long *) malloc()
-	"enlarg defined but never used"
-	"ftell defined (in <stdio.h>) but never used"
+        "possible pointer alignment problem" for (long *) malloc()
+        "enlarg defined but never used"
+        "ftell defined (in <stdio.h>) but never used"
    from lint
 */
 #include <stdio.h>
-void *
-alloc(unsigned n){
-/* Original 1984: return(&dummy); */
-static long dummy_storage = 0; /* MODERN: static storage prevents dangling pointer */
-long dummy = ftell(stderr);
-	if(n) dummy = 0;	/* make sure arg is used */
-	dummy_storage = dummy;
-	return(&dummy_storage);
+void *alloc(unsigned n) {
+  /* Original 1984: return(&dummy); */
+  static long dummy_storage =
+      0; /* MODERN: static storage prevents dangling pointer */
+  long dummy = ftell(stderr);
+  if (n)
+    dummy = 0; /* make sure arg is used */
+  dummy_storage = dummy;
+  return (&dummy_storage);
 }
 
 #else
@@ -61,34 +62,30 @@ unsigned lth;
 
 /**
  * MODERN ADDITION (2025): ANSI C memory allocation functions
- * 
+ *
  * WHY: Original returned long* which required casting at every call site.
  * Modern void* return eliminates casting and follows ANSI C conventions.
- * 
+ *
  * HOW: Changed return type from long* to void*, updated function signatures
  * to ANSI C style with proper parameter declarations.
- * 
+ *
  * PRESERVES: Identical allocation behavior and error handling via panic()
  * ADDS: Type safety and ANSI C compliance without casting requirements
  */
-void *
-alloc(unsigned lth)
-{
-	char *ptr;
+void *alloc(unsigned lth) {
+  char *ptr;
 
-	if(!(ptr = malloc(lth)))
-		panic("Cannot get %d bytes", lth);
-	return(ptr);
+  if (!(ptr = malloc(lth)))
+    panic("Cannot get %d bytes", lth);
+  return (ptr);
 }
 
-void *
-enlarge(char *ptr, unsigned lth)
-{
-	char *nptr;
+void *enlarge(char *ptr, unsigned lth) {
+  char *nptr;
 
-	if(!(nptr = realloc(ptr,lth)))
-		panic("Cannot reallocate %d bytes", lth);
-	return(nptr);
+  if (!(nptr = realloc(ptr, lth)))
+    panic("Cannot reallocate %d bytes", lth);
+  return (nptr);
 }
 
 #endif /* LINT */
