@@ -16,25 +16,6 @@
 extern char *eos(char *s);
 extern int CO;
 
-/* MODERN ADDITION (2025): File-based wizard logging to avoid terminal corruption */
-static FILE *wizlog = NULL;
-
-static void wizlog_init(void) {
-	if (!wizlog) {
-		const char *logpath = getenv("HACK_WIZLOG");
-		if (logpath && *logpath) {
-			wizlog = fopen(logpath, "a");
-			if (wizlog) {
-				setvbuf(wizlog, NULL, _IONBF, 0);  /* Unbuffered for real-time debug */
-			}
-		}
-	}
-}
-
-#define WLOG(...) do { \
-	wizlog_init(); \
-	if (wizlog) fprintf(wizlog, __VA_ARGS__); \
-} while(0)
 
 char toplines[BUFSZ];
 xchar tlx, tly;			/* set by pline; used by addtopl */
@@ -116,22 +97,14 @@ void
 /* MODERN: CONST-CORRECTNESS: xmore message is read-only */
 xmore(const char *s)	/* allowed chars besides space/return */
 {
-	if(flags.debug) {
-		WLOG("[WIZARD] xmore() called - tlx=%d, tly=%d, CO=%d, toplin=%d\n", 
-		     tlx, tly, CO, flags.toplin);
-	}
 	if(flags.toplin) {
 		curs(tlx, tly);
 		/* Original 1984: if(tlx + 8 > CO) putsym('\n'), tly++; */
 		if(tlx + 8 > CO) {
-			if(flags.debug) WLOG("[WIZARD] Adding newline before --More-- (tlx=%d > CO-8=%d)\n", tlx, CO-8);
 			putsym('\n');  /* MODERN: Removed redundant tly++ - putsym('\n') already increments tly in line 225 */
 		}
 	}
 
-	if(flags.debug) {
-		WLOG("[WIZARD] Displaying --More-- at tlx=%d, tly=%d\n", tlx, tly);
-	}
 	if(flags.standout)
 		standoutbeg();
 	putstr("--More--");
@@ -206,10 +179,6 @@ pline(const char *line, ...)
 	
 	if(flags.toplin == 1 && tly == 1 && !would_wrap && !would_overflow &&
 	    strncmp(bp, "You ", 4)) {
-		if(flags.debug) {
-			WLOG("[WIZARD] Concatenating: '%s' + '%s' (len=%d+%d, eff_CO=%d, tlx=%d)\n", 
-			     toplines, bp, current_len, n0, effective_CO, tlx);
-		}
 		/* MODERN: Safe concatenation with exact space management */
 		size_t remaining = BUFSZ - 1 - current_len;
 		if(remaining >= 2) {
@@ -220,18 +189,10 @@ pline(const char *line, ...)
 			}
 		}
 		tlx += 2;
-		if(flags.debug) {
-			WLOG("[WIZARD] Result: '%s' (len=%d, tlx=%d)\n", 
-			     toplines, (int)strlen(toplines), tlx);
-		}
 		addtopl(bp);
 		return;
 	}
 	if(flags.toplin == 1) {
-		if(flags.debug) {
-			WLOG("[WIZARD] Calling more() - toplines='%s' (len=%d, tly=%d)\n", 
-			     toplines, (int)strlen(toplines), tly);
-		}
 		more();
 	}
 	remember_topl();

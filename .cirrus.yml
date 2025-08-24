@@ -43,9 +43,22 @@ tarball_test_task:
   download_tarball_script: |
     set -euxo pipefail
     echo "Attempting to download hybrid tarball for tag: ${CIRRUS_TAG:-<unset>}"
-    API_JSON="$(curl -sf https://api.github.com/repos/Critlist/restoHack/releases/tags/${CIRRUS_TAG})"
+    # Add retry logic and better debugging
+    for i in 1 2 3; do
+      echo "Attempt $i: Fetching release info..."
+      API_JSON="$(curl -sf https://api.github.com/repos/Critlist/restoHack/releases/tags/${CIRRUS_TAG})" && break
+      echo "API call failed, retrying in 30s..."
+      sleep 30
+    done
+    echo "Release API response received, parsing assets..."
+    echo "$API_JSON" | jq -r '.assets[]?.name' || true  # Debug: show all asset names
     TARBALL_URL="$(echo "$API_JSON" | jq -r '.assets[]?.browser_download_url | select(test("restoHack-static.*linux-x86_64\\.tar\\.gz$"))' | head -n1)"
-    test -n "$TARBALL_URL" || { echo "No matching tarball asset found for ${CIRRUS_TAG}"; exit 1; }
+    test -n "$TARBALL_URL" || { 
+      echo "No matching tarball asset found for ${CIRRUS_TAG}"
+      echo "Available assets:"
+      echo "$API_JSON" | jq -r '.assets[]?.name' || echo "Failed to parse assets"
+      exit 1
+    }
     echo "Found tarball URL: $TARBALL_URL"
     curl -fL -o hybrid-tarball.tar.gz "$TARBALL_URL"
     ls -la hybrid-tarball.tar.gz
