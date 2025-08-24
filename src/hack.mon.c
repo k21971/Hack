@@ -190,7 +190,7 @@ void youswld(struct monst *mtmp, int dam, int die,
     return;
   kludge("%s digests you!", name);
   u.uhp -= dam;
-  if (u.uswldtim++ >= die) { /* a3 */
+  if ((int)u.uswldtim++ >= die) { /* a3 */ /* Cast to fix sign comparison */
     pline("It totally digests you!");
     u.uhp = -1;
   }
@@ -743,6 +743,7 @@ void killed(struct monst *mtmp) {
 #define NEW_SCORING
 #endif /* lint */
   int tmp, tmp2, nk, x, y;
+  (void)tmp2; /* Original 1984: used in NEW_SCORING (lint mode only) */
   struct permonst *mdat;
   extern long newuexp();
 

@@ -221,9 +221,9 @@ void bell(void) {
   (void)fflush(stdout);
 }
 
-static short tmspc10[] = {/* from termcap */
+static short tmspc10[] __attribute__((unused)) = {/* from termcap */
                           0,  2000, 1333, 909, 743, 666, 500, 333, 166,
-                          83, 55,   41,   20,  10,  5,   3,   2,   1};
+                          83, 55,   41,   20,  10,  5,   3,   2,   1}; /* Original 1984: used in delay timing, currently disabled code */
 
 #if !HAVE_DELAY_OUTPUT && !defined(_STATIC_BUILD)
 /**

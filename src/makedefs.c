@@ -76,6 +76,7 @@ int readline(void) {
   if (n == 0)
     eof++;
   lpe = lp0 + n;
+  return n; /* Original 1984: should return bytes read */
 }
 
 char nextchar() {
@@ -223,8 +224,11 @@ int getentry(void) {
 }
 
 int capitalize(char *sp) {
-  if ('a' <= *sp && *sp <= 'z')
+  if ('a' <= *sp && *sp <= 'z') {
     *sp += 'A' - 'a';
+    return 1; /* Original 1984: return 1 if capitalized */
+  }
+  return 0; /* Original 1984: return 0 if no change */
 }
 
 int letter(char ch) {

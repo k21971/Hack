@@ -102,6 +102,7 @@ int probtype(int let) {
   int i = bases[letindex(let)];
   int prob = rn2(100);
   int category_start = i;
+  (void)category_start; /* Original 1984: intended for bounds tracking, currently unused */
   /* MODERN ADDITION (2025): Safe probability calculation with bounds checking
    * WHY: Original could overflow when probabilities don't sum correctly
    * HOW: Track category boundaries and clamp to valid range

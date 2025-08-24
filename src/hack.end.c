@@ -329,7 +329,9 @@ void topten(void) {
       RECORD; /* MODERN: const because points to string literal */
   const char *reclock =
       "record_lock"; /* MODERN: const because points to string literal */
+  (void)reclock; /* Original 1984: used in link() locking, conditionally compiled */
   int sleepct = 300;
+  (void)sleepct; /* Original 1984: used in link() retry loop, conditionally compiled */
   FILE *rfile;
   int flg = 0;
   extern char *getdatestr();
@@ -351,6 +353,7 @@ void topten(void) {
    * ADDS: Defensive programming against stale resources
    */
   struct stat lockstat;
+  (void)lockstat; /* Original 1984: used for stale lock detection, conditionally compiled */
 #ifdef ENABLE_MODERN_LOCKING
   /* Modern locking: flock() automatically releases on process death */
   /* No stale locks to clean up */
