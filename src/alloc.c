@@ -23,9 +23,12 @@
 #include <stdio.h>
 void *
 alloc(unsigned n){
+/* Original 1984: return(&dummy); */
+static long dummy_storage = 0; /* MODERN: static storage prevents dangling pointer */
 long dummy = ftell(stderr);
 	if(n) dummy = 0;	/* make sure arg is used */
-	return(&dummy);
+	dummy_storage = dummy;
+	return(&dummy_storage);
 }
 
 #else

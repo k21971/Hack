@@ -654,7 +654,7 @@ int len, remaining;  /* MODERN: Track buffer usage for safe sprintf */
 	flags.botl = flags.botlx = 0;
 #ifdef GOLD_ON_BOTL
 	len = snprintf(newbot, sizeof(newbot),  /* MODERN: Safe sprintf replacement */
-		"Level %-2d  Gold %-5lu  Hp %3d(%d)  Ac %-2d  Str ",
+		"Level %-2d  Gold %-5ld  Hp %3d(%d)  Ac %-2d  Str ",
 		dlevel, u.ugold, u.uhp, u.uhpmax, u.uac);
 #else
 	len = snprintf(newbot, sizeof(newbot),  /* MODERN: Safe sprintf replacement */
@@ -680,7 +680,7 @@ int len, remaining;  /* MODERN: Track buffer usage for safe sprintf */
 	}
 #ifdef EXP_ON_BOTL
 	if(remaining > 0) {
-	    int added = snprintf(eos(newbot), remaining, "  Exp %2d/%-5lu ", u.ulevel, u.uexp);
+	    int added = snprintf(eos(newbot), remaining, "  Exp %2u/%-5ld ", u.ulevel, u.uexp);
 	    if(added > 0 && added < remaining) { len += added; remaining -= added; }
 	}
 #else

@@ -125,6 +125,7 @@ void cutworm(struct monst *mtmp, xchar x, xchar y, uchar weptyp) /* uwep->otyp o
 	/* if tail then worm just loses a tail segment */
 	tmp = mtmp->wormno;
 	wtmp = wsegs[tmp];
+	if(!wtmp) return; /* MODERN: defensive check against null worm segment */
 	if(wtmp->wx == x && wtmp->wy == y){
 		wsegs[tmp] = wtmp->nseg;
 		remseg(wtmp);
@@ -170,11 +171,12 @@ void cutworm(struct monst *mtmp, xchar x, xchar y, uchar weptyp) /* uwep->otyp o
 		wtmp2 = wtmp->nseg;
 		if(!tmp2) remseg(wtmp);
 		wtmp = wtmp2;
-	} while(wtmp->nseg);
+	} while(wtmp && wtmp->nseg); /* MODERN: check wtmp not null before dereferencing */
 	panic("Cannot find worm segment");
 }
 
 void remseg(struct wseg *wtmp) {
+	if(!wtmp) return; /* MODERN: defensive check against null segment */
 	if(wtmp->wdispl)
 		newsym(wtmp->wx, wtmp->wy);
 	free((char *) wtmp);

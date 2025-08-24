@@ -170,12 +170,14 @@ static-build.sh
 test.sh
 tools/build-matrix.sh
 restoHack-static-*-linux-x86_64.tar.gz.sha256
+CLAUDE.md
 verify-release.sh
 gh-release-notes.txt
 linux-debug
 sha256sums
 SHA256SUMS
 *.sha256
+release-notes-v1.1.0.md
 CLAUDE.md
 dev/.venv/
 dev/gauntlet-logs/
