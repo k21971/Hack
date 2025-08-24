@@ -177,3 +177,4 @@ linux-debug
 sha256sums
 SHA256SUMS
 *.sha256
+release-notes-v1.1.0.md
