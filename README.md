@@ -143,16 +143,9 @@ The original 1984 Hack source code was preserved in the FreeBSD games collection
 Our preservation methodology ensures authenticity:
 
 * **Automated retrieval**: [`docs/historical/original-source/download_hack.sh`](docs/historical/original-source/download_hack.sh)
-* **Verification**: SHA-256 checksums and cross-reference validation
+
 * **Documentation**: Complete chain of custody from 1984 → FreeBSD → restoHack
 * **Integrity**: Every original file preserved unchanged in `docs/historical/original-source/`
-
-#### **Preservation Standards**
-
-- **100% behavioral authenticity**: Every game mechanic functions exactly as in 1984
-* **Save file compatibility**: Original 1984 save files work in restoHack
-* **Statistical verification**: Random number sequences match the original precisely
-* **Cross-platform consistency**: Identical behavior on all supported systems
 
 #### **Modernization Documentation**
 
@@ -168,11 +161,10 @@ Every change from the original 1984 code is meticulously documented:
  */
 ```
 
-No original code is deleted—it's preserved in comments alongside modern equivalents.
-
 ### Historical Context
 
 Hack 1.0.3 represents:
+
 * **Andries Brouwer's masterpiece**: The mathematical peak of 1980s roguelike design
 * **The bridge**: Between Rogue's simplicity and NetHack's complexity
 * **Software archaeology**: A preserved artifact of computing history
