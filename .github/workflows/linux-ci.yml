@@ -107,10 +107,11 @@ jobs:
       run: |
         # Build with all security flags enabled
         cmake -B build-hardened -G Ninja \
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DCMAKE_BUILD_TYPE=Hardened \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fstack-protector-strong -D_FORTIFY_SOURCE=3 -Werror=format-security"
         
         cmake --build build-hardened --parallel
+        
 
 
