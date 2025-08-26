@@ -10,6 +10,7 @@
  */
 
 #include "hack.h"
+#include <limits.h>
 
 extern const char
     *nomovemsg; /* MODERN: const because assigned string literals */
@@ -115,7 +116,8 @@ void read_engr_at(int x, int y) {
     default:
       impossible("Something is written in a very strange way.", 0, 0);
     }
-    pline("You read: \"%s\".", ep->engr_txt);
+    /* MODERN: Safe format string - prevent format string attacks from save files */
+    pline("You read: \"%.*s\".", (int)strlen(ep->engr_txt), ep->engr_txt);
   }
 }
 
@@ -307,6 +309,12 @@ void save_engravings(int fd) {
       ep = ep->nxt_engr;
       continue;
     }
+    /* MODERN: Prevent integer overflow in write size calculation */
+    if (ep->engr_lth > UINT_MAX - sizeof(struct engr)) {
+      impossible("Engraving length overflow during save: %u", ep->engr_lth, 0);
+      ep = ep->nxt_engr;
+      continue;
+    }
     bwrite(fd, (char *)&(ep->engr_lth), sizeof(ep->engr_lth));
     bwrite(fd, (char *)ep, sizeof(struct engr) + ep->engr_lth);
     ep = ep->nxt_engr;
@@ -323,6 +331,10 @@ void rest_engravings(int fd) {
     mread(fd, (char *)&lth, sizeof(unsigned));
     if (lth == 0)
       return;
+    /* MODERN: Prevent integer overflow and limit engraving size */
+    if (lth > 32767 || lth > UINT_MAX - sizeof(struct engr)) {
+      error("Save file corrupted: invalid engraving size");
+    }
     ep = (struct engr *)alloc(sizeof(struct engr) + lth);
     mread(fd, (char *)ep, sizeof(struct engr) + lth);
     ep->nxt_engr = head_engr;

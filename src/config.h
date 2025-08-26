@@ -62,7 +62,7 @@
 #define DEF_MAILREADER _PATH_MAIL /* or e.g. /bin/mail */
 #define MAILCKFREQ 100
 
-#define SHELL /* do not delete the '!' command */
+/* #define SHELL */ /* SECURITY: Shell access disabled by default in 2025 builds */
 
 #ifdef BSD
 #define SUSPEND /* let ^Z suspend the game */
