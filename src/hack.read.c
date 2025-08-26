@@ -194,6 +194,8 @@ int doread(void) {
       do {
         pline("What monster do you want to genocide (Type the letter)? ");
         getlin(buf);
+        /* MODERN: Ensure null termination and prevent buffer overflow */
+        buf[BUFSZ - 1] = '\0';
       } while (strlen(buf) != 1 || !monstersym(*buf));
     if (!index(fut_geno, *buf))
       charcat(fut_geno, *buf);
@@ -430,7 +432,7 @@ int doread(void) {
     uball->spe = 1; /* special ball (see save) */
     break;
   default:
-    impossible("What weird language is this written in?", scroll->otyp, 0);
+    impossible("Unknown scroll type encountered: %d", scroll->otyp, 0); /* MODERN: Safe parameter usage */
   }
   if (!objects[scroll->otyp].oc_name_known) {
     if (known && !confused) {
@@ -459,9 +461,8 @@ void litroom(boolean on) {
     goto do_it;
   if (!on) {
     if (u.uswallow || !xdnstair ||
-        levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR ||
-        !levl[(unsigned char)u.ux][(unsigned char)u.uy]
-             .lit) { /* MODERN: Cast to unsigned char for safe array indexing */
+        ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR) ||
+        ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && !levl[(unsigned char)u.ux][(unsigned char)u.uy].lit)) { /* MODERN: Bounds check with unsigned cast */
       pline("It seems even darker in here than before.");
       return;
     } else
@@ -479,13 +480,10 @@ void litroom(boolean on) {
     pline("The cave lights up around you, then fades.");
     return;
 #else  /* QUEST */
-    if (levl[(unsigned char)u.ux][(unsigned char)u.uy].typ ==
-        CORR) { /* MODERN: Cast to unsigned char for safe array indexing */
+    if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR) { /* MODERN: Bounds check with unsigned cast */
       pline("The corridor lights up around you, then fades.");
       return;
-    } else if (levl[(unsigned char)u.ux][(unsigned char)u.uy]
-                   .lit) { /* MODERN: Cast to unsigned char for safe array
-                              indexing */
+    } else if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: Bounds check with unsigned cast */
       pline("The light here seems better now.");
       return;
     } else
@@ -497,37 +495,37 @@ do_it:
 #ifdef QUEST
   return;
 #else  /* QUEST */
-  if (levl[(unsigned char)u.ux][(unsigned char)u.uy].lit ==
-      on) /* MODERN: Cast to unsigned char for safe array indexing */
+  if ((unsigned char)u.ux >= COLNO || (unsigned char)u.uy >= ROWNO || levl[(unsigned char)u.ux][(unsigned char)u.uy].lit == on) /* MODERN: Bounds check with unsigned cast */
     return;
-  if (levl[(unsigned char)u.ux][(unsigned char)u.uy].typ ==
-      DOOR) { /* MODERN: Cast to unsigned char for safe array indexing */
-    if (IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy + 1)].typ))
-      zy = u.uy + 1; /* MODERN: Cast to unsigned char for safe array indexing */
-    else if (IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy - 1)].typ))
-      zy = u.uy - 1; /* MODERN: Cast to unsigned char for safe array indexing */
+  if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == DOOR) { /* MODERN: Bounds check with unsigned cast */
+    /* MODERN: Safe bounds checking with unsigned cast */
+    if ((unsigned char)u.uy < ROWNO - 1 && IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy + 1)].typ))
+      zy = u.uy + 1;
+    else if ((unsigned char)u.uy > 0 && IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy - 1)].typ))
+      zy = u.uy - 1;
     else
       zy = u.uy;
-    if (IS_ROOM(levl[(unsigned char)(u.ux + 1)][(unsigned char)u.uy].typ))
-      zx = u.ux + 1; /* MODERN: Cast to unsigned char for safe array indexing */
-    else if (IS_ROOM(levl[(unsigned char)(u.ux - 1)][(unsigned char)u.uy].typ))
-      zx = u.ux - 1; /* MODERN: Cast to unsigned char for safe array indexing */
+    if ((unsigned char)u.ux < COLNO - 1 && IS_ROOM(levl[(unsigned char)(u.ux + 1)][(unsigned char)u.uy].typ))
+      zx = u.ux + 1;
+    else if ((unsigned char)u.ux > 0 && IS_ROOM(levl[(unsigned char)(u.ux - 1)][(unsigned char)u.uy].typ))
+      zx = u.ux - 1;
     else
       zx = u.ux;
   } else {
     zx = u.ux;
     zy = u.uy;
   }
-  for (seelx = u.ux; (num = levl[seelx - 1][zy].typ) != CORR && num != 0;
+  /* MODERN: Safe array bounds checking to prevent negative/overflow indexing */
+  for (seelx = u.ux; seelx > 0 && (num = levl[seelx - 1][zy].typ) != CORR && num != 0;
        seelx--)
     ;
-  for (seehx = u.ux; (num = levl[seehx + 1][zy].typ) != CORR && num != 0;
+  for (seehx = u.ux; seehx < COLNO - 1 && (num = levl[seehx + 1][zy].typ) != CORR && num != 0;
        seehx++)
     ;
-  for (seely = u.uy; (num = levl[zx][seely - 1].typ) != CORR && num != 0;
+  for (seely = u.uy; seely > 0 && (num = levl[zx][seely - 1].typ) != CORR && num != 0;
        seely--)
     ;
-  for (seehy = u.uy; (num = levl[zx][seehy + 1].typ) != CORR && num != 0;
+  for (seehy = u.uy; seehy < ROWNO - 1 && (num = levl[zx][seehy + 1].typ) != CORR && num != 0;
        seehy++)
     ;
   for (zy = seely; zy <= seehy; zy++)

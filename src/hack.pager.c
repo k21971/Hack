@@ -334,7 +334,7 @@ int page_file(const char *fnam,
 
     if (fd < 0) {
       if (!silent)
-        pline("Cannot open %s.", fnam);
+        pline("Cannot open data file."); /* MODERN: Safe message without format string */
       return (0);
     }
     if (child(1)) {
@@ -346,11 +346,17 @@ int page_file(const char *fnam,
       (void)close(0);
       if (dup(fd)) {
         if (!silent)
-          printf("Cannot open %s as stdin.\n", fnam);
+          printf("Cannot open file as stdin.\n"); /* MODERN: Safe message without format string */
       } else {
-        execl(catmore, "page", (char *)0);
-        if (!silent)
-          printf("Cannot exec %s.\n", catmore);
+        /* MODERN: Command injection protection - validate pager path */
+        if (!catmore || catmore[0] != '/' || strstr(catmore, "..")) {
+          if (!silent)
+            printf("Invalid pager configuration.\n");
+        } else {
+          execl(catmore, "page", (char *)0);
+          if (!silent)
+            printf("Cannot exec pager.\n"); /* MODERN: Safe message without format string */
+        }
       }
       exit(1);
     }
@@ -365,7 +371,7 @@ int page_file(const char *fnam,
         home();
         perror(fnam);
         flags.toplin = 1;
-        pline("Cannot open %s.", fnam);
+        pline("Cannot open file."); /* MODERN: Safe message without format string */
       }
       return (0);
     }
@@ -381,7 +387,12 @@ int page_file(const char *fnam,
 int dosh(void) {
   char *str;
   if (child(0)) {
-    if ((str = getenv("SHELL")))
+    /* MODERN: Command injection protection - validate SHELL path */
+    str = getenv("SHELL");
+    if (str && (str[0] != '/' || strstr(str, ".."))) {
+      str = NULL; /* Reject relative or suspicious paths */
+    }
+    if (str)
       execl(str, str, (char *)0);
     else
       execl("/bin/sh", "sh", (char *)0);

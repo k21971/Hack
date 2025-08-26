@@ -21,6 +21,12 @@ void init_rumors(FILE *rumf) {
   while (skipline(rumf))
     n_rumors++;
   rewind(rumf);
+  /* MODERN: Prevent division by zero and integer overflow */
+  if (CHARSZ == 0 || n_rumors < 0) {
+    impossible("Invalid rumor system parameters: rumors=%d charsz=%d", n_rumors,
+               CHARSZ);
+    return;
+  }
   i = n_rumors / CHARSZ;
   usedbits = (char *)alloc((unsigned)(i + 1));
   for (; i >= 0; i--)
@@ -32,6 +38,8 @@ int skipline(FILE *rumf) {
   while (1) {
     if (!fgets(line, sizeof(line), rumf))
       return (0);
+    /* MODERN: Ensure null termination */
+    line[COLNO - 1] = '\0';
     if (index(line, '\n'))
       return (1);
   }
@@ -42,10 +50,13 @@ void outline(FILE *rumf) {
   char *ep;
   if (!fgets(line, sizeof(line), rumf))
     return;
+  /* MODERN: Ensure null termination and validate line length */
+  line[COLNO - 1] = '\0';
   if ((ep = index(line, '\n')) != 0)
     *ep = 0;
   pline("This cookie has a scrap of paper inside! It reads: ");
-  pline(line);
+  pline("%s",
+        line); /* MODERN: Safe format string - prevent format string attacks */
 }
 
 void outrumor(void) {
@@ -65,11 +76,28 @@ void outrumor(void) {
       rn--;
     i++;
   }
-  usedbits[i / CHARSZ] |= (1 << (i % CHARSZ));
-  n_used_rumors++;
+  /* MODERN: Bounds check before array access */
+  int byte_idx = i / CHARSZ;
+  int bit_idx = i % CHARSZ;
+  if (byte_idx >= 0 && byte_idx < (n_rumors / CHARSZ) + 1 && bit_idx >= 0 &&
+      bit_idx < CHARSZ) {
+    usedbits[byte_idx] |= (1 << bit_idx);
+    n_used_rumors++;
+  } else {
+    impossible("Rumor index out of bounds: i=%d byte_idx=%d", i, byte_idx);
+  }
   outline(rumf);
 none:
   (void)fclose(rumf);
 }
 
-int used(int i) { return (usedbits[i / CHARSZ] & (1 << (i % CHARSZ))); }
+int used(int i) {
+  /* MODERN: Bounds check before array access */
+  int byte_idx = i / CHARSZ;
+  int bit_idx = i % CHARSZ;
+  if (byte_idx >= 0 && byte_idx < (n_rumors / CHARSZ) + 1 && bit_idx >= 0 &&
+      bit_idx < CHARSZ) {
+    return (usedbits[byte_idx] & (1 << bit_idx));
+  }
+  return 0; /* Safe default for out-of-bounds access */
+}

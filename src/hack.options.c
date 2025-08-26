@@ -29,24 +29,48 @@ void initoptions(void) {
   flags.end_around = 4;
   flags.female = FALSE; /* players are usually male */
 
-  if ((opts = getenv("HACKOPTIONS")))
-    parseoptions(opts, TRUE);
+  if ((opts = getenv("HACKOPTIONS"))) {
+    /* MODERN: Validate environment variable length to prevent attacks */
+    if (strlen(opts) > 1024) {
+      pline("HACKOPTIONS too long (max 1024 chars) - ignoring.");
+    } else {
+      parseoptions(opts, TRUE);
+    }
+  }
 }
+
+/* MODERN: Track recursion depth to prevent stack overflow */
+static int parse_depth = 0;
+#define MAX_PARSE_DEPTH 50
 
 void parseoptions(char *opts, boolean from_env) {
   char *op, *op2;
   unsigned num;
   boolean negated;
 
+  /* MODERN: Prevent stack overflow from recursive parsing */
+  if (++parse_depth > MAX_PARSE_DEPTH) {
+    pline("Options parsing too deep - possible malformed input.");
+    parse_depth--;
+    return;
+  }
+
   if ((op = index(opts, ','))) {
     *op++ = 0;
     parseoptions(op, from_env);
   }
+  parse_depth--;
   if ((op = index(opts, ' '))) {
     op2 = op;
-    while (*op++)
-      if (*op != ' ')
+    /* MODERN: Safe space removal with bounds checking */
+    char *end = opts + strlen(opts);
+    while (op < end && *op) {
+      if (*op != ' ' && op2 < end) {
         *op2++ = *op;
+      }
+      op++;
+    }
+    if (op2 < end) *op2 = '\0'; /* Ensure null termination */
   }
   if (!*opts)
     return;
@@ -118,6 +142,7 @@ void parseoptions(char *opts, boolean from_env) {
     if (!op)
       goto bad;
     (void)strncpy(plname, op + 1, sizeof(plname) - 1);
+    plname[sizeof(plname) - 1] = '\0'; /* MODERN: Ensure null termination */
     return;
   }
 
@@ -131,6 +156,11 @@ void parseoptions(char *opts, boolean from_env) {
       num = 1;
       if (digit(*op)) {
         num = atoi(op);
+        /* MODERN: Validate numeric input to prevent integer overflow */
+        if (num > 9999) {
+          pline("Option value too large (max 9999): %u", num);
+          goto bad;
+        }
         while (digit(*op))
           op++;
       } else if (*op == '!') {
@@ -180,7 +210,7 @@ bad:
           "`endgame:own scores/5 top scores/4 around my score'.");
       return;
     }
-    pline("Bad option: %s.", opts);
+    pline("Bad option: %.50s.", opts); /* MODERN: Limit format string length to prevent attacks */
     pline("Type `o help<cr>' for help.");
     return;
   }
