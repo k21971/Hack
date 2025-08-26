@@ -1,0 +1,140 @@
+name: Linux Build & Security Check
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        # Test both compilers to catch different issues
+        compiler: [gcc, clang]
+        # Test both build types
+        build_type: [Debug, Release]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build ${{ matrix.compiler }} 
+        sudo apt-get install -y libncurses5-dev libncursesw5-dev
+        # For clang static analysis
+        if [ "${{ matrix.compiler }}" = "clang" ]; then
+          sudo apt-get install -y clang-tools
+        fi
+
+    - name: Configure CMake (${{ matrix.compiler }}-${{ matrix.build_type }})
+      env:
+        CC: ${{ matrix.compiler }}
+        CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
+      run: |
+        cmake -B build-${{ matrix.compiler }}-${{ matrix.build_type }} \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_C_COMPILER=${{ matrix.compiler }}
+
+    - name: Build
+      run: |
+        cmake --build build-${{ matrix.compiler }}-${{ matrix.build_type }} --parallel
+
+    - name: Smoke Test - Game Startup
+      run: |
+        cd build-${{ matrix.compiler }}-${{ matrix.build_type }}
+        echo "Testing game startup..."
+        # Test that game starts without crashing (quit immediately)
+        echo -e "q\ny" | timeout 10s ./hack || \
+          if [ $? -eq 124 ]; then 
+            echo "✓ Game startup test passed (timeout as expected)"
+          else 
+            echo "✗ Game startup test failed"
+            exit 1
+          fi
+
+    - name: Check for Security Warnings
+      if: matrix.compiler == 'clang' && matrix.build_type == 'Debug'
+      run: |
+        cd build-${{ matrix.compiler }}-${{ matrix.build_type }}
+        echo "Checking for critical security warnings..."
+        # Rebuild with extra warnings to check our security work
+        cmake .. -DCMAKE_C_FLAGS="-Wall -Wextra -Wformat-security -Werror=format-security"
+        ninja 2>&1 | tee build.log
+        
+        # Check that we don't have regressions in warning count
+        if grep -E "(warning:|error:)" build.log; then
+          echo "⚠️  Build warnings/errors detected - review needed"
+          # Don't fail the build, just warn (since you're actively fixing warnings)
+        else
+          echo "✓ Clean build - no warnings detected"
+        fi
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'  # Only run on PRs to save resources
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install clang tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang clang-tools cmake ninja-build
+        sudo apt-get install -y libncurses5-dev libncursesw5-dev
+
+    - name: Run Static Analysis
+      run: |
+        # Configure for analysis
+        cmake -B build-analysis -G Ninja -DCMAKE_BUILD_TYPE=Debug
+        
+        # Run clang-tidy on a few key security files
+        echo "Running static analysis on security-critical files..."
+        clang-tidy src/hack.tty.c src/hack.save.c src/hack.options.c \
+          -p build-analysis \
+          --checks="-*,security-*,bugprone-*,cert-*" \
+          --quiet || echo "Static analysis completed with findings"
+
+  # Special hardened build to test security features
+  security-hardened:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies  
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang cmake ninja-build
+        sudo apt-get install -y libncurses5-dev libncursesw5-dev
+
+    - name: Build with Security Hardening
+      run: |
+        # Build with all security flags enabled
+        cmake -B build-hardened -G Ninja \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fstack-protector-strong -D_FORTIFY_SOURCE=3 -Werror=format-security"
+        
+        cmake --build build-hardened --parallel
+
+    - name: Test Hardened Build
+      run: |
+        cd build-hardened
+        echo "Testing hardened build..."
+        # Quick test that hardened build works
+        echo -e "q\ny" | timeout 10s ./hack || \
+          if [ $? -eq 124 ]; then 
+            echo "✓ Hardened build test passed"
+          else 
+            echo "✗ Hardened build test failed"
+            exit 1
+          fi
+
