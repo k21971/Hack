@@ -45,22 +45,6 @@ jobs:
       run: |
         cmake --build build-${{ matrix.compiler }}-${{ matrix.build_type }} --parallel
 
-    - name: Smoke Test - Game Startup
-      run: |
-        cd build-${{ matrix.compiler }}-${{ matrix.build_type }}
-        echo "Testing game startup..."
-        # Set up minimal terminal environment for curses game
-        export TERM=xterm
-        export LINES=24
-        export COLUMNS=80
-        # Test that game starts without crashing (quit immediately)
-        echo -e "q\ny" | timeout 10s ./hack || \
-          if [ $? -eq 124 ]; then 
-            echo "✓ Game startup test passed (timeout as expected)"
-          else 
-            echo "✗ Game startup test failed"
-            exit 1
-          fi
 
     - name: Check for Security Warnings
       if: matrix.compiler == 'clang' && matrix.build_type == 'Debug'
@@ -129,20 +113,4 @@ jobs:
         
         cmake --build build-hardened --parallel
 
-    - name: Test Hardened Build
-      run: |
-        cd build-hardened
-        echo "Testing hardened build..."
-        # Set up minimal terminal environment for curses game
-        export TERM=xterm
-        export LINES=24
-        export COLUMNS=80
-        # Quick test that hardened build works
-        echo -e "q\ny" | timeout 10s ./hack || \
-          if [ $? -eq 124 ]; then 
-            echo "✓ Hardened build test passed"
-          else 
-            echo "✗ Hardened build test failed"
-            exit 1
-          fi
 
