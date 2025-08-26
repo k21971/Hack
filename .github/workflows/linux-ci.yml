@@ -49,6 +49,10 @@ jobs:
       run: |
         cd build-${{ matrix.compiler }}-${{ matrix.build_type }}
         echo "Testing game startup..."
+        # Set up minimal terminal environment for curses game
+        export TERM=xterm
+        export LINES=24
+        export COLUMNS=80
         # Test that game starts without crashing (quit immediately)
         echo -e "q\ny" | timeout 10s ./hack || \
           if [ $? -eq 124 ]; then 
@@ -129,6 +133,10 @@ jobs:
       run: |
         cd build-hardened
         echo "Testing hardened build..."
+        # Set up minimal terminal environment for curses game
+        export TERM=xterm
+        export LINES=24
+        export COLUMNS=80
         # Quick test that hardened build works
         echo -e "q\ny" | timeout 10s ./hack || \
           if [ $? -eq 124 ]; then 
