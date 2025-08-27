@@ -234,8 +234,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (argc > 1)
+  if (argc > 1) {
     locknum = atoi(argv[1]);
+    if (locknum < 0) locknum = 0; /* MODERN: prevent negative values */
+  }
 #ifdef MAX_NR_OF_PLAYERS
   if (!locknum || locknum > MAX_NR_OF_PLAYERS)
     locknum = MAX_NR_OF_PLAYERS;
@@ -509,15 +511,15 @@ void askname(void) {
       error("End of input\n");
     /* some people get confused when their erase char is not ^H */
     if (c == '\010') {
-      if (ct)
+      if (ct > 0)
         ct--;
       continue;
     }
     if (c != '-')
       if (c < 'A' || (c > 'Z' && c < 'a') || c > 'z')
         c = '_';
-    if (ct < (int)sizeof(plname) - 1)
-      plname[ct++] = c; /* MODERN: Cast to int to match ct type */
+    if (ct >= 0 && ct < (int)sizeof(plname) - 1) /* MODERN: prevent integer overflow */
+      plname[ct++] = c;
   }
   plname[ct] = 0;
   if (ct == 0)
@@ -576,7 +578,7 @@ static void chdirx(const char *dir,
 
   if (dir && chdir(dir) < 0) {
     perror(dir);
-    error("Cannot chdir to %s.", dir);
+    error("Cannot chdir to game directory."); /* MODERN: safe message prevents format string attack */
   }
 
   /* warn the player if he cannot write the record file */
