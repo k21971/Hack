@@ -426,10 +426,17 @@ int pickup(int all) {
 
       if (!all) {
         char c;
+        int retries = 0;
 
         pline("Pick up %s ? [ynaq]", doname(obj));
-        while (!index("ynaq ", (c = readchar())))
+        while (!index("ynaq ", (c = readchar()))) {
+          if (++retries > 100) { /* MODERN: prevent DoS via infinite input loop */
+            pline("Too many invalid inputs - assuming 'no'.");
+            c = 'n';
+            break;
+          }
           bell();
+        }
         if (c == 'q')
           return (0);
         if (c == 'n')
@@ -545,6 +552,8 @@ void lookaround(void) {
     for (y = u.uy - 1; y <= u.uy + 1; y++) {
       if (x == u.ux && y == u.uy)
         continue;
+      if (!isok(x, y)) /* MODERN: bounds check prevents OOB access at map edges */
+        continue;
       if (!levl[x][y].typ)
         continue;
       if ((mtmp = m_at(x, y)) && !mtmp->mimic &&
@@ -643,6 +652,8 @@ int monster_nearby(void) {
       for (y = u.uy - 1; y <= u.uy + 1; y++) {
         if (x == u.ux && y == u.uy)
           continue;
+        if (!isok(x, y)) /* MODERN: bounds check prevents OOB access */
+          continue;
         if ((mtmp = m_at(x, y)) && !mtmp->mimic && !mtmp->mtame &&
             !mtmp->mpeaceful && !index("Ea", mtmp->data->mlet) &&
             !mtmp->mfroz && !mtmp->msleep && /* aplvax!jcn */
@@ -695,7 +706,11 @@ int cansee(int x, int y) {
   }
 }
 
-int rroom(int x, int y) { return (IS_ROOM(levl[u.ux + x][u.uy + y].typ)); }
+int rroom(int x, int y) { 
+  int abs_x = u.ux + x, abs_y = u.uy + y;
+  if (!isok(abs_x, abs_y)) return 0; /* MODERN: bounds check prevents coordinate overflow */
+  return (IS_ROOM(levl[abs_x][abs_y].typ)); 
+}
 
 #else
 
