@@ -93,7 +93,7 @@ int cursed(struct obj *otmp) {
 }
 
 int armoroff(struct obj *otmp) {
-  int delay = -objects[otmp->otyp].oc_delay;
+  int delay = (otmp->otyp < NROFOBJECTS) ? -objects[otmp->otyp].oc_delay : 0; /* MODERN: bounds check prevents OOB access to objects[] array */
   if (cursed(otmp))
     return (0);
   setworn((struct obj *)0, otmp->owornmask & W_ARMOR);
@@ -169,7 +169,7 @@ int doweararm(void) {
   setworn(otmp, mask);
   if (otmp == uwep)
     setuwep((struct obj *)0);
-  delay = -objects[otmp->otyp].oc_delay;
+  delay = (otmp->otyp < NROFOBJECTS) ? -objects[otmp->otyp].oc_delay : 0; /* MODERN: bounds check prevents OOB access to objects[] array */
   if (delay) {
     nomul(delay);
     nomovemsg = "You finished your dressing manoeuvre.";
@@ -227,6 +227,7 @@ int dowearring(void) {
   setworn(otmp, mask);
   if (otmp == uwep)
     setuwep((struct obj *)0);
+  if (PROP(otmp->otyp) >= LAST_RING + 10) return (0); /* MODERN: bounds check prevents OOB access to uprops[] array */
   oldprop = u.uprops[PROP(otmp->otyp)].p_flgs;
   u.uprops[PROP(otmp->otyp)].p_flgs |= mask;
   switch (otmp->otyp) {
@@ -258,6 +259,7 @@ void ringoff(struct obj *obj) {
   long mask;
   mask = obj->owornmask & W_RING;
   setworn((struct obj *)0, obj->owornmask);
+  if (PROP(obj->otyp) >= LAST_RING + 10) return; /* MODERN: bounds check prevents OOB access to uprops[] array */
   if (!(u.uprops[PROP(obj->otyp)].p_flgs & mask))
     impossible("Strange... I didnt know you had that ring.", 0, 0);
   u.uprops[PROP(obj->otyp)].p_flgs &= ~mask;

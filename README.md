@@ -9,7 +9,7 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 **Philosophy**: "Fix what breaks, preserve what works" - authentic 1984 gameplay with modern build system and safety improvements.
 
-📜 **[Read the Complete History of Hack →](docs/HISTORY_OF_HACK.md)**  
+**[Read the Complete History of Hack →](docs/HISTORY_OF_HACK.md)**  
 *From Rogue (1980) to NetHack's rise, through decades of digital decay, to restoHack's 2025 resurrection*
 
 ---

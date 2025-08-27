@@ -85,15 +85,20 @@ gottype:
   if (i < 0) { /* shoptype not yet determined */
     int j;
 
-    for (j = rn2(100), i = 0; (j -= shprobs[i]) >= 0; i++)
+    for (j = rn2(100), i = 0; (j -= shprobs[i]) >= 0 && i < 7; i++) /* MODERN: bounds check prevents OOB access to shtypes[] array */
       if (!shtypes[i])
         break; /* superfluous */
     if (isbig(sroom) && i + SHOPBASE == WANDSHOP)
       i = GENERAL - SHOPBASE;
   }
   sroom->rtype = i + SHOPBASE;
-  let = shtypes[i];
+  if (i >= 0 && i < 8) { /* MODERN: bounds check prevents OOB access to shtypes[] array */
+    let = shtypes[i];
+  } else {
+    let = '?'; /* safe fallback */
+  }
   sh = sroom->fdoor;
+  if (sh < 0 || sh >= DOORMAX) return; /* MODERN: bounds check prevents OOB access to doors[] array */
   sx = doors[sh].x;
   sy = doors[sh].y;
   if (sx == sroom->lx - 1)
@@ -116,7 +121,8 @@ gottype:
             sroom->hy);
       pline("doormax=%d doorct=%d fdoor=%d", doorindex, sroom->doorct, sh);
       while (j--) {
-        pline("door [%d,%d]", doors[sh].x, doors[sh].y);
+        if (sh >= 0 && sh < DOORMAX) /* MODERN: bounds check prevents OOB access to doors[] array */
+          pline("door [%d,%d]", doors[sh].x, doors[sh].y);
         sh++;
       }
       more();
@@ -131,7 +137,8 @@ gottype:
   shk->mtrapseen = ~0; /* we know all the traps already */
   ESHK->shoproom = roomno;
   ESHK->shoplevel = dlevel;
-  ESHK->shd = doors[sh];
+  if (sh >= 0 && sh < DOORMAX) /* MODERN: bounds check prevents OOB access to doors[] array */
+    ESHK->shd = doors[sh];
   ESHK->shk.x = sx;
   ESHK->shk.y = sy;
   ESHK->robbed = 0;
@@ -143,10 +150,11 @@ gottype:
   for (sx = sroom->lx; sx <= sroom->hx; sx++)
     for (sy = sroom->ly; sy <= sroom->hy; sy++) {
       struct monst *mtmp;
-      if ((sx == sroom->lx && doors[sh].x == sx - 1) ||
-          (sx == sroom->hx && doors[sh].x == sx + 1) ||
-          (sy == sroom->ly && doors[sh].y == sy - 1) ||
-          (sy == sroom->hy && doors[sh].y == sy + 1))
+      if (sh >= 0 && sh < DOORMAX && /* MODERN: bounds check prevents OOB access to doors[] array */
+          ((sx == sroom->lx && doors[sh].x == sx - 1) ||
+           (sx == sroom->hx && doors[sh].x == sx + 1) ||
+           (sy == sroom->ly && doors[sh].y == sy - 1) ||
+           (sy == sroom->hy && doors[sh].y == sy + 1)))
         continue;
       if (rn2(100) < dlevel && !m_at(sx, sy) &&
           (mtmp = makemon(PM_MIMIC, sx, sy))) {
@@ -185,10 +193,11 @@ void mkzoo(int type) {
   sh = sroom->fdoor;
   for (sx = sroom->lx; sx <= sroom->hx; sx++)
     for (sy = sroom->ly; sy <= sroom->hy; sy++) {
-      if ((sx == sroom->lx && doors[sh].x == sx - 1) ||
-          (sx == sroom->hx && doors[sh].x == sx + 1) ||
-          (sy == sroom->ly && doors[sh].y == sy - 1) ||
-          (sy == sroom->hy && doors[sh].y == sy + 1))
+      if (sh >= 0 && sh < DOORMAX && /* MODERN: bounds check prevents OOB access to doors[] array */
+          ((sx == sroom->lx && doors[sh].x == sx - 1) ||
+           (sx == sroom->hx && doors[sh].x == sx + 1) ||
+           (sy == sroom->ly && doors[sh].y == sy - 1) ||
+           (sy == sroom->hy && doors[sh].y == sy + 1)))
         continue;
       mon = makemon((type == MORGUE)    ? morguemon()
                     : (type == BEEHIVE) ? PM_KILLER_BEE
@@ -198,7 +207,10 @@ void mkzoo(int type) {
         mon->msleep = 1;
       switch (type) {
       case ZOO:
-        i = sq(dist2(sx, sy, doors[sh].x, doors[sh].y));
+        if (sh >= 0 && sh < DOORMAX) /* MODERN: bounds check prevents OOB access to doors[] array */
+          i = sq(dist2(sx, sy, doors[sh].x, doors[sh].y));
+        else
+          i = 50; /* safe fallback distance */
         if (i >= goldlim)
           i = 5 * dlevel;
         goldlim -= i;
@@ -247,7 +259,7 @@ void mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
       for (sy = sroom->ly; sy <= sroom->hy; sy++)
         if ((sx + sy) % 2 && !o_at(sx, sy) && !t_at(sx, sy) && !m_at(sx, sy) &&
-            !nexttodoor(sx, sy)) {
+            !nexttodoor(sx, sy) && isok(sx, sy)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
           levl[sx][sy].typ = POOL;
           levl[sx][sy].scrsym = POOL_SYM;
           if (!eelct || !rn2(4)) {
@@ -263,8 +275,9 @@ int nexttodoor(int sx, int sy) {
   struct rm *lev;
   for (dx = -1; dx <= 1; dx++)
     for (dy = -1; dy <= 1; dy++)
-      if ((lev = &levl[sx + dx][sy + dy])->typ == DOOR || lev->typ == SDOOR ||
-          lev->typ == LDOOR)
+      if (isok(sx + dx, sy + dy) && /* MODERN: bounds check prevents OOB access to levl[][] array */
+          ((lev = &levl[sx + dx][sy + dy])->typ == DOOR || lev->typ == SDOOR ||
+           lev->typ == LDOOR))
         return (1);
   return (0);
 }

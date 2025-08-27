@@ -61,6 +61,8 @@ struct monst *makemon(struct permonst *ptr, int x, int y) {
     if (tmp >= ct)
       tmp = rn1(ct - ct / 2, ct / 2);
     for (ct = 0; ct < CMNUM; ct++) {
+      if (ct >= CMNUM)
+        break; /* MODERN: bounds check prevents OOB access to mons[] array */
       ptr = &mons[ct];
       if (index(fut_geno, ptr->mlet))
         continue;
@@ -107,7 +109,14 @@ gotmon:
   }
   if (ptr->mlet == ':') {
     mtmp->cham = 1;
-    (void)newcham(mtmp, &mons[dlevel + 14 + rn2(CMNUM - 14 - dlevel)]);
+    {
+      int idx = dlevel + 14 + rn2(CMNUM - 14 - dlevel);
+      if (idx >= 0 && idx < CMNUM) /* MODERN: bounds check prevents OOB access
+                                      to mons[] array */
+        (void)newcham(mtmp, &mons[idx]);
+      else
+        (void)newcham(mtmp, &mons[rn2(CMNUM)]); /* safe fallback */
+    }
   }
   if (ptr->mlet == 'I' || ptr->mlet == ';')
     mtmp->minvis = 1;
@@ -214,6 +223,8 @@ struct monst *mkmon_at(char let, int x, int y) {
   struct permonst *ptr;
 
   for (ct = 0; ct < CMNUM; ct++) {
+    if (ct >= CMNUM)
+      break; /* MODERN: bounds check prevents OOB access to mons[] array */
     ptr = &mons[ct];
     if (ptr->mlet == let)
       return (makemon(ptr, x, y));

@@ -35,6 +35,7 @@ void makemaz(void) {
     zy = 2 * (ROWNO / 4) - 1;
     for (x = zx - 2; x < zx + 4; x++)
       for (y = zy - 2; y <= zy + 2; y++) {
+        if (!isok(x, y)) continue; /* MODERN: bounds check prevents OOB access to levl[][] array */
         levl[x][y].typ =
             (y == zy - 2 || y == zy + 2 || x == zx - 2 || x == zx + 3)   ? POOL
             : (y == zy - 1 || y == zy + 1 || x == zx - 1 || x == zx + 2) ? HWALL
@@ -90,14 +91,19 @@ void makemaz(void) {
   for (x = rn1(6, 7); x; x--)
     mktrap(0, 1, (struct mkroom *)0);
   mm = mazexy();
-  levl[(xupstair = mm.x)][(yupstair = mm.y)].scrsym = '<';
-  levl[xupstair][yupstair].typ = STAIRS;
+  if (isok(mm.x, mm.y)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
+    xupstair = mm.x;
+    yupstair = mm.y;
+    levl[xupstair][yupstair].scrsym = '<';
+    levl[xupstair][yupstair].typ = STAIRS;
+  }
   xdnstair = ydnstair = 0;
 }
 
 void walkfrom(int x, int y) {
   int q, a, dir;
   int dirs[4];
+  if (!isok(x, y)) return; /* MODERN: bounds check prevents OOB access to levl[][] array */
   levl[x][y].typ = ROOM;
   while (1) {
     q = 0;
@@ -108,6 +114,7 @@ void walkfrom(int x, int y) {
       return;
     dir = dirs[rn2(q)];
     move(&x, &y, dir);
+    if (!isok(x, y)) return; /* MODERN: bounds check prevents OOB access to levl[][] array */
     levl[x][y].typ = ROOM;
     move(&x, &y, dir);
     walkfrom(x, y);
