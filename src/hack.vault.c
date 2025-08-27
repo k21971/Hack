@@ -50,6 +50,7 @@ static void restfakecorr(void) {
   struct rm *crm;
 
   while ((fcbeg = EGD->fcbeg) < EGD->fcend) {
+    if (fcbeg < 0 || fcbeg >= FCSIZ) break; /* MODERN: bounds check prevents OOB access to fakecorr[] array */
     fcx = EGD->fakecorr[fcbeg].fx;
     fcy = EGD->fakecorr[fcbeg].fy;
     if ((u.ux == fcx && u.uy == fcy) || cansee(fcx, fcy) || m_at(fcx, fcy))
@@ -69,9 +70,11 @@ static void restfakecorr(void) {
 static int goldincorridor(void) {
   int fci;
 
-  for (fci = EGD->fcbeg; fci < EGD->fcend; fci++)
+  for (fci = EGD->fcbeg; fci < EGD->fcend; fci++) {
+    if (fci < 0 || fci >= FCSIZ) break; /* MODERN: bounds check prevents OOB access to fakecorr[] array */
     if (g_at(EGD->fakecorr[fci].fx, EGD->fakecorr[fci].fy))
       return (1);
+  }
   return (0);
 }
 
@@ -88,7 +91,7 @@ void setgd(void) {
 
 void invault(void) {
   int tmp = inroom(u.ux, u.uy);
-  if (tmp < 0 || rooms[tmp].rtype != VAULT) {
+  if (tmp < 0 || tmp >= MAXNROFROOMS || rooms[tmp].rtype != VAULT) { /* MODERN: bounds check prevents OOB access to rooms[] array */
     u.uinvault = 0;
     return;
   }
@@ -99,12 +102,12 @@ void invault(void) {
     /* first find the goal for the guard */
     for (dd = 1; (dd < ROWNO || dd < COLNO); dd++) {
       for (y = u.uy - dd; y <= u.uy + dd; y++) {
-        if (y < 0 || y > ROWNO - 1)
+        if (y < 0 || y >= ROWNO) /* MODERN: simplified bounds check */
           continue;
         for (x = u.ux - dd; x <= u.ux + dd; x++) {
           if (y != u.uy - dd && y != u.uy + dd && x != u.ux - dd)
             x = u.ux + dd;
-          if (x < 0 || x > COLNO - 1)
+          if (x < 0 || x >= COLNO) /* MODERN: simplified bounds check */
             continue;
           if (levl[x][y].typ == CORR)
             goto fnd;
@@ -200,10 +203,12 @@ int gd_move(void) {
           if (isok(nx, ny))
             if (!IS_WALL(typ = (crm = &levl[nx][ny])->typ) && typ != POOL) {
               int i;
-              for (i = EGD->fcbeg; i < EGD->fcend; i++)
+              for (i = EGD->fcbeg; i < EGD->fcend; i++) {
+                if (i < 0 || i >= FCSIZ) break; /* MODERN: bounds check prevents OOB access to fakecorr[] array */
                 if (EGD->fakecorr[i].fx == nx && EGD->fakecorr[i].fy == ny)
                   goto nextnxy;
-              if ((i = inroom(nx, ny)) >= 0 && rooms[i].rtype == VAULT)
+              }
+              if ((i = inroom(nx, ny)) >= 0 && i < MAXNROFROOMS && rooms[i].rtype == VAULT) /* MODERN: bounds check prevents OOB access to rooms[] array */
                 goto nextnxy;
               /* seems we found a good place to leave him alone */
               EGD->gddone = 1;
@@ -228,8 +233,8 @@ int gd_move(void) {
   while ((typ = (crm = &levl[nx][ny])->typ) != 0) {
     /* in view of the above we must have IS_WALL(typ) or typ == POOL */
     /* must be a wall here */
-    if (isok(nx + nx - x, ny + ny - y) && typ != POOL &&
-        ZAP_POS(levl[nx + nx - x][ny + ny - y].typ)) {
+    int nx2 = nx + nx - x, ny2 = ny + ny - y; /* MODERN: calculate once for bounds check */
+    if (isok(nx2, ny2) && typ != POOL && ZAP_POS(levl[nx2][ny2].typ)) {
       crm->typ = DOOR;
       goto proceed;
     }
@@ -255,8 +260,12 @@ proceed:
     prl(nx, ny);
   }
   fcp = &(EGD->fakecorr[EGD->fcend]);
-  if (EGD->fcend++ == FCSIZ)
-    panic("fakecorr overflow");
+  if (EGD->fcend >= FCSIZ) { /* MODERN: bounds check prevents buffer overflow */
+    impossible("Fakecorr array full", EGD->fcend, FCSIZ);
+    EGD->gddone = 1; /* End guard escort to prevent crash */
+    return (0);
+  }
+  EGD->fcend++;
   fcp->fx = nx;
   fcp->fy = ny;
   fcp->ftyp = typ;
