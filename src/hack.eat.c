@@ -328,7 +328,7 @@ void lesshungry(int num) {
 }
 
 int unfaint(void) {
-  u.uhs = FAINTING;
+  u.uhs = FAINTING; /* within valid bounds (4) */
   flags.botl = 1;
   return 0;
 }
@@ -354,7 +354,7 @@ void newuhs(boolean incr) {
         newhs = FAINTED;
       }
     } else if (u.uhunger < -(int)(200 + 25 * u.ulevel)) {
-      u.uhs = STARVED;
+      u.uhs = STARVED; /* within valid bounds (6) */
       flags.botl = 1;
       bot();
       pline("You die from starvation.");
@@ -379,7 +379,12 @@ void newuhs(boolean incr) {
                                : "You are beginning to feel weak.");
       break;
     }
-    u.uhs = newhs;
+    /* MODERN: bounds check prevents array access violation in display code */
+    if (newhs >= 0 && newhs <= STARVED) {
+      u.uhs = newhs;
+    } else {
+      u.uhs = NOT_HUNGRY; /* safe fallback */
+    }
     flags.botl = 1;
     if (u.uhp < 1) {
       pline("You die from hunger and exhaustion.");

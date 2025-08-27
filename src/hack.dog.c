@@ -333,10 +333,18 @@ int dog_move(struct monst *mtmp, int after) {
         niy = ny;
         chi = i;
       eatobj:
-        edog->eattime = moves + obj->quan * objects[obj->otyp].oc_delay;
-        if (edog->hungrytime < moves)
-          edog->hungrytime = moves;
-        edog->hungrytime += 5 * obj->quan * objects[obj->otyp].nutrition;
+        if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+          edog->eattime = moves + obj->quan * objects[obj->otyp].oc_delay;
+          if (edog->hungrytime < moves)
+            edog->hungrytime = moves;
+          edog->hungrytime += 5 * obj->quan * objects[obj->otyp].nutrition;
+        } else {
+          /* Fallback for invalid object type */
+          edog->eattime = moves + obj->quan * 10; /* reasonable delay */
+          if (edog->hungrytime < moves)
+            edog->hungrytime = moves;
+          edog->hungrytime += 5 * obj->quan * 50; /* basic nutrition */
+        }
         mtmp->mconf = 0;
         if (cansee(nix, niy))
           pline("%s ate %s.", Monnam(mtmp), doname(obj));
@@ -422,7 +430,11 @@ int tamedog(struct monst *mtmp, struct obj *obj) {
     if (dogfood(obj) >= MANFOOD)
       return (0);
     if (cansee(mtmp->mx, mtmp->my)) {
-      pline("%s devours the %s.", Monnam(mtmp), objects[obj->otyp].oc_name);
+      if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+        pline("%s devours the %s.", Monnam(mtmp), objects[obj->otyp].oc_name);
+      } else {
+        pline("%s devours something.", Monnam(mtmp)); /* safe fallback */
+      }
     }
     obfree(obj, (struct obj *)0);
   }

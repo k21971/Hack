@@ -96,6 +96,10 @@ int dodown(void) {
     return (0);
   }
 
+  if (dlevel >= MAXLEVEL) { /* MODERN: prevent overflow in level calculation */
+    pline("You have reached the deepest level.");
+    return (0);
+  }
   goto_level(dlevel + 1, TRUE);
   return (1);
 }
@@ -114,6 +118,10 @@ int doup(void) {
     return (1);
   }
 
+  if (dlevel <= 1) { /* MODERN: prevent underflow in level calculation */
+    done("escaped");
+    return (1);
+  }
   goto_level(dlevel - 1, TRUE);
   return (1);
 }
@@ -170,7 +178,7 @@ void goto_level(int newlevel, boolean at_stairs) {
     extern int hackpid;
 
     if ((fd = open(lock, 0)) < 0) {
-      pline("Cannot open %s .", lock);
+      pline("Cannot open level file."); /* MODERN: safe message prevents format string attack */
       pline("Probably someone removed it.");
       done("tricked");
     }

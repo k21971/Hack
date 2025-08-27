@@ -48,7 +48,7 @@ int bhitm(struct monst *mtmp, struct obj *otmp) {
     }
     break;
   case WAN_POLYMORPH:
-    if (newcham(mtmp, &mons[rn2(CMNUM)]))
+    if (newcham(mtmp, &mons[rn2(CMNUM)]) && otmp->otyp < NROFOBJECTS) /* MODERN: bounds check prevents OOB access to objects[] array */
       objects[otmp->otyp].oc_name_known = 1;
     break;
   case WAN_CANCELLATION:
@@ -136,10 +136,10 @@ int dozap(void) {
   }
   if (obj->spe == 0)
     pline("You wrest one more spell from the worn-out wand.");
-  if (!(objects[obj->otyp].bits & NODIR) && !getdir(1))
+  if (obj->otyp < NROFOBJECTS && !(objects[obj->otyp].bits & NODIR) && !getdir(1)) /* MODERN: bounds check prevents OOB access to objects[] array */
     return (1); /* make him pay for knowing !NODIR */
   obj->spe--;
-  if (objects[obj->otyp].bits & IMMEDIATE) {
+  if (obj->otyp < NROFOBJECTS && (objects[obj->otyp].bits & IMMEDIATE)) { /* MODERN: bounds check prevents OOB access to objects[] array */
     if (u.uswallow)
       bhitm(u.ustuck, obj);
     else if (u.dz) {
@@ -256,7 +256,7 @@ int dozap(void) {
       buzz((int)obj->otyp - WAN_MAGIC_MISSILE, u.ux, u.uy, u.dx, u.dy);
       break;
     }
-    if (!objects[obj->otyp].oc_name_known) {
+    if (obj->otyp < NROFOBJECTS && !objects[obj->otyp].oc_name_known) { /* MODERN: bounds check prevents OOB access to objects[] array */
       objects[obj->otyp].oc_name_known = 1;
       more_experienced(0, 10);
     }
@@ -418,8 +418,7 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
   int abstype = abs(type);
   const char *fltxt = (type == -1)
                           ? "blaze of fire"
-                          : fl[abstype]; /* MODERN: const because reads from
-                                            fl[] array or string literal */
+                          : (abstype < SIZE(fl) ? fl[abstype] : "energy"); /* MODERN: bounds check prevents OOB access to fl[] array */
   struct rm *lev;
   xchar range;
   struct monst *mon;

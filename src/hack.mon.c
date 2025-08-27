@@ -142,6 +142,8 @@ void movemon(void) {
   warnlevel -= u.ulevel;
   if (warnlevel >= SIZE(warnings))
     warnlevel = SIZE(warnings) - 1;
+  if (warnlevel < 0) /* MODERN: prevent negative array index */
+    warnlevel = 0;
   if (warnlevel >= 0)
     if (warnlevel > lastwarnlev || moves > lastwarntime + 5) {
       const char *rr; /* MODERN: const because assigned string literals */

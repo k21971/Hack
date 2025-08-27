@@ -17,7 +17,7 @@ int dodrink(void) {
   otmp = getobj("!", "drink");
   if (!otmp)
     return (0);
-  if (!strcmp(objects[otmp->otyp].oc_descr, "smoky") && !rn2(13)) {
+  if (otmp->otyp < NROFOBJECTS && !strcmp(objects[otmp->otyp].oc_descr, "smoky") && !rn2(13)) { /* MODERN: bounds check prevents OOB access */
     ghost_from_bottle();
     goto use_it;
   }
@@ -188,7 +188,7 @@ int dodrink(void) {
     unkn++;
     pline("You have a peculiar feeling for a moment, then it passes.");
   }
-  if (otmp->dknown && !objects[otmp->otyp].oc_name_known) {
+  if (otmp->dknown && otmp->otyp < NROFOBJECTS && !objects[otmp->otyp].oc_name_known) { /* MODERN: bounds check prevents OOB access */
     if (!unkn) {
       objects[otmp->otyp].oc_name_known = 1;
       more_experienced(0, 10);
@@ -221,7 +221,7 @@ void strange_feeling(struct obj *obj, const char *txt) {
     pline("You have a strange feeling for a moment, then it passes.");
   else
     pline(txt);
-  if (!objects[obj->otyp].oc_name_known && !objects[obj->otyp].oc_uname)
+  if (obj->otyp < NROFOBJECTS && !objects[obj->otyp].oc_name_known && !objects[obj->otyp].oc_uname) /* MODERN: bounds check prevents OOB access */
     docall(obj);
   useup(obj);
 }

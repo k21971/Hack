@@ -166,13 +166,21 @@ boolean hmon(struct monst *mon, struct obj *obj,
       tmp = rnd(2);
     else {
       if (index(mlarge, mon->data->mlet)) {
-        tmp = rnd(objects[obj->otyp].wldam);
+        if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+          tmp = rnd(objects[obj->otyp].wldam);
+        } else {
+          tmp = rnd(6); /* fallback damage for invalid object type */
+        }
         if (obj->otyp == TWO_HANDED_SWORD)
           tmp += d(2, 6);
         else if (obj->otyp == FLAIL)
           tmp += rnd(4);
       } else {
-        tmp = rnd(objects[obj->otyp].wsdam);
+        if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+          tmp = rnd(objects[obj->otyp].wsdam);
+        } else {
+          tmp = rnd(4); /* fallback damage for invalid object type */
+        }
       }
       tmp += obj->spe;
       if (!thrown && obj == uwep && obj->otyp == BOOMERANG && !rn2(3)) {
@@ -185,7 +193,7 @@ boolean hmon(struct monst *mon, struct obj *obj,
       }
     }
     if (mon->data->mlet == 'O' && obj->otyp == TWO_HANDED_SWORD &&
-        !strcmp(ONAME(obj), "Orcrist"))
+        obj->onamelth && !strcmp(ONAME(obj), "Orcrist")) /* MODERN: check onamelth instead of array address */
       tmp += rnd(10);
   } else
     switch (obj->otyp) {
@@ -288,15 +296,19 @@ int attack(struct monst *mtmp) {
   if (mtmp->mimic) {
     if (!u.ustuck && !mtmp->mflee)
       u.ustuck = mtmp;
-    switch (levl[u.ux + u.dx][u.uy + u.dy].scrsym) {
+    if (isok(u.ux + u.dx, u.uy + u.dy)) { /* MODERN: bounds check prevents OOB access */
+      switch (levl[u.ux + u.dx][u.uy + u.dy].scrsym) {
     case '+':
       pline("The door actually was a Mimic.");
       break;
-    case '$':
-      pline("The chest was a Mimic!");
-      break;
-    default:
-      pline("Wait! That's a Mimic!");
+      case '$':
+        pline("The chest was a Mimic!");
+        break;
+      default:
+        pline("Wait! That's a Mimic!");
+      }
+    } else {
+      pline("Wait! That's a Mimic!"); /* fallback if coordinates invalid */
     }
     wakeup(mtmp); /* clears mtmp->mimic */
     return (TRUE);

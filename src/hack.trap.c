@@ -44,8 +44,13 @@ void dotrap(struct trap *trap) {
   int ttype = trap->ttyp;
 
   nomul(0);
-  if (trap->tseen && !rn2(5) && ttype != PIT)
-    pline("You escape a%s.", traps[ttype]);
+  if (trap->tseen && !rn2(5) && ttype != PIT) {
+    if (ttype >= 0 && ttype < TRAPNUM) { /* MODERN: bounds check prevents OOB access */
+      pline("You escape a%s.", traps[ttype]);
+    } else {
+      pline("You escape a trap."); /* safe fallback for invalid trap type */
+    }
+  }
   else {
     trap->tseen = 1;
     switch (ttype) {
