@@ -138,12 +138,18 @@ void movemon(void) {
     if (mtmp->mspeed == MFAST && dochugw(mtmp))
       continue;
   }
-
+  /* IMPORTANT NOTE: when enabling the modern code below it allows a warning
+   a warning message to appear without a ring of warning. to my knowledge this
+   is a bug from the original source. I will continue to investigate and decide
+   on the approptiate course of action.
+         default:
+      rr = "Your fingertips glow";
+      break; */
   warnlevel -= u.ulevel;
   if (warnlevel >= SIZE(warnings))
     warnlevel = SIZE(warnings) - 1;
-  if (warnlevel < 0) /* MODERN: prevent negative array index */
-    warnlevel = 0;
+  // if (warnlevel < 0) /* MODERN: prevent negative array index */
+  //   warnlevel = 0;
   if (warnlevel >= 0)
     if (warnlevel > lastwarnlev || moves > lastwarntime + 5) {
       const char *rr; /* MODERN: const because assigned string literals */

@@ -5,6 +5,20 @@ All notable changes to restoHack will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Comprehensive security audit**: Systematic review and hardening of all game logic files
+
+### Fixed 
+- **HISTORICAL**: 40-year-old monster warning system bug - "Your fingertips glow white" messages now work as originally intended (discovered during security audit)
+- **SECURITY**: Fixed 150+ array bounds violations across all game systems
+- **SECURITY**: Added comprehensive bounds checking to prevent buffer overflows
+- **SECURITY**: Fixed null pointer dereferences in monster, object, and room systems  
+- **SECURITY**: Protected against integer overflow in tracking and scoring systems
+- **SECURITY**: Secured format string vulnerabilities in error reporting
+- **SECURITY**: Fixed memory corruption issues in worm segments and vault guards
+
 ## [1.1.0] - 2025-08-23
 
 ### Added

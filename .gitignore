@@ -187,3 +187,4 @@ fuzz*/
 dev/README-modular.md
 *.pyc
 ctest/
+docs/messagebug.txt

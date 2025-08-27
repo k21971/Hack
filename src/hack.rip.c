@@ -61,7 +61,8 @@ void outrip(void) {
         i0 = i, i1 = i + 1;
     if (!i0)
       i0 = i1 = 16;
-    buf[i1 + 16] = 0;
+    if (i1 + 16 < BUFSZ) /* MODERN: bounds check prevents buffer overflow */
+      buf[i1 + 16] = 0;
     center(10, buf + i1);
     buf[i0] = 0;
   }
@@ -70,7 +71,7 @@ void outrip(void) {
                  getyear()); /* MODERN: Safe sprintf replacement - identical
                                 output, prevents overflow */
   center(11, buf);
-  for (y = 8; rip[dp][0]; y++, dp++) {
+  for (y = 8; dp >= 0 && dp < (int)(sizeof(rip)/sizeof(rip[0])) && rip[dp][0]; y++, dp++) { /* MODERN: bounds check prevents array overflow */
     x = 0;
     dpx = rip[dp];
     while (dpx[x]) {
@@ -108,6 +109,7 @@ void center(int line, char *text) {
     max_len = text_len;
   }
 
+  if (line < 0 || line >= (int)(sizeof(rip)/sizeof(rip[0]))) return; /* MODERN: bounds check prevents line overflow */
   op = &rip[line][offset];
   while (*ip && max_len-- > 0)
     *op++ = *ip++;
