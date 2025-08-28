@@ -231,20 +231,7 @@ char unctrl(char sym)
 #endif
 
 /**
- * MODERN ADDITION (2025): Renamed unctrl to avoid curses library conflict
- *
- * WHY: curses.h declares unctrl with different signature causing compile error.
- * Original function conflicts with standard curses unctrl function.
- *
- * HOW: Renamed function from unctrl to hack_unctrl to avoid namespace
- * collision. Updated all call sites to use new name.
- *
- * PRESERVES: Original 1984 control character handling logic unchanged.
- * Same algorithm for converting control characters to printable form.
- *
- * ADDS: Namespace safety to avoid conflicts with system curses library.
- * Allows building with curses headers without symbol conflicts.
- */
+ * MODERN: Renamed unctrl to avoid curses library conflict */
 char hack_unctrl(char sym) {
   return ((sym >= ('A' & 037) && sym <= ('Z' & 037)) ? sym + 0140 : sym);
 }

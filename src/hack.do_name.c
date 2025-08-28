@@ -46,19 +46,20 @@ getpos(int force, const char *goal) {
       pline("Use [hjkl] to move the cursor to %s.", goal);
       pline("Type a . when you are at the right place.");
     } else {
-      pline("Unknown direction: '%s' (%s).", visctrl(c),
+      pline("Unknown direction: '%s' (%s).",
+            visctrl((char)c), /* MODERN: cast int to char */
             force ? "use hjkl or ." : "aborted");
       if (force)
         goto nxtc;
-      cc.x = -1;
+      cc.x = (unsigned char)(-1); /* MODERN: explicit cast for sentinel value */
       cc.y = 0;
       return (cc);
     }
   nxtc:;
     curs(cx, cy + 2);
   }
-  cc.x = cx;
-  cc.y = cy;
+  cc.x = (unsigned char)cx; /* MODERN: cast int to unsigned char */
+  cc.y = (unsigned char)cy; /* MODERN: cast int to unsigned char */
   return (cc);
 }
 
@@ -96,31 +97,26 @@ int do_mname(void) {
   clrlin();
   if (!*buf || *buf == '\033')
     return (1);
-  lth = strlen(buf) + 1;
+  lth = (int)strlen(buf) + 1; /* MODERN: cast strlen to int */
   if (lth > 63) {
     buf[62] = 0; /* MODERN: Safe bounds checking for 62-char monster names */
     lth = 63;
   }
-  mtmp2 = newmonst(mtmp->mxlth + lth);
+  mtmp2 = newmonst((unsigned)(mtmp->mxlth +
+                              lth)); /* MODERN: cast to unsigned for newmonst */
   *mtmp2 = *mtmp;
   for (i = 0; i < mtmp->mxlth; i++)
     ((char *)mtmp2->mextra)[i] = ((char *)mtmp->mextra)[i];
-  mtmp2->mnamelth = lth;
-  /* MODERN: Critical fix - mxlth stays the same so NAME() macro works correctly */
+  mtmp2->mnamelth = (unsigned char)lth; /* MODERN: cast to bitfield type */
+  /* MODERN: Critical fix - mxlth stays the same so NAME() macro works correctly
+   */
 
   /**
-   * MODERN ADDITION (2025): Bounds checking for NAME() macro access
-   *
-   * WHY: NAME(mtmp) macro uses pointer arithmetic with mxlth offset - if
-   * corrupted could write to arbitrary memory HOW: Validate mxlth is within
-   * reasonable bounds before pointer arithmetic
-   *
-   * PRESERVES: All original monster naming functionality for valid cases
-   * ADDS: Protection against memory corruption from invalid mxlth values
-   */
+   * MODERN: Bounds checking for NAME() macro acces*/
   if (mtmp2->mxlth >
       1024) { /* MODERN: Sanity check - mxlth should never be this large */
-    impossible("monster mxlth corruption detected: %u", mtmp2->mxlth, 0);
+    impossible("monster mxlth corruption detected: %u", (int)mtmp2->mxlth,
+               0); /* MODERN: cast to int */
     monfree(mtmp2);
     return (1);
   }
@@ -143,14 +139,14 @@ void do_oname(struct obj *obj) {
   clrlin();
   if (!*buf || *buf == '\033')
     return;
-  lth = strlen(buf) + 1;
+  lth = (int)strlen(buf) + 1; /* MODERN: cast strlen to int */
   if (lth > 63) {
     buf[62] = 0; /* MODERN: Safe bounds checking for 62-char object names */
     lth = 63;
   }
   otmp2 = newobj(lth);
   *otmp2 = *obj;
-  otmp2->onamelth = lth;
+  otmp2->onamelth = (unsigned char)lth; /* MODERN: cast to bitfield type */
   (void)strcpy(ONAME(otmp2), buf);
 
   setworn((struct obj *)0, obj->owornmask);
@@ -211,7 +207,8 @@ void docall(struct obj *obj) {
     return;
   str = newstring(strlen(buf) + 1);
   (void)strcpy(str, buf);
-  str1 = &(SAFE_OBJECTS(obj->otyp).oc_uname); /* MODERN: Bounds-checked object access */
+  str1 = &(SAFE_OBJECTS(obj->otyp)
+               .oc_uname); /* MODERN: Bounds-checked object access */
   if (*str1)
     free(*str1);
   *str1 = str;

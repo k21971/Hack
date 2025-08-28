@@ -169,7 +169,7 @@ void set_pager(int mode) /* 0: open  1: wait+close  2: close */
       curs(1, LI);
       more();
     }
-    flags.standout = (unsigned char)so; /* MODERN: cast boolean to bitfield type */
+    flags.standout = so ? 1 : 0; /* MODERN: explicit bitfield assignment */
     if (whole_screen)
       docrt();
     else {
@@ -246,7 +246,9 @@ void cornline(int mode, const char *text) {
     len = (int)strlen(text); /* MODERN: cast strlen to int */
     if (len > maxlen)
       maxlen = len;
-    tl = (struct line *)alloc((unsigned)(len + sizeof(struct line) + 1));
+    tl = (struct line *)alloc(
+        (unsigned)((size_t)len + sizeof(struct line) +
+                   1)); /* MODERN: cast to size_t for calculation */
     tl->next_line = 0;
     tl->line_text = (char *)(tl + 1);
     (void)strcpy(tl->line_text, text);
@@ -260,7 +262,8 @@ void cornline(int mode, const char *text) {
 
   /* --- now we really do it --- */
   if (mode == 2 && linect == 1) /* topline only */
-    pline("%s", texthead->line_text); /* MODERN: Fix format string vulnerability */
+    pline("%s",
+          texthead->line_text); /* MODERN: Fix format string vulnerability */
   else if (mode == 2) {
     int curline, lth;
 
@@ -334,7 +337,8 @@ int page_file(const char *fnam,
 
     if (fd < 0) {
       if (!silent)
-        pline("Cannot open data file."); /* MODERN: Safe message without format string */
+        pline("Cannot open data file."); /* MODERN: Safe message without format
+                                            string */
       return (0);
     }
     if (child(1)) {
@@ -346,7 +350,8 @@ int page_file(const char *fnam,
       (void)close(0);
       if (dup(fd)) {
         if (!silent)
-          printf("Cannot open file as stdin.\n"); /* MODERN: Safe message without format string */
+          printf("Cannot open file as stdin.\n"); /* MODERN: Safe message
+                                                     without format string */
       } else {
         /* MODERN: Command injection protection - validate pager path */
         if (!catmore || catmore[0] != '/' || strstr(catmore, "..")) {
@@ -355,7 +360,8 @@ int page_file(const char *fnam,
         } else {
           execl(catmore, "page", (char *)0);
           if (!silent)
-            printf("Cannot exec pager.\n"); /* MODERN: Safe message without format string */
+            printf("Cannot exec pager.\n"); /* MODERN: Safe message without
+                                               format string */
         }
       }
       exit(1);
@@ -371,7 +377,8 @@ int page_file(const char *fnam,
         home();
         perror(fnam);
         flags.toplin = 1;
-        pline("Cannot open file."); /* MODERN: Safe message without format string */
+        pline("Cannot open file."); /* MODERN: Safe message without format
+                                       string */
       }
       return (0);
     }
@@ -436,18 +443,7 @@ int child(int wt) {
 		setgid(getgid());
 #endif
     /**
-     * MODERN ADDITION (2025): Privilege dropping with error checking
-     *
-     * WHY: Modern security practices require checking setgid() return value.
-     *      Original 1984 code ignored potential privilege dropping failures.
-     *
-     * HOW: Check setgid() return value and warn on failure, but continue
-     *      execution since privilege dropping is advisory in this context.
-     *
-     * PRESERVES: Original privilege dropping behavior and program flow
-     * ADDS: Defensive programming and security robustness
-     */
-    /* revoke */
+     * MODERN ADDITION (2025): Privilege dropping with error checking */
     if (setgid(getgid()) != 0) {
       /* Privilege dropping failed, but continue - it's advisory */
       perror("setgid warning");
@@ -459,17 +455,7 @@ int child(int wt) {
 		(void) chdir(getenv("HOME"));
 #endif
     /**
-     * MODERN ADDITION (2025): Improved chdir error handling
-     *
-     * WHY: Better error handling for directory changes in child process.
-     *      Original code explicitly ignored chdir return value.
-     *
-     * HOW: Check chdir() return value and warn on failure, but continue
-     *      since failure to change to HOME is not fatal.
-     *
-     * PRESERVES: Original behavior of continuing on chdir failure
-     * ADDS: Visibility into chdir failures for debugging
-     */
+     * MODERN ADDITION (2025): Improved chdir error handling*/
     if (chdir(getenv("HOME")) != 0) {
       /* Failed to change to HOME directory, warn but continue */
       perror("chdir to HOME warning");

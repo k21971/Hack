@@ -162,8 +162,8 @@ void nocmov(int x, int y) {
 
 void cmov(int x, int y) {
   xputs(tgoto(CM, x - 1, y - 1));
-  cury = y;
-  curx = x;
+  cury = (xchar)y; /* MODERN: cast int to xchar */
+  curx = (xchar)x; /* MODERN: cast int to xchar */
 }
 
 int xputc(int c) { return fputc(c, stdout); }

@@ -12,6 +12,7 @@
 #include "hack.h"
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h> /* MODERN: for ptrdiff_t */
 #include <stdio.h>
 extern char *eos(char *s);
 extern int CO;
@@ -162,7 +163,7 @@ pline(const char *line, ...) {
 
   /* If there is room on the line, print message on same line */
   /* But messages like "You die..." deserve their own line */
-  n0 = strlen(bp);
+  n0 = (int)strlen(bp); /* MODERN: cast strlen to int */
 
   /* MODERN ADDITION (2025): Clamp effective CO to 80 for 1984 compatibility */
   int effective_CO = CO > 80 ? 80 : CO;
@@ -174,7 +175,7 @@ pline(const char *line, ...) {
   if (flags.toplin == 1 && tly == 1 && !would_wrap && !would_overflow &&
       strncmp(bp, "You ", 4)) {
     /* MODERN: Safe concatenation with exact space management */
-    size_t remaining = BUFSZ - 1 - current_len;
+    size_t remaining = (size_t)(BUFSZ - 1 - current_len); /* MODERN: cast to size_t */
     if (remaining >= 2) {
       (void)strncat(toplines, "  ", remaining);
       remaining -= 2;
@@ -208,7 +209,7 @@ pline(const char *line, ...) {
     tl = eos(toplines);
     /* MODERN: Bounds check before copying */
     if (tl - toplines + n0 + 2 < BUFSZ) { /* +2 for \n and \0 */
-      (void)strncpy(tl, bp, n0);
+      (void)strncpy(tl, bp, (size_t)n0); /* MODERN: cast int to size_t */
       tl[n0] = 0;
       bp += n0;
 
@@ -216,9 +217,9 @@ pline(const char *line, ...) {
       while (n0 > 1 && tl[n0 - 1] == ' ' && tl[n0 - 2] == ' ')
         tl[--n0] = 0;
 
-      n0 = strlen(bp);
+      n0 = (int)strlen(bp); /* MODERN: cast strlen to int */
       if (n0 && tl[0]) {
-        if (tl - toplines + strlen(tl) + 1 < BUFSZ)
+        if (tl - toplines + (ptrdiff_t)strlen(tl) + 1 < BUFSZ) /* MODERN: cast strlen to ptrdiff_t */
           (void)strcat(tl, "\n");
       }
     } else {

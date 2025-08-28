@@ -131,8 +131,7 @@ void domove(void) {
   }
 
   /* Original 1984: ust = &levl[u.ux][u.uy]; */
-  ust = &levl[(int)u.ux]
-             [(int)u.uy]; /* MODERN: safe array indexing */
+  ust = &levl[(int)u.ux][(int)u.uy]; /* MODERN: safe array indexing */
   oldx = u.ux;
   oldy = u.uy;
   if (!u.uswallow && (trap = t_at(u.ux + u.dx, u.uy + u.dy)) && trap->tseen)
@@ -190,8 +189,7 @@ void domove(void) {
     nomul(0);
     /* Original 1984: if(isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) &&
      * (levl[rx][ry].typ != DOOR || !(u.dx && u.dy)) && */
-    if (isok(rx, ry) &&
-        !IS_ROCK(levl[(int)rx][(int)ry].typ) &&
+    if (isok(rx, ry) && !IS_ROCK(levl[(int)rx][(int)ry].typ) &&
         (levl[(int)rx][(int)ry].typ != DOOR ||
          !(u.dx && u.dy)) && /* MODERN: safe array indexing */
         !sobj_at(ENORMOUS_ROCK, rx, ry)) {
@@ -216,8 +214,7 @@ void domove(void) {
       /* Original 1984: if(levl[rx][ry].typ == POOL) { levl[rx][ry].typ = ROOM;
        */
       if (levl[(int)rx][(int)ry].typ == POOL) {
-        levl[(int)rx][(int)ry].typ =
-            ROOM; /* MODERN: safe array indexing */
+        levl[(int)rx][(int)ry].typ = ROOM; /* MODERN: safe array indexing */
         mnewsym(rx, ry);
         prl(rx, ry);
         pline("You push the rock into the water.");
@@ -249,8 +246,7 @@ void domove(void) {
              (IS_ROCK(levl[u.ux][u.uy+u.dy].typ) &&
              IS_ROCK(levl[u.ux+u.dx][u.uy].typ))){ */
           (!u.dx || !u.dy ||
-           (IS_ROCK(
-                levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
+           (IS_ROCK(levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
             IS_ROCK(levl[(int)(u.ux + u.dx)][(int)u.uy]
                         .typ)))) { /* MODERN: safe array indexing */
         pline("However, you can squeeze yourself into a small opening.");
@@ -261,8 +257,7 @@ void domove(void) {
   }
   /* Original 1984: if(u.dx && u.dy && IS_ROCK(levl[u.ux][u.uy+u.dy].typ) &&
    * IS_ROCK(levl[u.ux+u.dx][u.uy].typ) && */
-  if (u.dx && u.dy &&
-      IS_ROCK(levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
+  if (u.dx && u.dy && IS_ROCK(levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
       IS_ROCK(levl[(int)(u.ux + u.dx)][(int)u.uy]
                   .typ) && /* MODERN: safe array indexing */
       invent &&
@@ -430,7 +425,8 @@ int pickup(int all) {
 
         pline("Pick up %s ? [ynaq]", doname(obj));
         while (!index("ynaq ", (c = readchar()))) {
-          if (++retries > 100) { /* MODERN: prevent DoS via infinite input loop */
+          if (++retries >
+              100) { /* MODERN: prevent DoS via infinite input loop */
             pline("Too many invalid inputs - assuming 'no'.");
             c = 'n';
             break;
@@ -541,8 +537,7 @@ void lookaround(void) {
     return;
   /* Original 1984: if(flags.run == 1 && levl[u.ux][u.uy].typ == ROOM) return;
    */
-  if (flags.run == 1 &&
-      levl[(int)u.ux][(int)u.uy].typ == ROOM)
+  if (flags.run == 1 && levl[(int)u.ux][(int)u.uy].typ == ROOM)
     return; /* MODERN: safe array indexing */
 #ifdef QUEST
   if (u.ux0 == u.ux + u.dx && u.uy0 == u.uy + u.dy)
@@ -552,7 +547,8 @@ void lookaround(void) {
     for (y = u.uy - 1; y <= u.uy + 1; y++) {
       if (x == u.ux && y == u.uy)
         continue;
-      if (!isok(x, y)) /* MODERN: bounds check prevents OOB access at map edges */
+      if (!isok(x,
+                y)) /* MODERN: bounds check prevents OOB access at map edges */
         continue;
       if (!levl[x][y].typ)
         continue;
@@ -706,10 +702,11 @@ int cansee(int x, int y) {
   }
 }
 
-int rroom(int x, int y) { 
+int rroom(int x, int y) {
   int abs_x = u.ux + x, abs_y = u.uy + y;
-  if (!isok(abs_x, abs_y)) return 0; /* MODERN: bounds check prevents coordinate overflow */
-  return (IS_ROOM(levl[abs_x][abs_y].typ)); 
+  if (!isok(abs_x, abs_y))
+    return 0; /* MODERN: bounds check prevents coordinate overflow */
+  return (IS_ROOM(levl[abs_x][abs_y].typ));
 }
 
 #else
@@ -752,19 +749,13 @@ void setsee(void) {
     return;
   }
   /**
-   * MODERN ADDITION (2025): Bounds check before array access
-   * WHY: u.ux/u.uy can exceed COLNO/ROWNO bounds (e.g. u.ux=82 > 79)
-   * HOW: Validate coordinates before accessing levl array
-   * PRESERVES: Original 1984 vision logic exactly
-   * ADDS: Memory safety by preventing buffer overflow
-   */
+   * MODERN: Bounds check before array access */
   if (!isok(u.ux, u.uy)) {
     pru(); /* Fallback to partial update if coords invalid */
     return;
   }
   /* Original 1984: if(!levl[u.ux][u.uy].lit) { */
-  if (!levl[(int)u.ux][(int)u.uy]
-           .lit) { /* Bounds already checked above */
+  if (!levl[(int)u.ux][(int)u.uy].lit) { /* Bounds already checked above */
     seelx = u.ux - 1;
     seehx = u.ux + 1;
     seely = u.uy - 1;
@@ -773,17 +764,15 @@ void setsee(void) {
     /* Original 1984: for(seelx = u.ux; levl[seelx-1][u.uy].lit; seelx--); etc.
      */
     /* MODERN: Add bounds checking to prevent array access beyond levl bounds */
-    for (seelx = u.ux; seelx > 1 && levl[seelx - 1][(int)u.uy].lit;
-         seelx--)
+    for (seelx = u.ux; seelx > 1 && levl[seelx - 1][(int)u.uy].lit; seelx--)
       ;
-    for (seehx = u.ux;
-         seehx < COLNO - 2 && levl[seehx + 1][(int)u.uy].lit; seehx++)
+    for (seehx = u.ux; seehx < COLNO - 2 && levl[seehx + 1][(int)u.uy].lit;
+         seehx++)
       ;
-    for (seely = u.uy; seely > 1 && levl[(int)u.ux][seely - 1].lit;
-         seely--)
+    for (seely = u.uy; seely > 1 && levl[(int)u.ux][seely - 1].lit; seely--)
       ;
-    for (seehy = u.uy;
-         seehy < ROWNO - 2 && levl[(int)u.ux][seehy + 1].lit; seehy++)
+    for (seehy = u.uy; seehy < ROWNO - 2 && levl[(int)u.ux][seehy + 1].lit;
+         seehy++)
       ;
   }
   for (y = seely; y <= seehy; y++)

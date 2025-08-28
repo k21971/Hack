@@ -317,7 +317,7 @@ void getlin(char *bufp) {
       return;
     }
     if (c == '\033') {
-      *obufp = c;
+      *obufp = (char)c; /* MODERN: cast int to char */
       obufp[1] = 0;
       return;
     }
@@ -333,7 +333,7 @@ void getlin(char *bufp) {
     } else if (' ' <= c && c < '\177') {
       /* avoid isprint() - some people don't have it
          ' ' is not always a printing char */
-      *bufp = c;
+      *bufp = (char)c; /* MODERN: cast int to char */
       bufp[1] = 0;
       putstr(bufp);
       if (bufp - obufp < BUFSZ - 1 && bufp - obufp < COLNO)
@@ -380,7 +380,7 @@ xwaitforspace(const char *s) /* chars allowed besides space or return */
       if (c == ' ')
         break;
       if (s && strchr(s, c)) {
-        morc = c;
+        morc = (char)c; /* MODERN: cast int to char */
         break;
       }
       bell();
@@ -403,19 +403,19 @@ char *parse(void) {
     multi--;
     save_cm = inputline;
   }
-  inputline[0] = foo;
+  inputline[0] = (char)foo; /* MODERN: cast int to char */
   inputline[1] = 0;
   if (foo == 'f' || foo == 'F') {
-    inputline[1] = getchar();
+    inputline[1] = (char)getchar(); /* MODERN: cast int to char */
 #ifdef QUEST
     if (inputline[1] == foo)
-      inputline[2] = getchar();
+      inputline[2] = (char)getchar(); /* MODERN: cast int to char */
     else
 #endif /* QUEST */
       inputline[2] = 0;
   }
   if (foo == 'm' || foo == 'M') {
-    inputline[1] = getchar();
+    inputline[1] = (char)getchar(); /* MODERN: cast int to char */
     inputline[2] = 0;
   }
   clrlin();

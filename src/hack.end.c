@@ -18,10 +18,6 @@
 #include <time.h>
 /* MODERN: Safe sprintf replacement - same interface, prevents overflow */
 /* MODERN ADDITION (2025): Bounds-safe sprintf replacement for outentry function
- * WHY: Original Sprintf could overflow linebuf causing crashes in topten
- * display HOW: Calculate remaining buffer space and use snprintf with proper
- * bounds PRESERVES: Original 1984 text formatting behavior when space available
- * ADDS: Memory safety bounds checking to prevent buffer overflow crashes
  */
 #define SafeAppend(linebuf, ...)                                               \
   do {                                                                         \
@@ -100,15 +96,7 @@ void done_in_by(struct monst *mtmp) {
     killer = buf;
   } else if (mtmp->mnamelth) {
     /**
-     * MODERN ADDITION (2025): Bounds checking for NAME() macro in death
-     * messages
-     *
-     * WHY: NAME(mtmp) uses mxlth offset - corruption could access invalid
-     * memory in death screen HOW: Validate mxlth before using NAME() macro
-     *
-     * PRESERVES: All original death message functionality
-     * ADDS: Protection against crash during death from corrupted monster names
-     */
+     * MODERN: Bounds checking for NAME() macro in death*/
     if (mtmp->mxlth > 1024) { /* MODERN: Sanity check for corrupted mxlth */
       Sprintf(buf, "%s called <corrupted name>", mtmp->data->mname);
     } else {
@@ -265,22 +253,14 @@ void done(const char *st1) {
   if (done_stopprint)
     printf("\n\n");
 
-  /* MODERN ADDITION (2025): Memory cleanup for sanitizers */
+  /* MODERN: Memory cleanup for sanitizers */
   cleanup_all_engravings();
 
   exit(0);
 }
 
 /**
- * MODERN ADDITION (2025): Expanded buffer sizes for modern systems
- *
- * WHY: Original 8-character name limit insufficient for modern usernames
- * WHAT: NAMSZ expanded from 8 to 64, DTHSZ increased to 128 for longer death
- * messages
- *
- * PRESERVES: All original functionality and file format compatibility
- * ADDS: Protection against buffer overflows from long usernames/death messages
- */
+ * MODERN: Expanded buffer sizes for modern systems */
 #define NAMSZ 64 /* MODERN: Expanded from 8 to handle modern usernames */
 #define DTHSZ                                                                  \
   128 /* MODERN: Expanded from 40 to prevent death message truncation */
@@ -329,9 +309,11 @@ void topten(void) {
       RECORD; /* MODERN: const because points to string literal */
   const char *reclock =
       "record_lock"; /* MODERN: const because points to string literal */
-  (void)reclock; /* Original 1984: used in link() locking, conditionally compiled */
+  (void)reclock;     /* Original 1984: used in link() locking, conditionally
+                        compiled */
   int sleepct = 300;
-  (void)sleepct; /* Original 1984: used in link() retry loop, conditionally compiled */
+  (void)sleepct; /* Original 1984: used in link() retry loop, conditionally
+                    compiled */
   FILE *rfile;
   int flg = 0;
   extern char *getdatestr();
@@ -353,7 +335,8 @@ void topten(void) {
    * ADDS: Defensive programming against stale resources
    */
   struct stat lockstat;
-  (void)lockstat; /* Original 1984: used for stale lock detection, conditionally compiled */
+  (void)lockstat; /* Original 1984: used for stale lock detection, conditionally
+                     compiled */
 #ifdef ENABLE_MODERN_LOCKING
   /* Modern locking: flock() automatically releases on process death */
   /* No stale locks to clean up */
@@ -531,8 +514,6 @@ void topten(void) {
       (void)outentry(0, t0, 1);
   (void)fclose(rfile);
 unlock:
-  /* TODO: Revisit memory cleanup - current cleanup causes use-after-free errors
-   */
   /* Original 1984 code had no cleanup as program exits immediately after
    * topten() */
 #ifdef ENABLE_MODERN_LOCKING
@@ -618,12 +599,7 @@ int outentry(int rank, struct toptenentry *t1, int so) {
       while (bp < linebuf + hppos)
         *bp++ = ' ';
       (void)strcpy(bp, hpbuf);
-      /* MODERN ADDITION (2025): Bounds-checked append to prevent buffer
-       * overflow WHY: Original Sprintf could write beyond linebuf end causing
-       * crash HOW: Calculate remaining space and use snprintf with proper limit
-       * PRESERVES: Original 1984 behavior when space available
-       * ADDS: Memory safety bounds checking
-       */
+      /* MODERN: Bounds-checked append to prevent buffer*/
       char *append_pos = eos(bp);
       size_t remaining = BUFSZ - (append_pos - linebuf);
       if (remaining > 1) {
