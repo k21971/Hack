@@ -103,9 +103,7 @@ void movemon(void) {
     {
       boolean inpool, iseel;
 
-      inpool =
-          (levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ ==
-           POOL); /* MODERN: Cast to unsigned char for safe array indexing */
+      inpool = (levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL);
       iseel = (mtmp->data->mlet == ';');
       if (inpool && !iseel) {
         if (cansee(mtmp->mx, mtmp->my))
@@ -138,21 +136,22 @@ void movemon(void) {
     if (mtmp->mspeed == MFAST && dochugw(mtmp))
       continue;
   }
-  /* IMPORTANT NOTE: when enabling the modern code below it allows a warning
-   a warning message to appear without a ring of warning. to my knowledge this
-   is a bug from the original source. I will continue to investigate and decide
-   on the approptiate course of action.
-         default:
-      rr = "Your fingertips glow";
-      break; */
+  /* IMPORTANT NOTE: when enabling the modern code below (bounds check) it
+   allows a warning message to appear without a ring of warning indicating a
+   possible default mechanic that has been silienced since v1.0 and carried
+   over. I will continue
+   to investigate and decide on the approptiate course of action.*/
   warnlevel -= u.ulevel;
   if (warnlevel >= SIZE(warnings))
     warnlevel = SIZE(warnings) - 1;
-  // if (warnlevel < 0) /* MODERN: prevent negative array index */
-  //   warnlevel = 0;
   if (warnlevel >= 0)
     if (warnlevel > lastwarnlev || moves > lastwarntime + 5) {
       const char *rr; /* MODERN: const because assigned string literals */
+      /* MODERN: Defensive bounds check for array access while preserving game
+       * logic */
+      // int display_level = (warnlevel < 0) ? 0 : warnlevel;
+      // if (warnlevel < 0) /* MODERN: prevent negative array index */
+      //     warnlevel = 0;
       switch (Warning & (LEFT_RING | RIGHT_RING)) {
       case LEFT_RING:
         rr = "Your left ring glows";
@@ -355,9 +354,7 @@ int m_move(struct monst *mtmp, int after) {
   /* teleport if that lies in our nature ('t') or when badly wounded ('1') */
   if ((msym == 't' && !rn2(5)) ||
       (msym == '1' && (mtmp->mhp < 7 || (!xdnstair && !rn2(5)) ||
-                       levl[(unsigned char)u.ux][(unsigned char)u.uy].typ ==
-                           STAIRS))) { /* MODERN: Cast to unsigned char for safe
-                                          array indexing */
+                       levl[(int)u.ux][(int)u.uy].typ == STAIRS))) {
     if (mtmp->mhp < 7 || (msym == 't' && rn2(2)))
       rloc(mtmp);
     else
@@ -485,15 +482,13 @@ not_special:
   nxti:;
   }
   if (mmoved) {
-    if (info[(unsigned char)chi] &
-        ALLOW_M) { /* MODERN: Cast to unsigned char for safe array indexing */
+    if (info[(int)chi] & ALLOW_M) {
       mtmp2 = m_at(nix, niy);
       if (hitmm(mtmp, mtmp2) == 1 && rn2(4) && hitmm(mtmp2, mtmp) == 2)
         return (2);
       return (0);
     }
-    if (info[(unsigned char)chi] &
-        ALLOW_U) { /* MODERN: Cast to unsigned char for safe array indexing */
+    if (info[(int)chi] & ALLOW_U) {
       (void)hitu(mtmp, d(mtmp->data->damn, mtmp->data->damd) + 1);
       return (0);
     }
@@ -537,8 +532,7 @@ void mpickgold(struct monst *mtmp) {
   while ((gold = g_at(mtmp->mx, mtmp->my))) {
     mtmp->mgold += gold->amount;
     freegold(gold);
-    if (levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym ==
-        '$') /* MODERN: Cast to unsigned char for safe array indexing */
+    if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == '$')
       newsym(mtmp->mx, mtmp->my);
   }
 }
@@ -551,9 +545,7 @@ void mpickgems(struct monst *mtmp) {
         if (mtmp->data->mlet != 'u' || objects[otmp->otyp].g_val != 0) {
           freeobj(otmp);
           mpickobj(mtmp, otmp);
-          if (levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].scrsym ==
-              GEM_SYM) /* MODERN: Cast to unsigned char for safe array indexing
-                        */
+          if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == GEM_SYM)
             newsym(mtmp->mx, mtmp->my); /* %% */
           return;                       /* pick only one object */
         }

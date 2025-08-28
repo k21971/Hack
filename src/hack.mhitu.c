@@ -93,9 +93,7 @@ int mhitu(struct monst *mtmp) {
         pline("%s swings itself around you!", Monnam(mtmp));
         u.ustuck = mtmp;
       } else if (u.ustuck == mtmp &&
-                 levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ ==
-                     POOL) { /* MODERN: Cast to unsigned char for safe array
-                                indexing */
+                 levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL) {
         pline("%s drowns you ...", Monnam(mtmp));
         done("drowned");
       }

@@ -574,9 +574,7 @@ void seemons(void) {
     if (mtmp->data->mlet == ';')
       mtmp->minvis =
           (u.ustuck != mtmp &&
-           levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ ==
-               POOL); /* MODERN: Cast to unsigned char for safe array indexing
-                       */
+           levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL);
     pmon(mtmp);
 #ifndef NOWORM
     if (mtmp->wormno)
