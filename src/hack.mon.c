@@ -141,12 +141,22 @@ void movemon(void) {
    possible default mechanic that has been silienced since v1.0 and carried
    over. I will continue
    to investigate and decide on the approptiate course of action.*/
+  /* IMPORTANT NOTE: when enabling the modern code below (bounds check) it
+   allows a warning message to appear without a ring of warning indicating a
+   possible default mechanic that has been silienced since v1.0 and carried
+   over. I will continue
+   to investigate and decide on the approptiate course of action.*/
   warnlevel -= u.ulevel;
   if (warnlevel >= SIZE(warnings))
     warnlevel = SIZE(warnings) - 1;
   if (warnlevel >= 0)
     if (warnlevel > lastwarnlev || moves > lastwarntime + 5) {
       const char *rr; /* MODERN: const because assigned string literals */
+      /* MODERN: Defensive bounds check for array access while preserving game
+       * logic */
+      // int display_level = (warnlevel < 0) ? 0 : warnlevel;
+      // if (warnlevel < 0) /* MODERN: prevent negative array index */
+      //     warnlevel = 0;
       /* MODERN: Defensive bounds check for array access while preserving game
        * logic */
       // int display_level = (warnlevel < 0) ? 0 : warnlevel;
@@ -363,7 +373,8 @@ int m_move(struct monst *mtmp, int after) {
     goto postmov;
   }
 
-  /* spit fire ('D') or use a wand ('1') when appropriate */
+  /* spit fire ('D') or use a wand ('1') when appropriate
+   */
   if (index("D1", msym))
     inrange(mtmp);
 
@@ -533,7 +544,8 @@ void mpickgold(struct monst *mtmp) {
     mtmp->mgold += gold->amount;
     freegold(gold);
     if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == '$')
-      newsym(mtmp->mx, mtmp->my);
+      if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == '$')
+        newsym(mtmp->mx, mtmp->my);
   }
 }
 
@@ -546,8 +558,9 @@ void mpickgems(struct monst *mtmp) {
           freeobj(otmp);
           mpickobj(mtmp, otmp);
           if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == GEM_SYM)
-            newsym(mtmp->mx, mtmp->my); /* %% */
-          return;                       /* pick only one object */
+            if (levl[(int)mtmp->mx][(int)mtmp->my].scrsym == GEM_SYM)
+              newsym(mtmp->mx, mtmp->my); /* %% */
+          return;                         /* pick only one object */
         }
 }
 
