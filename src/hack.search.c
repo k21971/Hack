@@ -16,26 +16,26 @@ int findit(void) /* returns number of things found */
 
   if (u.uswallow)
     return (0);
-  for (lx = (unsigned char)u.ux;
-       (num = levl[(unsigned char)(lx - 1)][(unsigned char)u.uy].typ) &&
+  for (lx = (unsigned char)u.ux; /* MODERN: cast xchar to unsigned char */
+       (num = levl[(int)(lx - 1)][(int)u.uy].typ) &&
        num != CORR;
        lx--)
-    ; /* MODERN: Cast to unsigned char for safe array indexing */
-  for (hx = (unsigned char)u.ux;
-       (num = levl[(unsigned char)(hx + 1)][(unsigned char)u.uy].typ) &&
+    ; /* MODERN: Cast to int for safe array indexing */
+  for (hx = (unsigned char)u.ux; /* MODERN: cast xchar to unsigned char */
+       (num = levl[(int)(hx + 1)][(int)u.uy].typ) &&
        num != CORR;
        hx++)
-    ; /* MODERN: Cast to unsigned char for safe array indexing */
-  for (ly = (unsigned char)u.uy;
-       (num = levl[(unsigned char)u.ux][(unsigned char)(ly - 1)].typ) &&
+    ; /* MODERN: Cast to int for safe array indexing */
+  for (ly = (unsigned char)u.uy; /* MODERN: cast xchar to unsigned char */
+       (num = levl[(int)u.ux][(int)(ly - 1)].typ) &&
        num != CORR;
        ly--)
-    ; /* MODERN: Cast to unsigned char for safe array indexing */
-  for (hy = (unsigned char)u.uy;
-       (num = levl[(unsigned char)u.ux][(unsigned char)(hy + 1)].typ) &&
+    ; /* MODERN: Cast to int for safe array indexing */
+  for (hy = (unsigned char)u.uy; /* MODERN: cast xchar to unsigned char */
+       (num = levl[(int)u.ux][(int)(hy + 1)].typ) &&
        num != CORR;
        hy++)
-    ; /* MODERN: Cast to unsigned char for safe array indexing */
+    ; /* MODERN: Cast to int for safe array indexing */
   num = 0;
   for (zy = ly; zy <= hy; zy++)
     for (zx = lx; zx <= hx; zx++) {
@@ -77,8 +77,8 @@ int dosearch(void) {
     return (1);
   } else
     /* MODERN: Safe coordinate iteration with bounds checking */
-    for (x = u.ux - 1; x <= u.ux + 1; x++)
-      for (y = u.uy - 1; y <= u.uy + 1; y++)
+    for (x = (unsigned char)(u.ux - 1); x <= u.ux + 1; x++) /* MODERN: cast to unsigned char */
+      for (y = (unsigned char)(u.uy - 1); y <= u.uy + 1; y++) /* MODERN: cast to unsigned char */
         if ((x != u.ux || y != u.uy) && isok(x, y)) {
           if (levl[x][y].typ == SDOOR) {
             if (rn2(7))

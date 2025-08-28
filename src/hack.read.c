@@ -461,8 +461,8 @@ void litroom(boolean on) {
     goto do_it;
   if (!on) {
     if (u.uswallow || !xdnstair ||
-        ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR) ||
-        ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && !levl[(unsigned char)u.ux][(unsigned char)u.uy].lit)) { /* MODERN: Bounds check with unsigned cast */
+        ((int)u.ux < COLNO && (int)u.uy < ROWNO && levl[(int)u.ux][(int)u.uy].typ == CORR) ||
+        ((int)u.ux < COLNO && (int)u.uy < ROWNO && !levl[(int)u.ux][(int)u.uy].lit)) { /* MODERN: Bounds check with int cast */
       pline("It seems even darker in here than before.");
       return;
     } else
@@ -480,10 +480,10 @@ void litroom(boolean on) {
     pline("The cave lights up around you, then fades.");
     return;
 #else  /* QUEST */
-    if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == CORR) { /* MODERN: Bounds check with unsigned cast */
+    if ((int)u.ux < COLNO && (int)u.uy < ROWNO && levl[(int)u.ux][(int)u.uy].typ == CORR) { /* MODERN: Bounds check with int cast */
       pline("The corridor lights up around you, then fades.");
       return;
-    } else if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].lit) { /* MODERN: Bounds check with unsigned cast */
+    } else if ((int)u.ux < COLNO && (int)u.uy < ROWNO && levl[(int)u.ux][(int)u.uy].lit) { /* MODERN: Bounds check with int cast */
       pline("The light here seems better now.");
       return;
     } else
@@ -495,19 +495,19 @@ do_it:
 #ifdef QUEST
   return;
 #else  /* QUEST */
-  if ((unsigned char)u.ux >= COLNO || (unsigned char)u.uy >= ROWNO || levl[(unsigned char)u.ux][(unsigned char)u.uy].lit == on) /* MODERN: Bounds check with unsigned cast */
+  if ((int)u.ux >= COLNO || (int)u.uy >= ROWNO || levl[(int)u.ux][(int)u.uy].lit == on) /* MODERN: Bounds check with int cast */
     return;
-  if ((unsigned char)u.ux < COLNO && (unsigned char)u.uy < ROWNO && levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == DOOR) { /* MODERN: Bounds check with unsigned cast */
+  if ((int)u.ux < COLNO && (int)u.uy < ROWNO && levl[(int)u.ux][(int)u.uy].typ == DOOR) { /* MODERN: Bounds check with int cast */
     /* MODERN: Safe bounds checking with unsigned cast */
-    if ((unsigned char)u.uy < ROWNO - 1 && IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy + 1)].typ))
+    if ((int)u.uy < ROWNO - 1 && IS_ROOM(levl[(int)u.ux][(int)(u.uy + 1)].typ))
       zy = u.uy + 1;
-    else if ((unsigned char)u.uy > 0 && IS_ROOM(levl[(unsigned char)u.ux][(unsigned char)(u.uy - 1)].typ))
+    else if ((int)u.uy > 0 && IS_ROOM(levl[(int)u.ux][(int)(u.uy - 1)].typ))
       zy = u.uy - 1;
     else
       zy = u.uy;
-    if ((unsigned char)u.ux < COLNO - 1 && IS_ROOM(levl[(unsigned char)(u.ux + 1)][(unsigned char)u.uy].typ))
+    if ((int)u.ux < COLNO - 1 && IS_ROOM(levl[(int)(u.ux + 1)][(int)u.uy].typ))
       zx = u.ux + 1;
-    else if ((unsigned char)u.ux > 0 && IS_ROOM(levl[(unsigned char)(u.ux - 1)][(unsigned char)u.uy].typ))
+    else if ((int)u.ux > 0 && IS_ROOM(levl[(int)(u.ux - 1)][(int)u.uy].typ))
       zx = u.ux - 1;
     else
       zx = u.ux;

@@ -68,7 +68,7 @@ void seeoff(int mode) /* 1 to redo @, 0 to leave them */
   if (u.udispl && mode) {
     u.udispl = 0;
     /* Original 1984: levl[u.udisx][u.udisy].scrsym = news0(u.udisx,u.udisy); */
-    levl[(unsigned char)u.udisx][(unsigned char)u.udisy].scrsym =
+    levl[(int)u.udisx][(int)u.udisy].scrsym =
         news0(u.udisx, u.udisy); /* MODERN: safe array indexing */
   }
 #ifndef QUEST
@@ -131,8 +131,8 @@ void domove(void) {
   }
 
   /* Original 1984: ust = &levl[u.ux][u.uy]; */
-  ust = &levl[(unsigned char)u.ux]
-             [(unsigned char)u.uy]; /* MODERN: safe array indexing */
+  ust = &levl[(int)u.ux]
+             [(int)u.uy]; /* MODERN: safe array indexing */
   oldx = u.ux;
   oldy = u.uy;
   if (!u.uswallow && (trap = t_at(u.ux + u.dx, u.uy + u.dy)) && trap->tseen)
@@ -176,8 +176,8 @@ void domove(void) {
     return;
   }
   /* Original 1984: tmpr = &levl[u.ux+u.dx][u.uy+u.dy]; */
-  tmpr = &levl[(unsigned char)(u.ux + u.dx)]
-              [(unsigned char)(u.uy + u.dy)]; /* MODERN: safe array indexing */
+  tmpr = &levl[(int)(u.ux + u.dx)]
+              [(int)(u.uy + u.dy)]; /* MODERN: safe array indexing */
   if (IS_ROCK(tmpr->typ) ||
       (u.dx && u.dy && (tmpr->typ == DOOR || ust->typ == DOOR))) {
     flags.move = 0;
@@ -191,8 +191,8 @@ void domove(void) {
     /* Original 1984: if(isok(rx,ry) && !IS_ROCK(levl[rx][ry].typ) &&
      * (levl[rx][ry].typ != DOOR || !(u.dx && u.dy)) && */
     if (isok(rx, ry) &&
-        !IS_ROCK(levl[(unsigned char)rx][(unsigned char)ry].typ) &&
-        (levl[(unsigned char)rx][(unsigned char)ry].typ != DOOR ||
+        !IS_ROCK(levl[(int)rx][(int)ry].typ) &&
+        (levl[(int)rx][(int)ry].typ != DOOR ||
          !(u.dx && u.dy)) && /* MODERN: safe array indexing */
         !sobj_at(ENORMOUS_ROCK, rx, ry)) {
       if (m_at(rx, ry)) {
@@ -215,8 +215,8 @@ void domove(void) {
         }
       /* Original 1984: if(levl[rx][ry].typ == POOL) { levl[rx][ry].typ = ROOM;
        */
-      if (levl[(unsigned char)rx][(unsigned char)ry].typ == POOL) {
-        levl[(unsigned char)rx][(unsigned char)ry].typ =
+      if (levl[(int)rx][(int)ry].typ == POOL) {
+        levl[(int)rx][(int)ry].typ =
             ROOM; /* MODERN: safe array indexing */
         mnewsym(rx, ry);
         prl(rx, ry);
@@ -250,8 +250,8 @@ void domove(void) {
              IS_ROCK(levl[u.ux+u.dx][u.uy].typ))){ */
           (!u.dx || !u.dy ||
            (IS_ROCK(
-                levl[(unsigned char)u.ux][(unsigned char)(u.uy + u.dy)].typ) &&
-            IS_ROCK(levl[(unsigned char)(u.ux + u.dx)][(unsigned char)u.uy]
+                levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
+            IS_ROCK(levl[(int)(u.ux + u.dx)][(int)u.uy]
                         .typ)))) { /* MODERN: safe array indexing */
         pline("However, you can squeeze yourself into a small opening.");
         break;
@@ -262,8 +262,8 @@ void domove(void) {
   /* Original 1984: if(u.dx && u.dy && IS_ROCK(levl[u.ux][u.uy+u.dy].typ) &&
    * IS_ROCK(levl[u.ux+u.dx][u.uy].typ) && */
   if (u.dx && u.dy &&
-      IS_ROCK(levl[(unsigned char)u.ux][(unsigned char)(u.uy + u.dy)].typ) &&
-      IS_ROCK(levl[(unsigned char)(u.ux + u.dx)][(unsigned char)u.uy]
+      IS_ROCK(levl[(int)u.ux][(int)(u.uy + u.dy)].typ) &&
+      IS_ROCK(levl[(int)(u.ux + u.dx)][(int)u.uy]
                   .typ) && /* MODERN: safe array indexing */
       invent &&
       inv_weight() + 40 > 0) {
@@ -542,7 +542,7 @@ void lookaround(void) {
   /* Original 1984: if(flags.run == 1 && levl[u.ux][u.uy].typ == ROOM) return;
    */
   if (flags.run == 1 &&
-      levl[(unsigned char)u.ux][(unsigned char)u.uy].typ == ROOM)
+      levl[(int)u.ux][(int)u.uy].typ == ROOM)
     return; /* MODERN: safe array indexing */
 #ifdef QUEST
   if (u.ux0 == u.ux + u.dx && u.uy0 == u.uy + u.dy)
@@ -763,7 +763,7 @@ void setsee(void) {
     return;
   }
   /* Original 1984: if(!levl[u.ux][u.uy].lit) { */
-  if (!levl[(unsigned char)u.ux][(unsigned char)u.uy]
+  if (!levl[(int)u.ux][(int)u.uy]
            .lit) { /* Bounds already checked above */
     seelx = u.ux - 1;
     seehx = u.ux + 1;
@@ -773,17 +773,17 @@ void setsee(void) {
     /* Original 1984: for(seelx = u.ux; levl[seelx-1][u.uy].lit; seelx--); etc.
      */
     /* MODERN: Add bounds checking to prevent array access beyond levl bounds */
-    for (seelx = u.ux; seelx > 1 && levl[seelx - 1][(unsigned char)u.uy].lit;
+    for (seelx = u.ux; seelx > 1 && levl[seelx - 1][(int)u.uy].lit;
          seelx--)
       ;
     for (seehx = u.ux;
-         seehx < COLNO - 2 && levl[seehx + 1][(unsigned char)u.uy].lit; seehx++)
+         seehx < COLNO - 2 && levl[seehx + 1][(int)u.uy].lit; seehx++)
       ;
-    for (seely = u.uy; seely > 1 && levl[(unsigned char)u.ux][seely - 1].lit;
+    for (seely = u.uy; seely > 1 && levl[(int)u.ux][seely - 1].lit;
          seely--)
       ;
     for (seehy = u.uy;
-         seehy < ROWNO - 2 && levl[(unsigned char)u.ux][seehy + 1].lit; seehy++)
+         seehy < ROWNO - 2 && levl[(int)u.ux][seehy + 1].lit; seehy++)
       ;
   }
   for (y = seely; y <= seehy; y++)
@@ -791,7 +791,7 @@ void setsee(void) {
       prl(x, y);
     }
   /* Original 1984: if(!levl[u.ux][u.uy].lit) seehx = 0; */
-  if (!levl[(unsigned char)u.ux][(unsigned char)u.uy].lit)
+  if (!levl[(int)u.ux][(int)u.uy].lit)
     seehx = 0; /* Bounds already validated above */
   else {
     if (seely == u.uy)

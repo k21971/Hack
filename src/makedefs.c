@@ -3,6 +3,8 @@
 /* $FreeBSD$ */
 
 #include <fcntl.h>
+#include <limits.h> /* MODERN: for INT_MAX */
+#include <stddef.h> /* MODERN: for ptrdiff_t, size_t */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,7 +70,13 @@ char line[LINSZ], *lp = line, *lp0 = line, *lpe = line;
 int eof;
 
 int readline(void) {
-  int n = read(fd, lp0, (line + LINSZ) - lp0);
+  ptrdiff_t buffer_space = (line + LINSZ) - lp0; /* MODERN: safe pointer arithmetic */
+  if (buffer_space <= 0) {
+    printf("Buffer space error.\n");
+    exit(1);
+  }
+  
+  ssize_t n = read(fd, lp0, (size_t)buffer_space); /* MODERN: proper POSIX types */
   if (n < 0) {
     printf("Input error.\n");
     exit(1);
@@ -76,7 +84,12 @@ int readline(void) {
   if (n == 0)
     eof++;
   lpe = lp0 + n;
-  return n; /* Original 1984: should return bytes read */
+  
+  if (n > INT_MAX) { /* MODERN: validate range before int conversion */
+    printf("Read size too large.\n");
+    exit(1);
+  }
+  return (int)n; /* Original 1984: return bytes read as int */
 }
 
 char nextchar() {
@@ -95,7 +108,7 @@ loop:
       printf("Cannot skipuntil %s\n", s);
       exit(1);
     }
-  if (strlen(s) > lpe - lp + 1) {
+  if ((ptrdiff_t)strlen(s) > lpe - lp + 1) { /* MODERN: cast strlen to signed for comparison */
     char *lp1, *lp2;
     lp2 = lp;
     lp1 = lp = lp0;
@@ -105,7 +118,7 @@ loop:
     lp0 = lp1;
     readline();
     lp0 = lp2;
-    if (strlen(s) > lpe - lp + 1) {
+    if ((ptrdiff_t)strlen(s) > lpe - lp + 1) { /* MODERN: cast strlen to signed for comparison */
       printf("error in skipuntil");
       exit(1);
     }

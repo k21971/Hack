@@ -116,7 +116,7 @@ void tmp_at(schar x, schar y) {
     delay_output(50);
     prl(prevx, prevy); /* in case there was a monster */
     at(prevx, prevy,
-       levl[(unsigned char)prevx][(unsigned char)prevy]
+       levl[(int)prevx][(int)prevy]
            .scrsym); /* MODERN: Cast to unsigned char for safe array indexing */
   }
   if (x >= 0) { /* normal call */
@@ -145,13 +145,13 @@ void Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2
     }
     /* close call (do not distinguish y==0 and y==-1) */
     while (cnt--) {
-      xx = tc[(unsigned char)cnt]
+      xx = tc[(int)cnt]
                .x; /* MODERN: Cast to unsigned char for safe array indexing */
-      yy = tc[(unsigned char)cnt]
+      yy = tc[(int)cnt]
                .y; /* MODERN: Cast to unsigned char for safe array indexing */
       prl(xx, yy);
       at(xx, yy,
-         levl[(unsigned char)xx][(unsigned char)yy]
+         levl[(int)xx][(int)yy]
              .scrsym); /* MODERN: Cast to unsigned char for safe array indexing
                         */
     }
@@ -167,13 +167,13 @@ void Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2
     if (cnt)
       delay_output(50);
     at(x, y, let);
-    tc[(unsigned char)cnt].x =
+    tc[(int)cnt].x =
         x; /* MODERN: Cast to unsigned char for safe array indexing */
-    tc[(unsigned char)cnt].y =
+    tc[(int)cnt].y =
         y; /* MODERN: Cast to unsigned char for safe array indexing */
     if (++cnt >= COLNO)
       panic("Tmp_at overflow?");
-    levl[(unsigned char)x][(unsigned char)y].new = 0;
+    levl[(int)x][(int)y].new = 0;
         /* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char
                                                 for safe array indexing */
   }
@@ -234,9 +234,9 @@ void docrt(void) {
     if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
       /* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym =
        * u.usym; levl[u.udisx][u.udisy].seen = 1; */
-      levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)]
+      levl[(int)(u.udisx = u.ux)][(int)(u.udisy = u.uy)]
           .scrsym = u.usym;
-      levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen =
+      levl[(int)u.udisx][(int)u.udisy].seen =
           1; /* Bounds already validated */
     }
     u.udispl = 1;
@@ -328,7 +328,7 @@ void pru(void) {
    * ADDS: Memory safety by preventing buffer overflow
    */
   if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
-    levl[(unsigned char)u.ux][(unsigned char)u.uy].seen =
+    levl[(int)u.ux][(int)u.uy].seen =
         1; /* Bounds already validated */
   }
 }
@@ -355,7 +355,7 @@ void prl(int x, int y) {
   /* Original 1984: if((!room->typ) || (IS_ROCK(room->typ) &&
    * levl[u.ux][u.uy].typ == CORR)) */
   if ((!room->typ) || (IS_ROCK(room->typ) &&
-                       levl[(unsigned char)u.ux][(unsigned char)u.uy].typ ==
+                       levl[(int)u.ux][(int)u.uy].typ ==
                            CORR)) /* MODERN: safe array indexing */
     return;
   if ((mtmp = m_at(x, y)) && !mtmp->mhide && (!mtmp->minvis || See_invisible)) {

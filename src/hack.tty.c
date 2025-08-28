@@ -206,13 +206,13 @@ void gettty(void) {
 #if 0
 	ospeed = OSPEED(inittyb);
 #endif
-  erase_char = inittyb.erase_sym;
-  kill_char = inittyb.kill_sym;
+  erase_char = (char)inittyb.erase_sym; /* MODERN: explicit cast from cc_t to char */
+  kill_char = (char)inittyb.kill_sym; /* MODERN: explicit cast from cc_t to char */
   getioctls();
 
   /* do not expand tabs - they might be needed inside a cm sequence */
   if (curttyb.tabflgs & EXTABS) {
-    curttyb.tabflgs &= ~EXTABS;
+    curttyb.tabflgs &= (tcflag_t)(~EXTABS); /* MODERN: cast bitwise NOT to tcflag_t */
     setctty();
   }
   settty_needed = TRUE;
@@ -244,7 +244,7 @@ settty(const char *s) {
     printf("Warning: Cannot restore terminal settings (modern terminal)\n");
     return;
   }
-  flags.echo = (inittyb.echoflgs & ECHO) ? ON : OFF;
+  flags.echo = (unsigned char)((inittyb.echoflgs & ECHO) ? ON : OFF); /* MODERN: cast to bitfield type */
   flags.cbreak = (CBRKON(inittyb.cbrkflgs & CBRKMASK)) ? ON : OFF;
   setioctls();
 }
@@ -263,14 +263,14 @@ void setftty(void) {
   /* Should use (ECHO|CRMOD) here instead of ECHO */
   if ((curttyb.echoflgs & ECHO) !=
       (unsigned int)ef) { /* MODERN: Cast to unsigned for flag comparison */
-    curttyb.echoflgs &= ~ECHO;
+    curttyb.echoflgs &= (tcflag_t)(~ECHO); /* MODERN: cast bitwise NOT to tcflag_t */
     /*		curttyb.echoflgs |= ef;					*/
     change++;
   }
   if ((curttyb.cbrkflgs & CBRKMASK) !=
       (unsigned int)cf) { /* MODERN: Cast to unsigned for flag comparison */
-    curttyb.cbrkflgs &= ~CBRKMASK;
-    curttyb.cbrkflgs |= cf;
+    curttyb.cbrkflgs &= (tcflag_t)(~CBRKMASK); /* MODERN: cast bitwise NOT to tcflag_t */
+    curttyb.cbrkflgs |= (tcflag_t)cf; /* MODERN: cast cf to tcflag_t */
 #if defined(USG) || defined(MODERN_TERMIOS)
     /* be satisfied with one character; no timeout */
     curttyb.c_cc[VMIN] = 1;  /* was VEOF */

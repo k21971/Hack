@@ -225,8 +225,8 @@ int dozap(void) {
         while (--digdepth >= 0) {
           if (!isok(zx, zy))
             break;
-          room = &levl[(unsigned char)zx]
-                      [(unsigned char)zy]; /* MODERN: Cast to unsigned char for
+          room = &levl[(int)zx]
+                      [(int)zy]; /* MODERN: Cast to int for
                                               safe array indexing */
           Tmp_at(zx, zy);
           if (!xdnstair) {
@@ -439,19 +439,19 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
   while (range-- > 0) {
     sx += dx;
     sy += dy;
-    if ((lev = &levl[(unsigned char)sx][(unsigned char)sy])->typ)
+    if ((lev = &levl[(int)sx][(int)sy])->typ)
       Tmp_at(sx,
              sy); /* MODERN: Cast to unsigned char for safe array indexing */
     else {
       int bounce = 0;
       if (cansee(sx - dx, sy - dy))
         pline("The %s bounces!", fltxt);
-      if (ZAP_POS(levl[(unsigned char)sx][(unsigned char)(sy - dy)]
-                      .typ)) /* MODERN: Cast to unsigned char for safe array
+      if (ZAP_POS(levl[(int)sx][(int)(sy - dy)]
+                      .typ)) /* MODERN: Cast to int for safe array
                                 indexing */
         bounce = 1;
-      if (ZAP_POS(levl[(unsigned char)(sx - dx)][(unsigned char)sy]
-                      .typ)) { /* MODERN: Cast to unsigned char for safe array
+      if (ZAP_POS(levl[(int)(sx - dx)][(int)sy]
+                      .typ)) { /* MODERN: Cast to int for safe array
                                   indexing */
         if (!bounce || rn2(2))
           bounce = 2;
@@ -542,20 +542,20 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
         dx = -dx;
         dy = -dy;
       } else {
-        if (ZAP_POS(rmn = levl[(unsigned char)sx][(unsigned char)(sy - dy)]
-                              .typ) && /* MODERN: Cast to unsigned char for safe
+        if (ZAP_POS(rmn = levl[(int)sx][(int)(sy - dy)]
+                              .typ) && /* MODERN: Cast to int for safe
                                           array indexing */
             (IS_ROOM(rmn) ||
-             ZAP_POS(levl[(unsigned char)(sx + dx)][(unsigned char)(sy - dy)]
-                         .typ))) /* MODERN: Cast to unsigned char for safe array
+             ZAP_POS(levl[(int)(sx + dx)][(int)(sy - dy)]
+                         .typ))) /* MODERN: Cast to int for safe array
                                     indexing */
           bounce = 1;
-        if (ZAP_POS(rmn = levl[(unsigned char)(sx - dx)][(unsigned char)sy]
-                              .typ) && /* MODERN: Cast to unsigned char for safe
+        if (ZAP_POS(rmn = levl[(int)(sx - dx)][(int)sy]
+                              .typ) && /* MODERN: Cast to int for safe
                                           array indexing */
             (IS_ROOM(rmn) ||
-             ZAP_POS(levl[(unsigned char)(sx - dx)][(unsigned char)(sy + dy)]
-                         .typ))) /* MODERN: Cast to unsigned char for safe array
+             ZAP_POS(levl[(int)(sx - dx)][(int)(sy + dy)]
+                         .typ))) /* MODERN: Cast to int for safe array
                                     indexing */
           if (!bounce || rn2(2))
             bounce = 2;

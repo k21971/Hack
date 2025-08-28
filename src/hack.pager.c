@@ -169,7 +169,7 @@ void set_pager(int mode) /* 0: open  1: wait+close  2: close */
       curs(1, LI);
       more();
     }
-    flags.standout = so;
+    flags.standout = (unsigned char)so; /* MODERN: cast boolean to bitfield type */
     if (whole_screen)
       docrt();
     else {
@@ -243,7 +243,7 @@ void cornline(int mode, const char *text) {
     if (!text)
       return; /* superfluous, just to be sure */
     linect++;
-    len = strlen(text);
+    len = (int)strlen(text); /* MODERN: cast strlen to int */
     if (len > maxlen)
       maxlen = len;
     tl = (struct line *)alloc((unsigned)(len + sizeof(struct line) + 1));
