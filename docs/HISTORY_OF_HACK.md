@@ -14,12 +14,13 @@
      │    ∘ Jay Fenlason begins development after 1982 USENIX conference  
      │    ∘ Adds shops, complex inventory, rule-driven monster behaviors
      │    ∘ First distributed on 1984 USENIX tape alongside JOVE editor
-     │    ∘ Wizard Mode present in early Hack (likely introduced by Fenlason's team)
+     │
      │
 1984 ████ HACK 1.0 (Brouwer Takes Control)
      │    ∘ Andries Brouwer assumes development (December 1984)
      │    ∘ Mathematical approach to game balance
      │    ∘ 58 monster types with rule-driven behaviors
+     │    ∘ First known refrence to Wizard Mode found in config.h 
      │
 1985 ████ HACK 1.0.3 (The Masterpiece)
      │    ∘ Brouwer's final version - peak of design
