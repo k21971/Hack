@@ -10,11 +10,11 @@
      │    ∘ Establishes procedural generation + permadeath
      │    ∘ ASCII graphics, turn-based gameplay
      │
-1982-1984 ░░░ HACK DEVELOPMENT (Fenlason Era)
-     │    ∘ Jay Fenlason begins development after 1982 USENIX conference  
+~1981-1984 ░░░ HACK DEVELOPMENT (Fenlason Era)  
+     │    ∘ Jay Fenlason creates Hack as high school student (timeline uncertain)
      │    ∘ Adds shops, complex inventory, rule-driven monster behaviors
-     │    ∘ First distributed on 1984 USENIX tape alongside JOVE editor
-     │
+     │    ∘ Distributed on USENIX tape (most popular alongside JOVE editor)
+     │    ∘ Development began after UC Berkeley visit, inspired by Rogue
      │
 1984 ████ HACK 1.0 (Brouwer Takes Control)
      │    ∘ Andries Brouwer assumes development (December 1984)
@@ -98,11 +98,15 @@ Rogue emerged during the golden age of Unix development at universities. It spre
 
 ---
 
-## Enter the Hack: Fenlason's Revolution (1982)
+## Enter the Hack: Fenlason's Revolution (~1981-1984)
 
-### The Visionaries
+### The Visionary High School Student
 
-**Jay Fenlason**, working with **Kenny Woodland**, **Mike Thome**, and **Jon Payne**, looked at Rogue and saw untapped potential. Development began shortly after the 1982 USENIX conference where Rogue's creators spoke, but **the exact timeline and content of the original Hack remains uncertain** - multiple variants existed and "the exact content of the original Hack is not known for sure" (NetHack Wiki).
+**Jay Fenlason** was a junior at a high school in a small suburb outside of Boston when he visited UC Berkeley and was introduced to Rogue. As he recounts in a 2000 NewsForge interview: *"I was curious about some of the game play issues involved in designing it, things like how the rooms and corridors were generated, so I started hacking up some random level generators and stuff to try things out."* 
+
+When someone looked over his shoulder and asked what he was working on, they said *"oh, that's cool; when do we get to play it?"* - and Hack was born. Working with **Kenny Woodland**, **Mike Thome**, and **Jonathan Payne** (creator of the JOVE text editor), Fenlason developed Hack under the guise of work for his advanced computer class.
+
+**The exact timeline remains uncertain** - Fenlason was working almost 20 years before the 2000 interview, placing initial development around 1981-1982, though multiple variants existed and "the exact content of the original Hack is not known for sure" (NetHack Wiki).
 
 ### Revolutionary Innovations
 
@@ -140,6 +144,12 @@ Fenlason's team didn't just expand Rogue—they reimagined it:
 * **Teleportation** and exploration tools
 * **Monster summoning** and behavioral control
 
+### The Hardware and Philosophy  
+
+Fenlason's high school was near Maynard, where DEC headquarters were located. His ninth-grade teacher convinced DEC to sell him a PDP-11 at a 75% discount. Instead of loading DEC's operating system, he loaded Unix, then significantly discounted for the education community. This Unix environment became the foundation for Hack's development.
+
+Even decades later, Fenlason remained a purist about gaming and technology. In the 2000 interview, he expressed concerns about modern graphical gaming: *"No special effects in the movies will ever live up to those in your head."* He kept his children away from computers, believing they needed to learn *"more about how the world works, like climbing and building towers out of blocks and all the basic physics things that we take for granted."*
+
 ### Technical Architecture
 
 Early Hack introduced object-oriented concepts in pure C:
@@ -158,16 +168,18 @@ struct monst {
 };
 ```
 
-### Cultural Explosion
+### Cultural Explosion and USENIX Distribution
 
-Hack spread like wildfire through:
+Fenlason submitted Hack to a USENIX conference tape collection. As he recalls: *"Usenix had biannual meetings, Unix users would get together and swap war stories. For each meeting they'd put together a tape of some of the contributed software. I put [Hack] on the tape and forgot about it until someone I know mentioned that the two most popular pieces of software on that particular tape were my silly game and my friend Jonathon's text editor."*
 
-* **USENET newsgroups** (comp.sources.games)
+From there, Hack spread through:
+
+* **USENIX conference tapes** as the most popular contributed software  
 * **University computer labs** where it quickly displaced Rogue
-* **Hobbyist BBSs** and early online communities
+* **USENET newsgroups** (comp.sources.games)
 * **Source code sharing** that encouraged variants and modifications
 
-By the early-to-mid 1980s, Hack had become a prominent roguelike experience, though **the exact timeline of its spread remains unclear** from available sources.
+By the early-to-mid 1980s, Hack had become a prominent roguelike experience, with **Fenlason voluntarily avoiding participation** in further development after spawning the original almost 20 years before NetHack's rise.
 
 ---
 
@@ -199,14 +211,9 @@ Brouwer approached Hack like a complex system requiring mathematical rigor:
 
 #### **Game Balance as Science**
 
-Brouwer treated game balance as a mathematical discipline:
+Brouwer brought his mathematical and coding theory background to bear on game design. Signs of this expertise can be seen throughout the codebase: tight probability distributions, carefully structured data tables, and algorithmic approaches to balance that go beyond Fenlason's more experimental groundwork.
 
-* **Statistical analysis** of all gameplay mechanics
-* **Probability distributions** carefully tuned for optimal challenge
-* **Combat formulas** based on mathematical models
-* **Experience curves** designed for perfect progression pacing
-
-### The Masterpiece: Hack 1.0.3 (1985)
+### The Final Release: Hack 1.0.3 (1985)
 
 Brouwer's final version represented the pinnacle of 1980s game design:
 
@@ -214,7 +221,7 @@ Brouwer's final version represented the pinnacle of 1980s game design:
 
 * **19,239 lines** of meticulously crafted C code (exact count from preserved source)
 
-* **Modular architecture** with clean separation of concerns
+* **Semi-Modular architecture** with clean separation of concerns
 * **Custom data structures** optimized for limited hardware
 * **Memory efficiency** enabling complex gameplay in 64KB RAM
 
@@ -229,10 +236,6 @@ Brouwer's final version represented the pinnacle of 1980s game design:
 ### Cultural Phenomenon
 
 By 1985, Hack had gained significant influence in academic computing environments:
-
-#### **Academic Integration**
-
-* **Computer science students** may have examined Hack's data structures informally as programming practice, though specific documented evidence of this is limited
 
 #### **Community Development**
 
@@ -279,7 +282,7 @@ By 1987, NetHack had won the popularity contest:
 * **Active development** with regular releases and community support
 * **Lower barrier to entry** with improved documentation and tutorials
 
-**Hack development effectively ceased** after Brouwer's 1.0.3 release.
+**Hack development effectively ceased** after Brouwer's 1.0.3 release. Fenlason, meanwhile, had long since stepped away from development. As he explained in 2000: *"It has evolved without him. It doesn't bother him, he simply plays the original version. (His wife, on the other hand, fancies playing the latest release.)"* He considered the later versions to have *"got so busy adding cool features and didn't spend enough time thinking about how it would effect playing the game."*
 
 ---
 
@@ -782,7 +785,7 @@ The dungeons of Doom await. Choose your weapon, prepare your spells, and descend
 ### **Primary Sources**
 
 * **[Original 1984 Source Code](docs/historical/original-source/)** - Complete preserved codebase
-
+* **[Jay Fenlason Interview (2000)](https://web.archive.org/web/20030512112023/http://newsforge.com/article.pl?sid=00/12/03/2052246)** - Creator's firsthand account
 * **[Source Retrieval Script](docs/historical/original-source/download_hack.sh)** - Automated provenance documentation
 * **[FreeBSD Games Collection](https://cgit.freebsd.org/src/tree/games/hack?h=releng/4.10)** - Canonical preservation
 
