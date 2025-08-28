@@ -174,8 +174,8 @@ void Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2
     if (++cnt >= COLNO)
       panic("Tmp_at overflow?");
     levl[(int)x][(int)y].new = 0;
-        /* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char
-                                                for safe array indexing */
+    /* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char
+                                            for safe array indexing */
   }
 }
 
@@ -225,19 +225,12 @@ void docrt(void) {
   /* Some ridiculous code to get display of @ and monsters (almost) right */
   if (!Invisible) {
     /**
-     * MODERN ADDITION (2025): Bounds check before array access
-     * WHY: u.ux/u.uy can exceed array bounds causing buffer overflow
-     * HOW: Validate coordinates before accessing levl array
-     * PRESERVES: Original 1984 display logic
-     * ADDS: Memory safety by preventing buffer overflow
-     */
+     * MODERN ADDITION (2025): Bounds check before array access */
     if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
       /* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym =
        * u.usym; levl[u.udisx][u.udisy].seen = 1; */
-      levl[(int)(u.udisx = u.ux)][(int)(u.udisy = u.uy)]
-          .scrsym = u.usym;
-      levl[(int)u.udisx][(int)u.udisy].seen =
-          1; /* Bounds already validated */
+      levl[(int)(u.udisx = u.ux)][(int)(u.udisy = u.uy)].scrsym = u.usym;
+      levl[(int)u.udisx][(int)u.udisy].seen = 1; /* Bounds already validated */
     }
     u.udispl = 1;
   } else
@@ -321,15 +314,9 @@ void pru(void) {
   }
   /* Original 1984: levl[u.ux][u.uy].seen = 1; */
   /**
-   * MODERN ADDITION (2025): Bounds check before array access
-   * WHY: u.ux/u.uy can exceed array bounds (e.g. u.ux=82 > 79)
-   * HOW: Validate coordinates before accessing levl array
-   * PRESERVES: Original 1984 visibility logic
-   * ADDS: Memory safety by preventing buffer overflow
-   */
+   * MODERN: Bounds check before array access*/
   if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
-    levl[(int)u.ux][(int)u.uy].seen =
-        1; /* Bounds already validated */
+    levl[(int)u.ux][(int)u.uy].seen = 1; /* Bounds already validated */
   }
 }
 
@@ -354,9 +341,9 @@ void prl(int x, int y) {
   room = &levl[x][y];
   /* Original 1984: if((!room->typ) || (IS_ROCK(room->typ) &&
    * levl[u.ux][u.uy].typ == CORR)) */
-  if ((!room->typ) || (IS_ROCK(room->typ) &&
-                       levl[(int)u.ux][(int)u.uy].typ ==
-                           CORR)) /* MODERN: safe array indexing */
+  if ((!room->typ) ||
+      (IS_ROCK(room->typ) && levl[(int)u.ux][(int)u.uy].typ ==
+                                 CORR)) /* MODERN: safe array indexing */
     return;
   if ((mtmp = m_at(x, y)) && !mtmp->mhide && (!mtmp->minvis || See_invisible)) {
 #ifndef NOWORM
@@ -573,8 +560,7 @@ void seemons(void) {
   for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
     if (mtmp->data->mlet == ';')
       mtmp->minvis =
-          (u.ustuck != mtmp &&
-           levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL);
+          (u.ustuck != mtmp && levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL);
     pmon(mtmp);
 #ifndef NOWORM
     if (mtmp->wormno)

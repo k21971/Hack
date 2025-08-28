@@ -136,11 +136,7 @@ void movemon(void) {
     if (mtmp->mspeed == MFAST && dochugw(mtmp))
       continue;
   }
-  /* IMPORTANT NOTE: when enabling the modern code below (bounds check) it
-   allows a warning message to appear without a ring of warning indicating a
-   possible default mechanic that has been silienced since v1.0 and carried
-   over. I will continue
-   to investigate and decide on the approptiate course of action.*/
+
   /* IMPORTANT NOTE: when enabling the modern code below (bounds check) it
    allows a warning message to appear without a ring of warning indicating a
    possible default mechanic that has been silienced since v1.0 and carried

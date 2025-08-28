@@ -57,14 +57,7 @@ static inline int safe_strcat(char *dst, size_t cap, const char *src) {
 }
 
 /**
- * MODERN ADDITION (2025): Enhanced safe string copy with memory validation
- *
- * WHY: Crashes occur when src pointer is corrupted (not just NULL)
- * HOW: Added pointer validation to detect corrupted memory addresses
- *
- * PRESERVES: All original string functionality for valid pointers
- * ADDS: Protection against crashes from corrupted object name pointers
- */
+ * MODERN: Enhanced safe string copy with memory validation */
 static inline int safe_strcpy(char *dst, size_t cap, const char *src) {
   if (cap == 0)
     return -1;

@@ -76,7 +76,9 @@ void init_objects(void) {
       sum += objects[j].oc_prob;
     if (sum == 0) {
       for (j = first; j < last; j++)
-        objects[j].oc_prob = (schar)((100 + j - first) / (last - first)); /* MODERN: cast to schar */
+        objects[j].oc_prob =
+            (schar)((100 + j - first) /
+                    (last - first)); /* MODERN: cast to schar */
       goto check;
     }
     if (sum != 100)
@@ -99,16 +101,13 @@ void init_objects(void) {
 }
 
 int probtype(int let) {
-  int i = bases[letindex((char)let)]; /* MODERN: cast int to char for letindex */
+  int i =
+      bases[letindex((char)let)]; /* MODERN: cast int to char for letindex */
   int prob = rn2(100);
   int category_start = i;
-  (void)category_start; /* Original 1984: intended for bounds tracking, currently unused */
-  /* MODERN ADDITION (2025): Safe probability calculation with bounds checking
-   * WHY: Original could overflow when probabilities don't sum correctly
-   * HOW: Track category boundaries and clamp to valid range
-   * PRESERVES: Original 1984 random selection behavior within category
-   * ADDS: Memory safety to prevent array bounds violations
-   */
+  (void)category_start; /* Original 1984: intended for bounds tracking,
+                           currently unused */
+  /* MODERN: Safe probability calculation with bounds checking*/
 
   /* Find the end of this object category */
   int category_end = i;
@@ -147,7 +146,9 @@ void setgemprobs(void) {
     printf("Not enough gems? - first=%d j=%d LAST_GEM=%d\n", first, j,
            LAST_GEM);
   for (j = first; j < LAST_GEM; j++)
-    objects[j].oc_prob = (schar)((20 + j - first) / (LAST_GEM - first)); /* MODERN: cast to schar */
+    objects[j].oc_prob =
+        (schar)((20 + j - first) /
+                (LAST_GEM - first)); /* MODERN: cast to schar */
 }
 
 void oinit(void) /* level dependent initialization */
@@ -165,9 +166,11 @@ void savenames(int fd) {
      oc_uname for all objects */
   for (i = 0; i < SIZE(objects); i++) {
     if (objects[i].oc_uname) {
-      len = (unsigned int)(strlen(objects[i].oc_uname) + 1); /* MODERN: cast to unsigned int */
+      len = (unsigned int)(strlen(objects[i].oc_uname) +
+                           1); /* MODERN: cast to unsigned int */
       bwrite(fd, (char *)&len, sizeof len);
-      bwrite(fd, objects[i].oc_uname, (int)len); /* MODERN: cast to int for bwrite */
+      bwrite(fd, objects[i].oc_uname,
+             (int)len); /* MODERN: cast to int for bwrite */
     }
   }
 }
@@ -181,7 +184,8 @@ void restnames(int fd) {
     if (objects[i].oc_uname) {
       mread(fd, (char *)&len, sizeof len);
       objects[i].oc_uname = (char *)alloc(len);
-      mread(fd, objects[i].oc_uname, (int)len); /* MODERN: cast to int for mread */
+      mread(fd, objects[i].oc_uname,
+            (int)len); /* MODERN: cast to int for mread */
     }
 }
 
