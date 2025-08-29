@@ -30,10 +30,8 @@
 #define POINTER_ARITHMETIC_CHECK(ptr) ((void)0)
 #endif
 
-#ifndef BSD
-#define index strchr
-#define rindex strrchr
-#endif /* BSD */
+/* MODERN: index/rindex macros moved to compat.h for cleaner organization */
+#include "compat.h"
 
 #define Null(type) ((struct type *)0)
 

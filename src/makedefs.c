@@ -26,7 +26,7 @@ int digit(char ch);
 int readline(void);
 
 int main(int argc, char **argv) {
-  int index = 0;
+  int idx = 0; /* MODERN: renamed from 'index' to avoid collision with index() macro */
   int propct = 0;
   char *sp;
   if (argc != 2) {
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   skipuntil("objects[] = {");
   while (getentry()) {
     if (!*string) {
-      index++;
+      idx++;
       continue;
     }
     for (sp = string; *sp; sp++)
@@ -54,15 +54,15 @@ int main(int argc, char **argv) {
       capitalize(sp);
     /* avoid trouble with stupid C preprocessors */
     if (!strncmp(string, "WORTHLESS_PIECE_OF_", 19))
-      printf("/* #define %s	%d */\n", string, index);
+      printf("/* #define %s	%d */\n", string, idx);
     else
-      printf("#define	%s	%d\n", string, index);
-    index++;
+      printf("#define	%s	%d\n", string, idx);
+    idx++;
   }
   printf("\n#define	CORPSE	DEAD_HUMAN\n");
   printf("#define	LAST_GEM	(JADE+1)\n");
   printf("#define	LAST_RING	%d\n", propct);
-  printf("#define	NROFOBJECTS	%d\n", index - 1);
+  printf("#define	NROFOBJECTS	%d\n", idx - 1);
   exit(0);
 }
 

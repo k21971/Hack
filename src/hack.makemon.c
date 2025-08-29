@@ -11,7 +11,7 @@
 
 #include "hack.h"
 extern char fut_geno[];
-extern char *index(const char *s, int c);
+/* MODERN: removed bogus extern for index() - provided by string.h/compat.h */
 extern struct obj *mkobj_at(int let, int x, int y);
 
 /* Function prototypes for missing functions */
