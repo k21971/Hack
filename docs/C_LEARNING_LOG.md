@@ -139,11 +139,13 @@ Replaced stubs with authentic 1984 code.
 ## 7. Final Phase: Playable Game (Phase 0G - July 29, 2025)
 
 **Build Fixes:**
+
 * Resolved hack.lev.c prototype conflicts
 * Fixed header duplications
 * Removed conflicting stubs
 
 **Critical Fixes:**
+
 * mintrap() - Fixed infinite loop segfault
 * makedog() - Removed stub messages
 * initrack() - Silenced debug output
@@ -155,6 +157,7 @@ Replaced stubs with authentic 1984 code.
 ## 8. Polish Phase (Phase 0H - July 29, 2025)
 
 **Fixes:**
+
 1. Created proper hackdir structure
 2. Silenced lock messages
 3. Removed combat spam
@@ -167,11 +170,13 @@ Replaced stubs with authentic 1984 code.
 ## 9. Bug Fixes (Phase 1 - July 29, 2025)
 
 **Experienced Player Crash:**
+
 * Segfault at: `roles[i][0] = pc;`
 * Cause: String literals are read-only in ANSI C
 * K&R allowed modifying string literals
 
 **Fix:** Changed string literals to mutable arrays:
+
 ```c
 // Before: char *(roles[]) = {"Tourist", "Speleologist", ...};
 // After: static char role_tourist[] = "Tourist"; ...
@@ -192,6 +197,7 @@ Replaced stubs with authentic 1984 code.
 ## 11. Trap System (Phase 1A - July 29, 2025)
 
 **hack.trap.c Integration:**
+
 * 9 functions converted from K&R
 * Added prototypes to hack.h
 * Fixed header conflicts
@@ -222,12 +228,14 @@ Replaced stubs with authentic 1984 code.
 ## 13. K&R Conversion (Phase 1C - July 30, 2025)
 
 **Files Converted:**
+
 * hack.apply.c - 13 functions
 * hack.dog.c - 9 functions
 * hack.do_name.c - Already ANSI
 * hack.shk.c - 25+ functions
 
 **Conversion Types:**
+
 1. Function signatures: `dog_move(mtmp, after) struct monst *mtmp;` → `int dog_move(struct monst *mtmp, int after)`
 2. Return types: `dopay()` → `int dopay(void)`
 3. Parameter types: `shopdig(fall) int fall;` → `void shopdig(int fall)`
@@ -240,6 +248,7 @@ Replaced stubs with authentic 1984 code.
 ## 14. Final K&R Conversion (Phase 1D - August 2025)
 
 **Final Files:**
+
 * hack.main.c, hack.mkmaze.c, hack.steal.c, hack.wizard.c
 * hack.do_wear.c, hack.ioctl.c, hack.mkshop.c, hack.rip.c
 * hack.options.c and all remaining K&R files
