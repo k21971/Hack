@@ -165,7 +165,6 @@ Every change from the original 1984 code is meticulously documented:
 
 Hack 1.0.3 represents:
 
-* **Andries Brouwer's masterpiece**: The mathematical peak of 1980s roguelike design
 * **The bridge**: Between Rogue's simplicity and NetHack's complexity
 * **Software archaeology**: A preserved artifact of computing history
 * **Gaming heritage**: The foundation of an entire genre
