@@ -49,7 +49,10 @@ panic(const char *str, ...) {
   fputs(" ERROR:  ", stdout);
   va_list args;
   va_start(args, str);
-  vprintf(str, args);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+  vprintf(str, args); /* MODERN: pragma suppresses false positive - str comes from panic() caller */
+#pragma GCC diagnostic pop
   va_end(args);
 #ifdef DEBUG
 #ifdef UNIX

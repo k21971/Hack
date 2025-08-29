@@ -293,7 +293,10 @@ error(const char *s, ...) {
   va_start(args, s);
   if (settty_needed)
     settty((char *)0);
-  vprintf(s, args);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+  vprintf(s, args); /* MODERN: pragma suppresses false positive - s comes from error() caller */
+#pragma GCC diagnostic pop
   va_end(args);
   putchar('\n');
   exit(1);

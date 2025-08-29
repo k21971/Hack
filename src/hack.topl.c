@@ -152,9 +152,12 @@ pline(const char *line, ...) {
     pbuf[BUFSZ - 1] = '\0'; /* MODERN: Ensure null termination */
   } else {
     va_start(args, line);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
     (void)vsnprintf(pbuf, BUFSZ, line,
                     args); /* MODERN: Safe vsprintf replacement - identical
                               output, prevents overflow */
+#pragma GCC diagnostic pop
     va_end(args);
   }
   if (flags.toplin == 1 && !strcmp(pbuf, toplines))
