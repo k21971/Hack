@@ -89,7 +89,7 @@ jobs:
           --checks="-*,security-*,bugprone-*,cert-*" \
           --quiet || echo "Static analysis completed with findings"
 
-  # Special hardened build to test security features
+  # Special RelWithDebInfo build to test production-ready builds with debug symbols
   security-hardened:
     runs-on: ubuntu-latest
     
@@ -106,12 +106,12 @@ jobs:
     - name: Build with Security Hardening
       run: |
         # Build with all security flags enabled
-        cmake -B build-hardened -G Ninja \
-          -DCMAKE_BUILD_TYPE=Hardened \
+        cmake -B build-relwithdebinfo -G Ninja \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fstack-protector-strong -D_FORTIFY_SOURCE=3 -Werror=format-security"
         
-        cmake --build build-hardened --parallel
+        cmake --build build-relwithdebinfo --parallel
         
 
 
