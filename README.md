@@ -167,7 +167,7 @@ Hack 1.0.3 represents:
 
 * **The bridge**: Between Rogue's simplicity and NetHack's complexity
 * **Software archaeology**: A preserved artifact of computing history
-* **Gaming heritage**: The foundation of an entire genre
+* **Gaming heritage**: The foundation of an entire sub-genre or Rougelikes
 
 For the complete story of Hack's creation, evolution, abandonment, and resurrection, see **[The Complete History of Hack](docs/HISTORY_OF_HACK.md)**.
 
