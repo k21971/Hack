@@ -88,9 +88,10 @@ int otyp;
     if (otmp->otyp == TIN)
       otmp->spe = rnd(...);
 #endif /* NOT_YET_IMPLEMENTED */
-       /* fallthrough */
+       /* FALLTHROUGH */
   case GEM_SYM:
     otmp->quan = rn2(6) ? 1 : 2;
+    /* FALLTHROUGH */
   case TOOL_SYM:
   case CHAIN_SYM:
   case BALL_SYM:

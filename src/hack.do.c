@@ -188,19 +188,19 @@ void goto_level(int newlevel, boolean at_stairs) {
 
   if (at_stairs) {
     if (up) {
-      u.ux = xdnstair;
-      u.uy = ydnstair;
+      u.ux = (xchar)xdnstair; /* MODERN: Safe cast - map coords are 0-79, within xchar range */
+      u.uy = (xchar)ydnstair; /* MODERN: Safe cast - map coords are 0-21, within xchar range */
       if (!u.ux) {       /* entering a maze from below? */
-        u.ux = xupstair; /* this will confuse the player! */
-        u.uy = yupstair;
+        u.ux = (xchar)xupstair; /* this will confuse the player! */ /* MODERN: Safe cast */
+        u.uy = (xchar)yupstair; /* MODERN: Safe cast */
       }
       if (Punished && !Levitation) {
         pline("With great effort you climb the stairs.");
         placebc(1);
       }
     } else {
-      u.ux = xupstair;
-      u.uy = yupstair;
+      u.ux = (xchar)xupstair; /* MODERN: Safe cast - map coords within xchar range */
+      u.uy = (xchar)yupstair; /* MODERN: Safe cast - map coords within xchar range */
       if (inv_weight() + 5 > 0 || Punished) {
         pline("You fall down the stairs."); /* %% */
         losehp(rnd(3), "fall");

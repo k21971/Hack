@@ -176,7 +176,7 @@ void cutworm(struct monst *mtmp, xchar x, xchar y,
       wtmp->nseg = 0;
       if (tmp2) {
         pline("You cut the worm in half.");
-        mtmp2->mhpmax = mtmp2->mhp = d(mtmp2->data->mlevel, 8);
+        mtmp2->mhpmax = mtmp2->mhp = (schar)d(mtmp2->data->mlevel, 8); /* MODERN: Safe cast - HP bounded by dice */
         mtmp2->mx = wtmp->wx;
         mtmp2->my = wtmp->wy;
         mtmp2->nmon = fmon;

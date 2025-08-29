@@ -77,7 +77,7 @@ static void use_camera(struct obj *obj) {
   struct monst *mtmp;
   (void)obj;
   if (!getdir(1)) { /* ask: in what direction? */
-    flags.move = multi = 0;
+    flags.move = (unsigned char)(multi = 0); /* MODERN: Cast for bit field assignment */
     return;
   }
   if (u.uswallow) {
@@ -212,7 +212,7 @@ static struct monst *bchit(int ddx, int ddy, int range, char sym) {
       break;
     }
     if (sym)
-      Tmp_at(bchx, bchy);
+      Tmp_at((schar)bchx, (schar)bchy); /* MODERN: Safe cast - coordinates bounded by map size */
   }
   if (sym)
     Tmp_at(-1, -1);

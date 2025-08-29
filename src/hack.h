@@ -76,7 +76,8 @@ typedef struct {
 
 extern void *alloc(unsigned lth);
 /* MODERN: CONST-CORRECTNESS: panic message is read-only */
-extern void panic(const char *str, ...);
+/* MODERN: noreturn attribute tells compiler panic() never returns */
+extern void panic(const char *str, ...) __attribute__((noreturn));
 
 /* Critical missing function prototypes */
 extern int carrying(int type);

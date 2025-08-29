@@ -10,6 +10,7 @@
  */
 
 #include "hack.h"
+#include <limits.h> /* MODERN: For SCHAR_MAX to prevent stat overflow */
 #include <stdio.h>
 char POISONOUS[] = "ADKSVabhks";
 extern const char
@@ -95,8 +96,12 @@ int opentin(void) {
   } else {
     pline("It contains spinach - this makes you feel like Popeye!");
     lesshungry(600);
-    if (u.ustr < 118)
-      u.ustr += rnd(((u.ustr < 17) ? 19 : 118) - u.ustr);
+    if (u.ustr < 118) {
+      int new_str = u.ustr + rnd(((u.ustr < 17) ? 19 : 118) - u.ustr);
+      /* MODERN: Prevent strength overflow - cap at max schar value */
+      if (new_str > SCHAR_MAX) new_str = SCHAR_MAX;
+      u.ustr = (schar)new_str;
+    }
     if (u.ustr > u.ustrmax)
       u.ustrmax = u.ustr;
     flags.botl = 1;

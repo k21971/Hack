@@ -68,8 +68,8 @@ int hitmm(struct monst *magr, struct monst *mdef) {
             "You have a peculiarly sad feeling for a moment, then it passes.");
       monstone(mdef);
       hit = 2;
-    } else if ((mdef->mhp -= d(pa->damn, pa->damd)) < 1) {
-      magr->mhpmax += 1 + rn2(pd->mlevel + 1);
+    } else if ((mdef->mhp -= (schar)d(pa->damn, pa->damd)) < 1) { /* MODERN: Safe cast - damage capped by dice */
+      magr->mhpmax += (schar)(1 + rn2(pd->mlevel + 1)); /* MODERN: Safe cast - level-based increment */
       if (magr->mtame && magr->mhpmax > 8 * pa->mlevel) {
         if (pa == &li_dog)
           magr->data = pa = &dog;
@@ -245,14 +245,19 @@ boolean hmon(struct monst *mon, struct obj *obj,
   }
   if (tmp < 1)
     tmp = 1;
-  mon->mhp -= tmp;
+  mon->mhp -= (schar)tmp; /* MODERN: Safe cast - tmp bounded above by weapon damage */
   if (mon->mhp < 1) {
     killed(mon);
     return (FALSE);
   }
   if (mon->mtame && (!mon->mflee || mon->mfleetim)) {
     mon->mflee = 1; /* Rick Richardson */
-    mon->mfleetim += 10 * rnd(tmp);
+    int flee_add = 10 * rnd(tmp);
+    /* MODERN: Cap flee time to 7-bit field max (127) */
+    if (mon->mfleetim + flee_add > 127)
+      mon->mfleetim = 127;
+    else
+      mon->mfleetim += flee_add;
   }
 
   if (!hittxt) {

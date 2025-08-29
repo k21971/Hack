@@ -206,7 +206,7 @@ int makerooms() {
     hix = lowx + dx;
     hiy = lowy + dy;
 
-    if (maker(lowx, dx, lowy, dy)) {
+    if (maker((schar)lowx, (schar)dx, (schar)lowy, (schar)dy)) { /* MODERN: Safe cast - room coordinates bounded by map */
       if (secret)
         return (1);
       addrs(lowx - 1, lowy - 1, hix + 1, hiy + 1);

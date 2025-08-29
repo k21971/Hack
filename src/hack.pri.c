@@ -39,6 +39,8 @@ boolean panicking;
 
 void
 /* MODERN: CONST-CORRECTNESS: panic message is read-only */
+/* MODERN: noreturn attribute tells compiler this function never returns */
+__attribute__((noreturn))
 panic(const char *str, ...) {
   if (panicking++)
     exit(1); /* avoid loops - this should never happen*/
@@ -57,6 +59,7 @@ panic(const char *str, ...) {
 #endif       /* DEBUG */
   more();    /* contains a fflush() */
   done("panicked");
+  exit(1); /* MODERN: Ensure panic never returns, satisfying noreturn attribute */
 }
 
 void atl(int x, int y, int ch) {

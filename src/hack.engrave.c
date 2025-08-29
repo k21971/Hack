@@ -251,7 +251,7 @@ int doengrave(void) {
       otmp->spe = -3;
       nomovemsg = "You cannot engrave more.";
     } else {
-      otmp->spe -= len / 2;
+      otmp->spe -= (schar)(len / 2); /* MODERN: Safe cast - engraving length bounded */
       nomovemsg = "You finished engraving.";
     }
     multi = -len;

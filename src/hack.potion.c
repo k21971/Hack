@@ -130,9 +130,12 @@ int dodrink(void) {
     pline("Wow do you feel strong!");
     if (u.ustr >= 118)
       break; /* > 118 is impossible */
-    if (u.ustr > 17)
-      u.ustr += rnd(118 - u.ustr);
-    else
+    if (u.ustr > 17) {
+      int new_str = u.ustr + rnd(118 - u.ustr);
+      /* MODERN: Prevent strength overflow - cap at max schar value */
+      if (new_str > 127) new_str = 127;
+      u.ustr = (schar)new_str;
+    } else
       u.ustr++;
     if (u.ustr > u.ustrmax)
       u.ustrmax = u.ustr;

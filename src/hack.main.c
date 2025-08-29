@@ -335,8 +335,8 @@ int main(int argc, char *argv[]) {
 
     (void)signal(SIGINT, done1);
     mklev();
-    u.ux = xupstair;
-    u.uy = yupstair;
+    u.ux = (xchar)xupstair; /* MODERN: Safe cast - map coords are 0-79, within xchar range */
+    u.uy = (xchar)yupstair; /* MODERN: Safe cast - map coords are 0-21, within xchar range */
     (void)inshop();
     setsee();
     flags.botlx = 1;
