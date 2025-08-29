@@ -153,11 +153,6 @@ void movemon(void) {
       // int display_level = (warnlevel < 0) ? 0 : warnlevel;
       // if (warnlevel < 0) /* MODERN: prevent negative array index */
       //     warnlevel = 0;
-      /* MODERN: Defensive bounds check for array access while preserving game
-       * logic */
-      // int display_level = (warnlevel < 0) ? 0 : warnlevel;
-      // if (warnlevel < 0) /* MODERN: prevent negative array index */
-      //     warnlevel = 0;
       switch (Warning & (LEFT_RING | RIGHT_RING)) {
       case LEFT_RING:
         rr = "Your left ring glows";
