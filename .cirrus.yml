@@ -27,8 +27,8 @@ freebsd_build_task:
         path: build/**
         type: ARCHIVE
 
-tarball_test_task:
-  name: Test hybrid tarball build
+source_tarball_test_task:
+  name: Test source tarball build
   only_if: $CIRRUS_TAG =~ '^v[0-9].+'
   freebsd_instance:
     image_family: freebsd-14-2
@@ -40,9 +40,9 @@ tarball_test_task:
     set -euxo pipefail
     pkg update -f
     pkg install -y cmake ninja pkgconf ncurses curl jq ca_root_nss
-  download_tarball_script: |
+  download_source_tarball_script: |
     set -euxo pipefail
-    echo "Attempting to download hybrid tarball for tag: ${CIRRUS_TAG:-<unset>}"
+    echo "Attempting to download source tarball for tag: ${CIRRUS_TAG:-<unset>}"
     # Add retry logic and better debugging
     for i in 1 2 3; do
       echo "Attempt $i: Fetching release info..."
@@ -52,24 +52,25 @@ tarball_test_task:
     done
     echo "Release API response received, parsing assets..."
     echo "$API_JSON" | jq -r '.assets[]?.name' || true  # Debug: show all asset names
-    TARBALL_URL="$(echo "$API_JSON" | jq -r '.assets[]?.browser_download_url | select(test("restoHack-static.*linux-x86_64\\.tar\\.gz$"))' | head -n1)"
-    test -n "$TARBALL_URL" || { 
-      echo "No matching tarball asset found for ${CIRRUS_TAG}"
+    # Look for source tarball (new naming pattern)
+    SOURCE_URL="$(echo "$API_JSON" | jq -r '.assets[]?.browser_download_url | select(test("restoHack-.*-source\\.tar\\.gz$"))' | head -n1)"
+    test -n "$SOURCE_URL" || { 
+      echo "No matching source tarball found for ${CIRRUS_TAG}"
       echo "Available assets:"
       echo "$API_JSON" | jq -r '.assets[]?.name' || echo "Failed to parse assets"
       exit 1
     }
-    echo "Found tarball URL: $TARBALL_URL"
-    curl -fL -o hybrid-tarball.tar.gz "$TARBALL_URL"
-    ls -la hybrid-tarball.tar.gz
-  test_tarball_extraction_script: |
+    echo "Found source tarball URL: $SOURCE_URL"
+    curl -fL -o source-tarball.tar.gz "$SOURCE_URL"
+    ls -la source-tarball.tar.gz
+  test_source_extraction_script: |
     set -euxo pipefail
-    mkdir tarball_test && cd tarball_test
-    tar -xzf ../hybrid-tarball.tar.gz
+    mkdir source_test && cd source_test
+    tar -xzf ../source-tarball.tar.gz --strip-components=1
     ls -la  # Show tarball contents
-  verify_hybrid_contents_script: |
+  verify_source_contents_script: |
     set -euxo pipefail
-    cd tarball_test
+    cd source_test
     echo "Checking for required source files..."
     test -f CMakeLists.txt || { echo "✗ CMakeLists.txt missing"; exit 1; }
     echo "✓ CMakeLists.txt present"
@@ -81,22 +82,78 @@ tarball_test_task:
     echo "✓ README.md present"
     test -f LICENSE || { echo "✗ LICENSE missing"; exit 1; }
     echo "✓ LICENSE present"
-    test -f data || { echo "✗ data file missing"; exit 1; }
-    echo "✓ data file present"
-    test -f help || { echo "✗ help file missing"; exit 1; }
-    echo "✓ help file present"
-    test -f hh || { echo "✗ hh file missing"; exit 1; }
-    echo "✓ hh file present"
-    test -f rumors || { echo "✗ rumors file missing"; exit 1; }
-    echo "✓ rumors file present"
-    test -f hack || { echo "✗ hack binary missing"; exit 1; }
-    echo "✓ hack binary present"
-    # Optional helpers
-    if [ -f run-hack.sh ]; then echo "• run-hack.sh present"; else echo "• run-hack.sh not present (optional)"; fi
+    test -d data || { echo "✗ data/ directory missing"; exit 1; }
+    echo "✓ data/ directory present"
+    test -d help || { echo "✗ help/ directory missing"; exit 1; }
+    echo "✓ help/ directory present"
+    test -d hh || { echo "✗ hh/ directory missing"; exit 1; }
+    echo "✓ hh/ directory present"
+    test -d rumors || { echo "✗ rumors/ directory missing"; exit 1; }
+    echo "✓ rumors/ directory present"
   test_source_build_script: |
     set -euxo pipefail
-    cd tarball_test
-    echo "Testing build from included source..."
-    cmake -S . -B test_build -DCMAKE_BUILD_TYPE=Release -G Ninja -DRESTOHACK_ENABLE_PACKAGE=OFF
+    cd source_test
+    echo "Testing build from source tarball..."
+    cmake -S . -B test_build -DCMAKE_BUILD_TYPE=Release -G Ninja
     cmake --build test_build --parallel
     file test_build/hack
+    # Quick smoke test
+    test_build/hack -s || true
+
+binary_tarball_test_task:
+  name: Test static binary tarball
+  only_if: $CIRRUS_TAG =~ '^v[0-9].+'
+  container:
+    image: alpine:3.20
+  env:
+    CIRRUS_CLONE_DEPTH: "1"
+  install_script: |
+    apk add --no-cache curl jq tar file
+  download_binary_tarball_script: |
+    set -eux
+    echo "Attempting to download binary tarball for tag: ${CIRRUS_TAG:-<unset>}"
+    # Add retry logic
+    for i in 1 2 3; do
+      echo "Attempt $i: Fetching release info..."
+      API_JSON="$(curl -sf https://api.github.com/repos/Critlist/restoHack/releases/tags/${CIRRUS_TAG})" && break
+      echo "API call failed, retrying in 30s..."
+      sleep 30
+    done
+    echo "Release API response received, parsing assets..."
+    echo "$API_JSON" | jq -r '.assets[]?.name' || true  # Debug: show all asset names
+    # Look for static binary tarball
+    BINARY_URL="$(echo "$API_JSON" | jq -r '.assets[]?.browser_download_url | select(test("restoHack-.*-linux-x86_64-static\\.tar\\.gz$"))' | head -n1)"
+    test -n "$BINARY_URL" || { 
+      echo "No matching binary tarball found for ${CIRRUS_TAG}"
+      echo "Available assets:"
+      echo "$API_JSON" | jq -r '.assets[]?.name' || echo "Failed to parse assets"
+      exit 1
+    }
+    echo "Found binary tarball URL: $BINARY_URL"
+    curl -fL -o binary-tarball.tar.gz "$BINARY_URL"
+    ls -la binary-tarball.tar.gz
+  test_binary_extraction_script: |
+    set -eux
+    mkdir binary_test && cd binary_test
+    tar -xzf ../binary-tarball.tar.gz
+    ls -la  # Show tarball contents
+  verify_binary_contents_script: |
+    set -eux
+    cd binary_test
+    echo "Checking for required binary files..."
+    test -f hack || { echo "✗ hack binary missing"; exit 1; }
+    echo "✓ hack binary present"
+    test -d hackdir || { echo "✗ hackdir/ directory missing"; exit 1; }
+    echo "✓ hackdir/ directory present"
+    test -f run-hack.sh || { echo "✗ run-hack.sh launcher missing"; exit 1; }
+    echo "✓ run-hack.sh launcher present"
+    test -f README.md || { echo "✗ README.md missing"; exit 1; }
+    echo "✓ README.md present"
+    test -f LICENSE || { echo "✗ LICENSE missing"; exit 1; }
+    echo "✓ LICENSE present"
+    # Verify it's actually a static binary
+    file hack | grep -q "statically linked" || { echo "✗ Binary is not statically linked"; exit 1; }
+    echo "✓ Binary is statically linked"
+    # Test that it runs
+    ./hack -s || true
+    echo "✓ Binary executes successfully"

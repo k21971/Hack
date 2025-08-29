@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2025-08-28
+
 ### Added
 - **Comprehensive security audit**: Systematic review and hardening of all game logic files
+- **Improved fuzzing infrastructure**: Standalone fuzzer for testing vulnerability patterns
+- **Release automation**: One-click script to generate all GitHub release assets
+- **Portability layer**: Added compat.h for BSD function compatibility
 
 ### Fixed 
 - **HISTORICAL**: 40-year-old monster warning system bug - "Your fingertips glow white" messages now work as originally intended (discovered during security audit)
@@ -18,6 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **SECURITY**: Protected against integer overflow in tracking and scoring systems
 - **SECURITY**: Secured format string vulnerabilities in error reporting
 - **SECURITY**: Fixed memory corruption issues in worm segments and vault guards
+- **CRITICAL**: Strength overflow bug that could instantly kill players (eating spinach, potions)
+- **CRITICAL**: Coordinate sign conversion bugs causing wraparound issues
+- **BUILD**: Fixed format-nonliteral warnings with pragma directives
+- **BUILD**: Resolved index/rindex macro collisions with variable names
+
+### Changed
+- Removed index/rindex macros from hack.h, moved to compat.h
+- Renamed 'index' variable to 'idx' in makedefs.c to avoid collisions
+- Added format string validation to block dangerous %n specifier
 
 ## [1.1.0] - 2025-08-23
 

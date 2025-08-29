@@ -147,6 +147,12 @@ pline(const char *line, ...) {
 
   if (!line || !*line)
     return;
+  
+  /* MODERN: Block dangerous %n format specifier */
+  if (strstr(line, "%n")) {
+    line = "[Format contains dangerous %n]";
+  }
+  
   if (!index(line, '%')) {
     (void)strncpy(pbuf, line, BUFSZ - 1);
     pbuf[BUFSZ - 1] = '\0'; /* MODERN: Ensure null termination */
