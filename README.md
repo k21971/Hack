@@ -50,15 +50,18 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 yay -S restohack
 ```
 
-### Hybrid Binary+Source Tarball
+### Download Pre-built Binary
 
-Download from [Releases](https://github.com/Critlist/restoHack/releases) and extract:
+Download the static binary from [Releases](https://github.com/Critlist/restoHack/releases):
 
 ```bash
 mkdir -p ~/Games/restohack
 cd ~/Games/restohack
-tar -xzf restoHack-static-YYYYMMDD-linux-x86_64.tar.gz
+tar -xzf restoHack-*-linux-x86_64-static.tar.gz
+./hack
 ```
+
+*Note: As of v1.1.1, we provide separate binary and source tarballs instead of hybrid packages.*
 
 ## Install & Build
 
