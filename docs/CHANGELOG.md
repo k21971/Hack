@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed 
 - **HISTORICAL**: 40-year-old monster warning system bug - "Your fingertips glow white" messages now work as originally intended (discovered during security audit)
 - **SECURITY**: Fixed 150+ array bounds violations across all game systems
-- **SECURITY**: Added comprehensive bounds checking to prevent buffer overflows
+- **SECURITY**: Added bounds checking to prevent buffer overflows
 - **SECURITY**: Fixed null pointer dereferences in monster, object, and room systems  
 - **SECURITY**: Protected against integer overflow in tracking and scoring systems
 - **SECURITY**: Secured format string vulnerabilities in error reporting
@@ -76,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Historical source files and game commands documentation
 
 ### Changed  
-- Refactored memory allocation functions to ANSI C standards with enhanced type safety
+- Refactored memory allocation to ANSI C standards
 - Improved asset copying logic to handle files uniformly with better error messaging
 - Updated CMake and CI configuration for BSD builds
 - Enhanced CPack configuration with optional packaging support
@@ -92,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BSD-specific build instructions for FreeBSD, OpenBSD, and NetBSD
 - Support for building from hybrid tarballs without separate source download
 - CI testing for published hybrid tarballs on release tags
-- FreeBSD CI reliability improvements with enhanced error handling
+- FreeBSD CI reliability improvements
 
 ### Fixed
 - Shell syntax error in static-build.sh (apostrophe in comment breaking Docker string)
@@ -129,7 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical
 - All original 1984 code preserved via comments, not deleted
-- Added comprehensive CMake feature detection for RNG functions
+- Added CMake feature detection for RNG functions
 - Improved static binary build process with libbsd support
 - Universal build compatibility across Linux, NetBSD, macOS
 

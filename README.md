@@ -94,23 +94,9 @@ If you just want to try it immediately without building from source:
 
 ---
 
-## Work in Progress
+## Current Status
 
-**Current Development: v1.1 - Hardening and Safety**
-
-The current work-in-progress focuses on introducing comprehensive hardening and safety parameters that the original 1984 code lacked. This version emphasizes stability improvements including:
-
-* Enhanced memory safety and bounds checking
-* Improved error handling and recovery mechanisms  
-* Compiler warning elimination and code hardening
-* Environment-specific adaptations for varying systems
-* Robust input validation and sanitization
-
-⚠️ **RELAX, MAN, IT COMPILES!**  
-This was the guiding philosophy of 1984. While undoubtedly brilliant, the original *Hack* was held together with duct tape, raw `struct` dumps, and a healthy dose of ’80s-era K&R magic.  
-Stability was a suggestion, not a guarantee.
-
-* Version **1.1** looks to fix that: modern hardening, memory safety, and input validation — while keeping the authentic 1984 gameplay intact.
+v1.1.1 - The original 1984 code now builds cleanly with modern compilers and runs without crashing. Memory safety fixes, bounds checking, and other boring but necessary work.
 
 ---
 
@@ -124,52 +110,17 @@ Stability was a suggestion, not a guarantee.
 
 ## Preservation Philosophy
 
-Fix what breaks, preserve what works. The original 1984 gameplay, balance, and feel remain untouched—only the infrastructure has been made reliable for modern systems.
+Fix what breaks, preserve what works.
 
 ---
 
-## Source Code Provenance
+## Source Code
 
-### Authenticity and Chain of Custody
+Built from Hack 1.0.3 (1985) preserved in FreeBSD's games collection. Original source in [`docs/historical/original-source/`](docs/historical/original-source/)
 
-**restoHack** is built from **verified original source code** with complete provenance documentation:
+See [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) for how changes are documented.
 
-#### **Primary Source: FreeBSD 4.10 Games Collection**
-
-The original 1984 Hack source code was preserved in the FreeBSD games collection, which maintained Andries Brouwer's final **Hack 1.0.3** release from 1985. This represents the canonical version of historical Hack.
-
-#### **Source Recovery Process**
-
-Our preservation methodology ensures authenticity:
-
-* **Automated retrieval**: [`docs/historical/original-source/download_hack.sh`](docs/historical/original-source/download_hack.sh)
-
-* **Documentation**: Complete chain of custody from 1984 → FreeBSD → restoHack
-* **Integrity**: Every original file preserved unchanged in `docs/historical/original-source/`
-
-#### **Modernization Documentation**
-
-Every change from the original 1984 code is meticulously documented:
-
-```c
-/**
- * MODERN ADDITION (2025): Brief description
- * WHY: Problem being solved
- * HOW: Technical implementation
- * PRESERVES: Original 1984 behavior maintained
- * ADDS: Modern functionality provided
- */
-```
-
-### Historical Context
-
-Hack 1.0.3 represents:
-
-* **The bridge**: Between Rogue's simplicity and NetHack's complexity
-* **Software archaeology**: A preserved artifact of computing history
-* **Gaming heritage**: The foundation of an entire sub-genre or Rougelikes
-
-For the complete story of Hack's creation, evolution, abandonment, and resurrection, see **[The Complete History of Hack](docs/HISTORY_OF_HACK.md)**.
+Full history: [HISTORY_OF_HACK.md](docs/HISTORY_OF_HACK.md)
 
 ---
 

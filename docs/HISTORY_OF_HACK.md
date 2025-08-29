@@ -1,6 +1,6 @@
 # 📜 The Complete History of Hack: From Rogue to restoHack
 
-* A comprehensive chronicle of roguelike gaming's overlooked masterpiece and its 2025 resurrection*
+*From 1984 to 2025: How Hack survived digital decay*
 
 ## ⏱️ Timeline at a Glance
 

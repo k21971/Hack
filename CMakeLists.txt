@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 project(restoHack VERSION 1.1.1 LANGUAGES C)
 
-# --- Supported build types: Debug | Release | Hardened ---
+# --- Supported build types: Debug | Release | RelWithDebInfo ---
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
-set(_RESTOHACK_BUILD_TYPES "Debug;Release;Hardened")
+set(_RESTOHACK_BUILD_TYPES "Debug;Release;RelWithDebInfo")
 list(FIND _RESTOHACK_BUILD_TYPES "${CMAKE_BUILD_TYPE}" _ix)
 if(_ix EQUAL -1)
   message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE='${CMAKE_BUILD_TYPE}'. Use one of: ${_RESTOHACK_BUILD_TYPES}")
@@ -336,14 +336,14 @@ if(ENABLE_SAVE_SANITIZERS)
     message(STATUS "Memory sanitizers enabled for save system debugging")
 endif()
 
-# --- Hardened profile ---
-if(CMAKE_BUILD_TYPE STREQUAL "Hardened")
-  message(STATUS "Configuring Hardened build")
+# --- RelWithDebInfo profile (for production servers) ---
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  message(STATUS "Configuring RelWithDebInfo build (optimized with debug symbols)")
 
   # Perf + debuggable backtraces
   target_compile_options(hack PRIVATE -O2 -fno-omit-frame-pointer)
 
-  # PIE + RELRO/NOW + NX (noexecstack) — mirror your Release hardening for Hardened
+  # PIE + RELRO/NOW + NX (noexecstack) — production-ready with symbols for debugging
   target_compile_options(hack PRIVATE -fPIE)
   target_link_options(hack PRIVATE -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack)
 
@@ -385,7 +385,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # Dev build = symbols + easy backtraces, warnings don’t kill flow
   target_compile_options(hack PRIVATE -O0 -g3 -fno-omit-frame-pointer -Wwrite-strings -Wno-error)
   target_link_options(hack PRIVATE -rdynamic)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Hardened")
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   # safe, strict, but do NOT fail on warnings
   target_compile_options(hack PRIVATE
     -O2 -fno-omit-frame-pointer -fPIE

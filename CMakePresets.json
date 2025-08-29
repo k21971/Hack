@@ -20,11 +20,11 @@
       }
     },
     {
-      "name": "hardened",
+      "name": "relwithdebinfo",
       "generator": "Ninja",
-      "binaryDir": "build-hardened",
+      "binaryDir": "build-relwithdebinfo",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Hardened",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
@@ -39,8 +39,8 @@
       "configurePreset": "debug"
     },
     {
-      "name": "hardened",
-      "configurePreset": "hardened"
+      "name": "relwithdebinfo",
+      "configurePreset": "relwithdebinfo"
     }
   ]
 }
