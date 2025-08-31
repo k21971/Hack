@@ -193,3 +193,4 @@ prepare-release.sh
 __pycache__/
 review_diffs/
 test/
+release.sh
