@@ -82,14 +82,14 @@ source_tarball_test_task:
     echo "✓ README.md present"
     test -f LICENSE || { echo "✗ LICENSE missing"; exit 1; }
     echo "✓ LICENSE present"
-    test -d data || { echo "✗ data/ directory missing"; exit 1; }
-    echo "✓ data/ directory present"
-    test -d help || { echo "✗ help/ directory missing"; exit 1; }
-    echo "✓ help/ directory present"
-    test -d hh || { echo "✗ hh/ directory missing"; exit 1; }
-    echo "✓ hh/ directory present"
-    test -d rumors || { echo "✗ rumors/ directory missing"; exit 1; }
-    echo "✓ rumors/ directory present"
+    test -f data || { echo "✗ data file missing"; exit 1; }
+    echo "✓ data file present"
+    test -f help || { echo "✗ help file missing"; exit 1; }
+    echo "✓ help file present"
+    test -f hh || { echo "✗ hh file missing"; exit 1; }
+    echo "✓ hh file present"
+    test -f rumors || { echo "✗ rumors file missing"; exit 1; }
+    echo "✓ rumors file present"
   test_source_build_script: |
     set -euxo pipefail
     cd source_test
