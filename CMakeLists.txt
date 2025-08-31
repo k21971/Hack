@@ -317,7 +317,9 @@ if(ENABLE_SANITIZERS)
 else()
     # Pure debugging: -O0 to avoid <optimized_out> in coredumps, disable FORTIFY_SOURCE
     target_compile_options(hack PRIVATE $<$<CONFIG:Debug>:-O0 -g3>)
+    # Modern: Explicitly undefine FORTIFY_SOURCE first to override system CFLAGS
     target_compile_definitions(hack PRIVATE $<$<CONFIG:Debug>:_FORTIFY_SOURCE=0>)
+    target_compile_options(hack PRIVATE $<$<CONFIG:Debug>:-U_FORTIFY_SOURCE>)
     message(STATUS "Debug build optimized for debugging (no <optimized_out>)")
 endif()
 
