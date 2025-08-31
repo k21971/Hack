@@ -181,8 +181,7 @@ release-notes-v1.1.0.md
 CLAUDE.md
 dev/.venv/
 dev/gauntlet-logs/
-uv.lock  # optional; commit if you want exact locking
-release-notes-v1.1.0.md
+uv.lock
 fuzz*/
 dev/README-modular.md
 *.pyc
@@ -192,3 +191,5 @@ sumlogs.sh
 release-v*/
 prepare-release.sh
 __pycache__/
+review_diffs/
+test/

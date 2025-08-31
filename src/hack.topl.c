@@ -136,57 +136,78 @@ void clrlin(void) {
   flags.toplin = 0;
 }
 
-/* MODERN: Format sanitizer for 1984-ish printf. Neutralizes bad specs by making them literal. */
+/* MODERN: Format sanitizer for 1984-ish printf. Neutralizes bad specs by making
+ * them literal. */
 static void sanitize_format_1984(char *out, size_t outsz, const char *in) {
   const char *p = in;
   char *d = out;
   char *end = outsz ? out + outsz - 1 : out;
 
   while (*p && d < end) {
-    if (*p != '%') { *d++ = *p++; continue; }
+    if (*p != '%') {
+      *d++ = *p++;
+      continue;
+    }
 
-    const char *start = p++;                 /* saw '%' */
+    const char *start = p++; /* saw '%' */
 
-    if (*p == '%') {                         /* '%%' literal */
-      if (d + 2 > end) break;
-      *d++ = '%'; *d++ = '%'; p++;
+    if (*p == '%') { /* '%%' literal */
+      if (d + 2 > end)
+        break;
+      *d++ = '%';
+      *d++ = '%';
+      p++;
       continue;
     }
 
     /* --- parse flags --- */
-    while (*p=='-' || *p=='+' || *p==' ' || *p=='#' || *p=='0' || *p=='\'') p++;
+    while (*p == '-' || *p == '+' || *p == ' ' || *p == '#' || *p == '0' ||
+           *p == '\'')
+      p++;
 
     /* --- width --- */
-    if (*p == '*') p++;
-    else while (*p >= '0' && *p <= '9') p++;
+    if (*p == '*')
+      p++;
+    else
+      while (*p >= '0' && *p <= '9')
+        p++;
 
     /* --- precision --- */
     if (*p == '.') {
       p++;
-      if (*p == '*') p++;
-      else while (*p >= '0' && *p <= '9') p++;
+      if (*p == '*')
+        p++;
+      else
+        while (*p >= '0' && *p <= '9')
+          p++;
     }
 
     /* --- length modifier (allow none or single 'l' for ints) --- */
     char len = '\0';
-    if (*p == 'l') { 
-      len = 'l'; 
+    if (*p == 'l') {
+      len = 'l';
       p++;
       /* Check if what follows 'l' is a valid conversion for 'l' modifier */
       if (!(*p && strchr("diouxX", *p))) {
         /* 'l' not followed by valid integer conversion - neutralize */
         size_t n = (size_t)(p - start);
-        if (d + n + 1 > end) break;
-        *d++ = '%'; memcpy(d, start + 1, n - 1); d += n - 1;
+        if (d + n + 1 > end)
+          break;
+        *d++ = '%';
+        memcpy(d, start + 1, n - 1);
+        d += n - 1;
         continue;
       }
-    }
-    else if (*p == 'h' || *p == 'z' || *p == 'j' || *p == 't' || *p == 'L' || *p == 'q') {
+    } else if (*p == 'h' || *p == 'z' || *p == 'j' || *p == 't' || *p == 'L' ||
+               *p == 'q') {
       /* reject modern/other length modifiers */
       /* neutralize: print the original sequence literally */
       size_t n = (size_t)(p - start);
-      if (d + n + 1 > end) break;
-      *d++ = '%'; memcpy(d, start + 1, n - 1); d += n - 1;
+      if (d + n + 1 > end)
+        break;
+      *d++ = '%';
+      memcpy(d, start + 1, n - 1);
+      d += n - 1;
       continue;
     }
 
@@ -194,34 +215,55 @@ static void sanitize_format_1984(char *out, size_t outsz, const char *in) {
     char c = *p ? *p++ : '\0';
     int allowed = 0;
     switch (c) {
-      /* integers */
-      case 'd': case 'i': case 'o': case 'u': case 'x': case 'X':
-        allowed = (len == '\0' || len == 'l'); break;
-      /* pointer/char/string */
-      case 'p': case 'c': case 's':
-        allowed = (len == '\0'); break;
-      /* floats: f/e/E/g/G (treat 'lf' as OK for printf) */
-      case 'f': case 'e': case 'E': case 'g': case 'G':
-        allowed = (len == '\0' || len == 'l'); break;
-      /* explicitly banned */
-      case 'n':
-        allowed = 0; break;
-      default:
-        allowed = 0; break;
+    /* integers */
+    case 'd':
+    case 'i':
+    case 'o':
+    case 'u':
+    case 'x':
+    case 'X':
+      allowed = (len == '\0' || len == 'l');
+      break;
+    /* pointer/char/string */
+    case 'p':
+    case 'c':
+    case 's':
+      allowed = (len == '\0');
+      break;
+    /* floats: f/e/E/g/G (treat 'lf' as OK for printf) */
+    case 'f':
+    case 'e':
+    case 'E':
+    case 'g':
+    case 'G':
+      allowed = (len == '\0' || len == 'l');
+      break;
+    /* explicitly banned */
+    case 'n':
+      allowed = 0;
+      break;
+    default:
+      allowed = 0;
+      break;
     }
 
     if (!allowed || c == '\0') {
       /* neutralize: print the original sequence literally */
       size_t n = (size_t)(p - start);
-      if (d + n + 1 > end) break;
-      *d++ = '%'; memcpy(d, start + 1, n - 1); d += n - 1;
+      if (d + n + 1 > end)
+        break;
+      *d++ = '%';
+      memcpy(d, start + 1, n - 1);
+      d += n - 1;
       continue;
     }
 
     /* copy through the valid specifier as-is */
     size_t n = (size_t)(p - start);
-    if (d + n > end) break;
-    memcpy(d, start, n); d += n;
+    if (d + n > end)
+      break;
+    memcpy(d, start, n);
+    d += n;
   }
 
   *d = '\0';
@@ -239,25 +281,25 @@ pline(const char *line, ...) {
 
   if (!line || !*line)
     return;
-  
+
   /* MODERN: Sanitize format string for 1984 C compatibility */
   sanitize_format_1984(sanitized, BUFSZ, line);
   line = sanitized;
-    
+
   if (!index(line, '%')) {
-      (void)strncpy(pbuf, line, BUFSZ - 1);
-      pbuf[BUFSZ - 1] = '\0'; /* MODERN: Ensure null termination */
-    } else {
-      va_start(args, line);
+    (void)strncpy(pbuf, line, BUFSZ - 1);
+    pbuf[BUFSZ - 1] = '\0'; /* MODERN: Ensure null termination */
+  } else {
+    va_start(args, line);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
-      (void)vsnprintf(pbuf, BUFSZ, line,
-                      args); /* MODERN: Safe vsprintf replacement - identical
-                                output, prevents overflow */
+    (void)vsnprintf(pbuf, BUFSZ, line,
+                    args); /* MODERN: Safe vsprintf replacement - identical
+                              output, prevents overflow */
 #pragma GCC diagnostic pop
-      va_end(args);
+    va_end(args);
   }
-  
+
   if (flags.toplin == 1 && !strcmp(pbuf, toplines))
     return;
   nscr(); /* %% */
@@ -266,7 +308,7 @@ pline(const char *line, ...) {
   /* But messages like "You die..." deserve their own line */
   n0 = (int)strlen(bp); /* MODERN: cast strlen to int */
 
-  /* MODERN ADDITION (2025): Clamp effective CO to 80 for 1984 compatibility */
+  /* MODERN: Clamp effective CO to 80 for 1984 compatibility */
   int effective_CO = CO > 80 ? 80 : CO;
   int current_len = (int)strlen(toplines);
   bool would_wrap =
@@ -276,7 +318,8 @@ pline(const char *line, ...) {
   if (flags.toplin == 1 && tly == 1 && !would_wrap && !would_overflow &&
       strncmp(bp, "You ", 4)) {
     /* MODERN: Safe concatenation with exact space management */
-    size_t remaining = (size_t)(BUFSZ - 1 - current_len); /* MODERN: cast to size_t */
+    size_t remaining =
+        (size_t)(BUFSZ - 1 - current_len); /* MODERN: cast to size_t */
     if (remaining >= 2) {
       (void)strncat(toplines, "  ", remaining);
       remaining -= 2;
@@ -310,7 +353,7 @@ pline(const char *line, ...) {
     tl = eos(toplines);
     /* MODERN: Bounds check before copying */
     if (tl - toplines + n0 + 2 < BUFSZ) { /* +2 for \n and \0 */
-      (void)strncpy(tl, bp, (size_t)n0); /* MODERN: cast int to size_t */
+      (void)strncpy(tl, bp, (size_t)n0);  /* MODERN: cast int to size_t */
       tl[n0] = 0;
       bp += n0;
 
@@ -320,7 +363,8 @@ pline(const char *line, ...) {
 
       n0 = (int)strlen(bp); /* MODERN: cast strlen to int */
       if (n0 && tl[0]) {
-        if (tl - toplines + (ptrdiff_t)strlen(tl) + 1 < BUFSZ) /* MODERN: cast strlen to ptrdiff_t */
+        if (tl - toplines + (ptrdiff_t)strlen(tl) + 1 <
+            BUFSZ) /* MODERN: cast strlen to ptrdiff_t */
           (void)strcat(tl, "\n");
       }
     } else {
