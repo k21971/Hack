@@ -29,7 +29,7 @@
      │    ∘ Pools, swamps, beehives, crypts added
      │
 1985 ████ HACK 1.0.3 (The Final Release)
-     │    ∘ Brouwer's final version - peak of design
+     │    ∘ Brouwer's final version
      │    ∘ 19,239 lines of optimized C code (verified from source)
      │    ∘ Direct template for NetHack development
      │
@@ -180,8 +180,8 @@ Fenlason submitted Hack to a USENIX conference tape collection. As he recalls: *
 
 From there, Hack spread through:
 
-* **USENIX conference tapes** as the most popular contributed software  
-* **University computer labs** where it quickly displaced Rogue
+* **USENIX conference tapes**
+* **University computer labs**
 * **USENET newsgroups** (comp.sources.games)
 * **Source code sharing** that encouraged variants and modifications
 
@@ -442,8 +442,8 @@ buf[sizeof(buf)-1] = '\0';
 
 #### **Data Structure Mastery**
 
-Hack pioneered object-oriented concepts in C:
-    s
+Hack helped pioneer object-oriented concepts in C:
+
 * **Polymorphic design** through function pointers and data tables
 * **Memory optimization** with bitfield packing and custom allocators
 * **Linked list architecture** for dynamic object management
@@ -462,10 +462,8 @@ Hack pioneered object-oriented concepts in C:
 #### **Academic Impact**
 
 * **Computer science education** used Hack to teach core concepts
-
 * **Research methodology** applied game analysis to software engineering
 * **Open source philosophy** demonstrated collaborative development
-* **Documentation standards** influenced technical writing practices
 
 #### **Gaming Evolution**
 
@@ -482,7 +480,6 @@ Contemporary games owing debt to Hack:
 * **Diablo** (real-time roguelike elements)
 * **The Binding of Isaac** (procedural generation and permadeath)
 * **FTL** (resource management with permanent consequences)
-* **Hades** (narrative-driven roguelike progression)
 
 ### Linguistic Legacy
 

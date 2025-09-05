@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2025-01-05
+
+### Changed
+
+- **DOCUMENTATION**: Updated HISTORY_OF_HACK.md to include Hack 1.0.2 (April 1985) in timeline
+- **DOCUMENTATION**: Updated references to cite original Linux.com article by Julie Bresnick (2000)
+- **DOCUMENTATION**: Reduced restoHack content in history document to maintain focus on Hack's history
+- **DOCUMENTATION**: Removed emojis from all documentation for consistency
+- **DOCUMENTATION**: Removed incorrect save compatibility claims due to flock implementation
+
+### Fixed
+
+- **BUILD**: Fixed string overflow warning in hack.topl.c pline() function by adding n0 > 0 check
+
 ## [1.1.1] - 2025-08-28
 
 ### Added
