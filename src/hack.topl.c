@@ -351,8 +351,8 @@ pline(const char *line, ...) {
         n0 = CO - 2;
     }
     tl = eos(toplines);
-    /* MODERN: Bounds check before copying */
-    if (tl - toplines + n0 + 2 < BUFSZ) { /* +2 for \n and \0 */
+    /* MODERN: Bounds check before copying - ensure n0 is positive */
+    if (n0 > 0 && tl - toplines + n0 + 2 < BUFSZ) { /* +2 for \n and \0 */
       (void)strncpy(tl, bp, (size_t)n0);  /* MODERN: cast int to size_t */
       tl[n0] = 0;
       bp += n0;
