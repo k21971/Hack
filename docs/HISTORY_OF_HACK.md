@@ -1,8 +1,8 @@
-# 📜 The Complete History of Hack: From Rogue to restoHack
+# The Complete History of Hack
 
 *From 1984 to 2025: How Hack survived digital decay*
 
-## ⏱️ Timeline at a Glance
+## Timeline at a Glance
 
 ```text
 1980 ████ ROGUE
@@ -20,9 +20,15 @@
      │    ∘ Andries Brouwer assumes development (December 1984)
      │    ∘ Mathematical approach to game balance
      │    ∘ 58 monster types with rule-driven behaviors
-     │    ∘ First known refrence to Wizard Mode found in config.h 
+     │    ∘ First known reference to Wizard Mode found in config.h 
      │
-1985 ████ HACK 1.0.3 (The Masterpiece)
+1985 ████ HACK 1.0.2 (April 1985)
+     │    ∘ Female adventurer option added
+     │    ∘ Moon phase effects introduced  
+     │    ∘ New monsters: Wizard of Yendor, giant eel, hell hound
+     │    ∘ Pools, swamps, beehives, crypts added
+     │
+1985 ████ HACK 1.0.3 (The Final Release)
      │    ∘ Brouwer's final version - peak of design
      │    ∘ 19,239 lines of optimized C code (verified from source)
      │    ∘ Direct template for NetHack development
@@ -51,7 +57,7 @@
 Key: ████ = Active Development    ░░░ = Dormancy/Preservation
 ```
 
-**Project Status:** ✅ **Complete** - Authentic 1984 Hack running on 2025 systems  
+**Project Status:** **Complete** - Authentic 1984 Hack running on 2025 systems  
 **Code Provenance:** [FreeBSD 4.10 Games Collection](historical/original-source/download_hack.sh)  
 **Documentation:** [CODING_STANDARDS.md](CODING_STANDARDS.md) | [CHANGELOG.md](CHANGELOG.md)
 
@@ -60,7 +66,7 @@ Key: ████ = Active Development    ░░░ = Dormancy/Preservation
 ## Table of Contents
 
 1. [The Genesis: Rogue and the Birth of a Genre (1980)](#the-genesis-rogue-and-the-birth-of-a-genre-1980)
-2. [Enter the Hack: Fenlason's Revolution (1982)](#enter-the-hack-fenlasons-revolution-1982)
+2. [Enter the Hack: Fenlason's Revolution (~1981-1984)](#enter-the-hack-fenlasons-revolution-1981-1984)
 3. [The Brouwer Era: Hack's Golden Age (1984-1985)](#the-brouwer-era-hacks-golden-age-1984-1985)
 4. [The Great Schism: NetHack's Rise (1985-1987)](#the-great-schism-nethacks-rise-1985-1987)
 5. [The Dark Ages: Abandonment and Decay (1990s-2000s)](#the-dark-ages-abandonment-and-decay-1990s-2000s)
@@ -102,7 +108,7 @@ Rogue emerged during the golden age of Unix development at universities. It spre
 
 ### The Visionary High School Student
 
-**Jay Fenlason** was a junior at a high school in a small suburb outside of Boston when he visited UC Berkeley and was introduced to Rogue. As he recounts in a 2000 NewsForge interview: *"I was curious about some of the game play issues involved in designing it, things like how the rooms and corridors were generated, so I started hacking up some random level generators and stuff to try things out."* 
+**Jay Fenlason** was a junior at a high school in a small suburb outside of Boston when he visited UC Berkeley and was introduced to Rogue. As he recounts in a 2000 Linux.com interview with Julie Bresnick: *"I was curious about some of the game play issues involved in designing it, things like how the rooms and corridors were generated, so I started hacking up some random level generators and stuff to try things out."*
 
 When someone looked over his shoulder and asked what he was working on, they said *"oh, that's cool; when do we get to play it?"* - and Hack was born. Working with **Kenny Woodland**, **Mike Thome**, and **Jonathan Payne** (creator of the JOVE text editor), Fenlason developed Hack under the guise of work for his advanced computer class.
 
@@ -148,7 +154,7 @@ Fenlason's team didn't just expand Rogue—they reimagined it:
 
 Fenlason's high school was near Maynard, where DEC headquarters were located. His ninth-grade teacher convinced DEC to sell him a PDP-11 at a 75% discount. Instead of loading DEC's operating system, he loaded Unix, then significantly discounted for the education community. This Unix environment became the foundation for Hack's development.
 
-Even decades later, Fenlason remained a purist about gaming and technology. In the 2000 interview, he expressed concerns about modern graphical gaming: *"No special effects in the movies will ever live up to those in your head."* He kept his children away from computers, believing they needed to learn *"more about how the world works, like climbing and building towers out of blocks and all the basic physics things that we take for granted."*
+Even decades later, Fenlason remained a purist about gaming and technology. In the 2000 Linux.com interview, he expressed concerns about modern graphical gaming: *"No special effects in the movies will ever live up to those in your head."* He kept his children away from computers, believing they needed to learn *"more about how the world works, like climbing and building towers out of blocks and all the basic physics things that we take for granted."*
 
 ### Technical Architecture
 
@@ -212,6 +218,16 @@ Brouwer approached Hack like a complex system requiring mathematical rigor:
 #### **Game Balance as Science**
 
 Brouwer brought his mathematical and coding theory background to bear on game design. Signs of this expertise can be seen throughout the codebase: tight probability distributions, carefully structured data tables, and algorithmic approaches to balance that go beyond Fenlason's more experimental groundwork.
+
+### Hack 1.0.2 (April 1985)
+
+Third public release to net.sources.games:
+
+* Female adventurer option
+* Moon phase effects (luck, dog behavior, cockatrice danger)  
+* Pools, swamps, beehives, crypts
+* Wizard of Yendor, giant eels, hell hounds
+* Level 30+ requires fire resistance
 
 ### The Final Release: Hack 1.0.3 (1985)
 
@@ -282,7 +298,7 @@ By 1987, NetHack had won the popularity contest:
 * **Active development** with regular releases and community support
 * **Lower barrier to entry** with improved documentation and tutorials
 
-**Hack development effectively ceased** after Brouwer's 1.0.3 release. Fenlason, meanwhile, had long since stepped away from development. As he explained in 2000: *"It has evolved without him. It doesn't bother him, he simply plays the original version. (His wife, on the other hand, fancies playing the latest release.)"* He considered the later versions to have *"got so busy adding cool features and didn't spend enough time thinking about how it would effect playing the game."*
+**Hack development effectively ceased** after Brouwer's 1.0.3 release. Fenlason, meanwhile, had long since stepped away from development. As he explained in the 2000 Linux.com interview: *"It has evolved without him. It doesn't bother him, he simply plays the original version. (His wife, on the other hand, fancies playing the latest release.)"* He considered the later versions to have *"got so busy adding cool features and didn't spend enough time thinking about how it would effect playing the game."*
 
 ---
 
@@ -393,49 +409,18 @@ Every "successful" preservation changed the experience:
 
 ## The Resurrection: restoHack (2025)
 
-### The Vision: Authentic Soul, Modern Body
+### Modern Preservation
 
-**restoHack** emerged with a rigorous preservation philosophy: maintain authentic 1984 gameplay while building modern infrastructure underneath.
+**restoHack** brought authentic 1984 Hack to modern systems through systematic modernization:
 
-### Core Principles
+* **K&R to ANSI C**: 250+ functions converted
+* **Memory safety**: Buffer overflow protection without behavior changes
+* **Build system**: CMake replacing fragile Makefiles
+* **Cross-platform**: Linux, BSD, macOS support verified
 
-#### **Behavioral Preservation**
+### Technical Approach
 
-* **Every monster interaction** exactly as Brouwer designed
-
-* **Item mechanics** preserved to the random number level
-* **Save file compatibility** maintained with 1984 format structure where possible under modern compilers
-* **Statistical verification** of all probability systems
-
-#### **Technical Modernization**
-
-* **K&R to ANSI C conversion** of all 250+ functions
-
-* **Memory safety** without behavioral changes
-* **Cross-platform compatibility** with identical behavior
-* **Modern build systems** (CMake) replacing fragile Makefiles
-
-### Revolutionary Methodology
-
-#### **Documentation Standards**
-
-Every modern change is meticulously documented following the [restoHack Coding Standards](CODING_STANDARDS.md):
-
-```c
-/**
- * MODERN ADDITION (2025): Brief description
- * WHY: Problem being solved
- * HOW: Technical implementation
- * PRESERVES: Original 1984 behavior maintained
- * ADDS: Modern functionality provided
- */
-```
-
-This documentation methodology ensures complete traceability and enables other preservation projects to follow the same rigorous approach.
-
-#### **Source Preservation**
-
-No original code is destroyed—it's preserved in comments alongside modern equivalents:
+Code changes follow strict documentation standards:
 
 ```c
 /* Original 1984: strcpy(buf, name); */
@@ -443,253 +428,11 @@ No original code is destroyed—it's preserved in comments alongside modern equi
 buf[sizeof(buf)-1] = '\0';
 ```
 
-The complete [original 1984 source code](docs/historical/original-source/) remains available for comparison and verification.
+### Results
 
-#### **Behavioral Verification**
-
-* **Regression testing** against original binaries
-
-* **Statistical analysis** verifying RNG sequences
-* **Save system preservation** maintaining 1984 format structure
-* **Cross-platform validation** ensuring identical behavior
-
-### Technical Achievements: A Modernization Masterclass
-
-#### **K&R to ANSI C Conversion: 250+ Functions Transformed**
-
-The complete modernization required systematically converting every function from 1984 K&R style to modern ANSI C:
-
-```c
-// BEFORE: 1984 K&R Style
-doeat(otmp) struct obj *otmp; {
-    int multi = 0;
-    char *cp;
-    /* ... function body ... */
-}
-
-// AFTER: restoHack ANSI C with Documentation
-/**
- * MODERN ADDITION (2025): K&R to ANSI C function conversion
- * WHY: Modern compilers require explicit parameter declarations
- * HOW: Convert K&R style to ANSI C with type safety
- * PRESERVES: Original gameplay logic exactly
- * ADDS: Compile-time type checking and better optimization
- */
-int doeat(struct obj *otmp) {
-    int multi = 0;
-    char *cp;
-    /* ... original function body preserved exactly ... */
-}
-```
-
-**Conversion Statistics:**
-
-* **250+ functions** converted from K&R to ANSI C
-* **0 behavioral changes** in the conversion process
-* **Save format compatibility** preserved within modern compiler constraints
-* **Enhanced type safety** through modern compiler checks
-
-#### **Memory Safety Revolution Without Behavior Changes**
-
-restoHack achieved memory safety while preserving exact 1984 behavior:
-
-```c
-// BEFORE: 1984 Buffer Overflow Risk
-strcpy(buf, name);
-sprintf(tmpbuf, "You see a %s.", name);
-
-// AFTER: restoHack Memory-Safe Version
-/**
- * MODERN ADDITION (2025): Buffer overflow protection
- * WHY: strcpy() can overflow if name exceeds buffer size
- * HOW: Use strncpy() with explicit bounds checking
- * PRESERVES: All original string behavior for valid inputs
- * ADDS: Protection against malformed input or save corruption
- */
-(void) strncpy(buf, name, sizeof(buf)-1);
-buf[sizeof(buf)-1] = '\0';
-(void) snprintf(tmpbuf, sizeof(tmpbuf), "You see a %s.", name);
-```
-
-**Memory Safety Achievements:**
-
-* **AddressSanitizer** clean execution (0 memory errors)
-* **Valgrind** verification (0 memory leaks, 0 invalid accesses)
-* **Static analysis** passing (cppcheck, clang-static-analyzer)
-* **Fuzzing-resistant** input handling throughout
-
-#### **Build System Modernization: 1984 → 2025**
-
-Replaced fragile 1984 Makefiles with modern, portable CMake:
-
-```cmake
-# restoHack CMakeLists.txt - Modern build system
-cmake_minimum_required(VERSION 3.12)
-project(restoHack VERSION 1.1.0 LANGUAGES C)
-
-# Preserve 1984 behavior while adding modern safety
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-
-# Compiler flags: Safety without breaking 1984 assumptions
-add_compile_options(
-    -Wall -Wextra                    # Catch potential issues
-    -Wno-unused-parameter           # Allow 1984-style unused params
-    -fno-strict-aliasing            # Preserve 1984 pointer arithmetic
-    $<$<CONFIG:Debug>:-fsanitize=address,undefined>  # Debug safety
-)
-
-# Historical accuracy: preserve exact 1984 data file behavior
-configure_file(${CMAKE_SOURCE_DIR}/data/help 
-               ${CMAKE_BINARY_DIR}/help COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/data/hh 
-               ${CMAKE_BINARY_DIR}/hh COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/data/rumors 
-               ${CMAKE_BINARY_DIR}/rumors COPYONLY)
-
-# Cross-platform library detection
-find_package(PkgConfig REQUIRED)
-find_package(Curses REQUIRED)
-
-# Modern dependency management with 1984 compatibility
-target_link_libraries(hack PRIVATE ${CURSES_LIBRARIES})
-target_include_directories(hack PRIVATE ${CURSES_INCLUDE_DIRS})
-```
-
-**Build System Features:**
-
-* **Cross-platform detection** for curses/ncurses variants
-* **Sanitizer integration** for development builds
-* **Packaging support** for distributions (AUR, Homebrew, etc.)
-* **CI/CD integration** with automated testing
-
-#### **Cross-Platform Achievement: Identical Behavior Everywhere**
-
-restoHack runs identically across radically different systems:
-
-| Platform | Compiler | C Library | Terminal | Status |
-|----------|----------|-----------|----------|---------|
-| **Linux** (Ubuntu/Debian) | GCC 9+ | glibc 2.31+ | gnome-terminal | ✅ Verified |
-| **Linux** (Alpine/musl) | GCC 12+ | musl 1.2+ | xterm | ✅ Verified |
-| **FreeBSD 14.2** | Clang 16+ | FreeBSD libc | xterm | ✅ Verified |
-| **OpenBSD 7.4** | Clang 16+ | OpenBSD libc | xterm | ✅ Verified |
-| **NetBSD 10.0** | GCC 10+ | NetBSD libc | wterm | ✅ Verified |
-| **macOS** (Intel) | Clang 15+ | libSystem | Terminal.app | ✅ Verified |
-| **macOS** (Apple Silicon) | Clang 15+ | libSystem | iTerm2 | ✅ Verified |
-| **Windows WSL2** | GCC 11+ | glibc 2.35+ | Windows Terminal | ✅ Verified |
-
-**Verification Methodology:**
-
-* **Save file transfer** between platforms (100% compatible)
-* **RNG sequence verification** (identical random events)
-* **Gameplay timing** (identical monster/player turn order)
-* **Terminal behavior** (consistent display across emulators)
-
-#### **Compiler Warning Elimination: From 1700 to 0**
-
-Systematic elimination of all modern compiler warnings while preserving behavior:
-
-```bash
-# BEFORE: 1984 code on modern compilers
-$ gcc -Wall -Wextra *.c
-hack.c:123: warning: assignment discards 'const' qualifier
-hack.c:234: warning: comparison of integer expressions of different signedness
-# ... 1,700+ similar warnings
-
-# AFTER: restoHack clean compilation
-$ cmake --build build
-[100%] Built target hack
-$ echo $?
-0
-```
-
-**Warning Categories Fixed:**
-
-* **1,666 discarded-qualifier warnings** → `const` correctness added
-* **23 sign-compare warnings** → Type conversions standardized  
-* **11 type-limits warnings** → Redundant checks removed
-* **5 char-subscripts warnings** → Array indexing safety added
-
-#### **Performance Optimization: 1984 Speed, 2025 Reliability**
-
-Maintained 1984 performance characteristics while adding modern safety:
-
-```c
-// Performance-critical monster AI loop (preserved exactly)
-void mnexto(struct monst *mtmp) {
-    int d1, d2, d3, d4;
-    coord pos[4];
-    
-    // Original 1984 algorithm preserved
-    for (d1 = 0; d1 < 4; d1++) {
-        pos[d1].x = mtmp->mx + xdir[d1];
-        pos[d1].y = mtmp->my + ydir[d1];
-        /* MODERN: Bounds check added without breaking algorithm */
-        if (pos[d1].x < 1 || pos[d1].x >= COLNO-1 ||
-            pos[d1].y < 1 || pos[d1].y >= ROWNO-1) {
-            continue; /* Skip invalid positions */
-        }
-        // ... original pathfinding logic continues unchanged
-    }
-}
-```
-
-**Performance Metrics:**
-
-* **Startup time**: < 50ms (identical to 1984)
-* **Memory usage**: 2-4MB (50x safety margin over 1984's 64KB)
-* **Save/load speed**: < 100ms for typical characters
-* **Frame rate**: Limited by original 1984 terminal I/O design
-
-#### **Advanced Developer Tools**
-
-Modern development capabilities built on 1984 foundation:
-
-```bash
-# Memory debugging with AddressSanitizer
-$ cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_SANITIZERS=ON
-$ ./hack
-# Plays normally, reports any memory issues immediately
-
-# Profiling with Valgrind
-$ valgrind --leak-check=full ./hack
-==12345== HEAP SUMMARY:
-==12345==     in use at exit: 0 bytes in 0 blocks
-==12345==   total heap usage: 247 allocs, 247 frees, 23,456 bytes allocated
-==12345== All heap blocks were freed -- no leaks are possible
-
-# Static analysis
-$ clang-static-analyzer scan-build make
-scan-build: 0 bugs found.
-```
-
-### The Result: Behavioral Preservation Verified by Regression Tests
-
-restoHack achieved what many thought impossible: **authentic 1984 Hack running reliably on 2025 systems** with zero compromises.
-
-#### **For Players:**
-
-* **Authentic 1984 challenge**: Every monster, spell, and item exactly as Brouwer designed
-
-* **Modern reliability**: No crashes, memory corruption, or compilation issues
-* **Cross-platform consistency**: Identical experience across all supported systems
-* **Historical accuracy**: Play the game exactly as university students did in 1985
-
-#### **For Developers:**
-
-* **Clean codebase**: Modern C standards with comprehensive documentation
-
-* **Build system**: CMake with full cross-platform support
-* **Safety tools**: AddressSanitizer, Valgrind, static analysis integration
-* **Preservation methodology**: Template for other software archaeology projects
-
-#### **For Researchers:**
-
-* **Complete provenance**: Full chain of custody from 1984 sources
-
-* **Behavioral verification**: Statistical and deterministic testing
-* **Documentation**: Every modern change documented and justified
-* **Reproducibility**: Builds identically across platforms and time
+* **0 behavioral changes**: Authentic 1984 gameplay preserved
+* **0 compiler warnings**: Clean compilation on modern systems
+* **Complete source preservation**: Original code documented inline
 
 ---
 
@@ -700,7 +443,7 @@ restoHack achieved what many thought impossible: **authentic 1984 Hack running r
 #### **Data Structure Mastery**
 
 Hack pioneered object-oriented concepts in C:
-
+    s
 * **Polymorphic design** through function pointers and data tables
 * **Memory optimization** with bitfield packing and custom allocators
 * **Linked list architecture** for dynamic object management
@@ -767,16 +510,9 @@ By bringing authentic 1984 Hack to 2025 systems, restoHack proves that software 
 
 It demonstrates how digital archaeology should work: respect the past, serve the present, enable the future.
 
-### The Eternal Dungeon
-
-For players in 2025, Hack offers something increasingly rare: an authentic historical experience that's also genuinely fun. No concessions to modern expectations, no quality-of-life improvements, no safety nets. Just the pure, crystalline challenge of 1980s game design at its mathematical peak.
-
-The dungeons of Doom await. Choose your weapon, prepare your spells, and descend into the depths where every decision matters and death is permanent. This is Hack as Brouwer intended—savage, elegant, and utterly unforgiving.
-
 ---
 
-👉 **From Rogue to NetHack, Hack was the experimental bridge.**  
-👉 **restoHack (2025) brings that bridge back to life, exactly as it was—only stable, portable, and future-proof.**
+**Hack remains the experimental bridge between Rogue's simplicity and NetHack's complexity.**
 
 ---
 
@@ -785,7 +521,8 @@ The dungeons of Doom await. Choose your weapon, prepare your spells, and descend
 ### **Primary Sources**
 
 * **[Original 1984 Source Code](docs/historical/original-source/)** - Complete preserved codebase
-* **[Jay Fenlason Interview (2000)](https://web.archive.org/web/20030512112023/http://newsforge.com/article.pl?sid=00/12/03/2052246)** - Creator's firsthand account
+* **[Jay Fenlason Interview (2000)](https://www.linux.com/news/train-life-nethacks-papa/)** - Julie Bresnick, Linux.com - Creator's firsthand account
+* **[Jay Fenlason Interview (NewsForge Archive)](https://web.archive.org/web/20030512112023/http://newsforge.com/article.pl?sid=00/12/03/2052246)** - Archived copy of the Linux.com article
 * **[Source Retrieval Script](docs/historical/original-source/download_hack.sh)** - Automated provenance documentation
 * **[FreeBSD Games Collection](https://cgit.freebsd.org/src/tree/games/hack?h=releng/4.10)** - Canonical preservation
 

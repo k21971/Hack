@@ -9,7 +9,7 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 **Philosophy**: "Fix what breaks, preserve what works" - authentic 1984 gameplay with modern build system and safety improvements.
 
-**[Read the Complete History of Hack →](docs/HISTORY_OF_HACK.md)**  
+**[Read the Complete History of Hack](docs/HISTORY_OF_HACK.md)**  
 *From Rogue (1980) to NetHack's rise, through decades of digital decay, to restoHack's 2025 resurrection*
 
 ---
@@ -93,7 +93,7 @@ If you just want to try it immediately without building from source:
 
 *(static binary, no dependencies required)*
 
-**For BSD systems, development builds, IDE integration, and troubleshooting:** see [**📋 Build Instructions**](docs/BUILD.md)
+**For BSD systems, development builds, IDE integration, and troubleshooting:** see [**Build Instructions**](docs/BUILD.md)
 
 ---
 
@@ -143,4 +143,4 @@ Want to port to Plan 9? Go for it. Just document changes and respect the code.
 
 ## License
 
-3-Clause BSD. Do what you want, just don’t sue us. See `LICENSE`.
+3-Clause BSD. Do what you want, just don’t sue me. See `LICENSE`.

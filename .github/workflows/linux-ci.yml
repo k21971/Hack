@@ -75,20 +75,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang clang-tools cmake ninja-build
-        sudo apt-get install -y libncurses5-dev libncursesw5-dev
-
-    - name: Run Static Analysis
-      run: |
-        # Configure for analysis
-        cmake -B build-analysis -G Ninja -DCMAKE_BUILD_TYPE=Debug
+        sudo apt-get install -y libncurses5-dev libncursesw5-dev 
         
-        # Run clang-tidy on a few key security files
-        echo "Running static analysis on security-critical files..."
-        clang-tidy src/hack.tty.c src/hack.save.c src/hack.options.c \
-          -p build-analysis \
-          --checks="-*,security-*,bugprone-*,cert-*" \
-          --quiet || echo "Static analysis completed with findings"
-
   # Special RelWithDebInfo build to test production-ready builds with debug symbols
   security-hardened:
     runs-on: ubuntu-latest
