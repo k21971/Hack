@@ -72,7 +72,7 @@ git clone https://github.com/Critlist/restoHack.git
 cd restoHack
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
-./build/hack
+cd build && ./hack
 ```
 
 **Alternative** (if your system supports CMake presets):
