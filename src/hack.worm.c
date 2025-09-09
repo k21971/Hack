@@ -24,7 +24,7 @@ int getwn(struct monst *mtmp) {
 void initworm(struct monst *mtmp) {
   struct wseg *wtmp;
   int tmp = mtmp->wormno;
-  if (!tmp)
+  if (!tmp || tmp < 0 || tmp >= 32) /* MODERN: bounds check prevents OOB access to worm arrays */
     return;
   wheads[tmp] = wsegs[tmp] = wtmp = newseg();
   wgrowtime[tmp] = 0;
@@ -37,12 +37,15 @@ void initworm(struct monst *mtmp) {
 void worm_move(struct monst *mtmp) {
   struct wseg *wtmp, *whd;
   int tmp = mtmp->wormno;
+  if (tmp < 0 || tmp >= 32) return; /* MODERN: bounds check prevents OOB access to worm arrays */
   wtmp = newseg();
   wtmp->wx = mtmp->mx;
   wtmp->wy = mtmp->my;
   wtmp->nseg = 0;
   /*	wtmp->wdispl = 0; */
-  (whd = wheads[tmp])->nseg = wtmp;
+  whd = wheads[tmp];
+  if (!whd) return; /* MODERN: null check prevents crash on corrupted worm head */
+  whd->nseg = wtmp;
   wheads[tmp] = wtmp;
   if (cansee(whd->wx, whd->wy)) {
     unpmon(mtmp);
@@ -60,6 +63,7 @@ void worm_move(struct monst *mtmp) {
     return;
   }
   whd = wsegs[tmp];
+  if (!whd) return; /* MODERN: null check prevents crash on corrupted worm segment */
   wsegs[tmp] = whd->nseg;
   remseg(whd);
 }
@@ -68,6 +72,7 @@ void worm_nomove(struct monst *mtmp) {
   int tmp;
   struct wseg *wtmp;
   tmp = mtmp->wormno;
+  if (tmp < 0 || tmp >= 32) return; /* MODERN: bounds check prevents OOB access to worm arrays */
   wtmp = wsegs[tmp];
   if (wtmp == wheads[tmp])
     return;
@@ -81,7 +86,7 @@ void worm_nomove(struct monst *mtmp) {
 void wormdead(struct monst *mtmp) {
   int tmp = mtmp->wormno;
   struct wseg *wtmp, *wtmp2;
-  if (!tmp)
+  if (!tmp || tmp < 0 || tmp >= 32) /* MODERN: bounds check prevents OOB access to worm arrays */
     return;
   mtmp->wormno = 0;
   for (wtmp = wsegs[tmp]; wtmp; wtmp = wtmp2) {
@@ -94,13 +99,14 @@ void wormdead(struct monst *mtmp) {
 void wormhit(struct monst *mtmp) {
   int tmp = mtmp->wormno;
   struct wseg *wtmp;
-  if (!tmp)
+  if (!tmp || tmp < 0 || tmp >= 32) /* MODERN: bounds check prevents OOB access to worm arrays */
     return; /* worm without tail */
   for (wtmp = wsegs[tmp]; wtmp; wtmp = wtmp->nseg)
     (void)hitu(mtmp, 1);
 }
 
 void wormsee(int tmp) {
+  if (tmp < 0 || tmp >= 32) return; /* MODERN: bounds check prevents OOB access to worm arrays */
   struct wseg *wtmp = wsegs[tmp];
   if (!wtmp)
     panic("wormsee: wtmp==0");
@@ -147,6 +153,7 @@ void cutworm(struct monst *mtmp, xchar x, xchar y,
 
   /* cut the worm in two halves */
   mtmp2 = newmonst(0);
+  if (!mtmp2) return; /* MODERN: null check prevents crash on memory allocation failure */
   *mtmp2 = *mtmp;
   mtmp2->mxlth = mtmp2->mnamelth = 0;
 
@@ -160,6 +167,7 @@ void cutworm(struct monst *mtmp, xchar x, xchar y,
     wgrowtime[tmp2] = 0;
   }
   do {
+    if (!wtmp->nseg) break; /* MODERN: null check prevents crash on segment chain corruption */
     if (wtmp->nseg->wx == x && wtmp->nseg->wy == y) {
       if (tmp2)
         wheads[tmp2] = wtmp;
@@ -168,7 +176,7 @@ void cutworm(struct monst *mtmp, xchar x, xchar y,
       wtmp->nseg = 0;
       if (tmp2) {
         pline("You cut the worm in half.");
-        mtmp2->mhpmax = mtmp2->mhp = d(mtmp2->data->mlevel, 8);
+        mtmp2->mhpmax = mtmp2->mhp = (schar)d(mtmp2->data->mlevel, 8); /* MODERN: Safe cast - HP bounded by dice */
         mtmp2->mx = wtmp->wx;
         mtmp2->my = wtmp->wy;
         mtmp2->nmon = fmon;

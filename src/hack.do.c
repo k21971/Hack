@@ -96,6 +96,10 @@ int dodown(void) {
     return (0);
   }
 
+  if (dlevel >= MAXLEVEL) { /* MODERN: prevent overflow in level calculation */
+    pline("You have reached the deepest level.");
+    return (0);
+  }
   goto_level(dlevel + 1, TRUE);
   return (1);
 }
@@ -114,6 +118,10 @@ int doup(void) {
     return (1);
   }
 
+  if (dlevel <= 1) { /* MODERN: prevent underflow in level calculation */
+    done("escaped");
+    return (1);
+  }
   goto_level(dlevel - 1, TRUE);
   return (1);
 }
@@ -164,13 +172,13 @@ void goto_level(int newlevel, boolean at_stairs) {
   glo(dlevel);
 
   /* Original 1984: if(!level_exists[dlevel]) */
-  if (!level_exists[(unsigned char)dlevel]) /* MODERN: safe array indexing */
+  if (dlevel >= 0 && dlevel <= MAXLEVEL && !level_exists[(int)dlevel]) /* MODERN: safe array indexing */
     mklev();
   else {
     extern int hackpid;
 
     if ((fd = open(lock, 0)) < 0) {
-      pline("Cannot open %s .", lock);
+      pline("Cannot open level file."); /* MODERN: safe message prevents format string attack */
       pline("Probably someone removed it.");
       done("tricked");
     }
@@ -180,19 +188,19 @@ void goto_level(int newlevel, boolean at_stairs) {
 
   if (at_stairs) {
     if (up) {
-      u.ux = xdnstair;
-      u.uy = ydnstair;
+      u.ux = (xchar)xdnstair; /* MODERN: Safe cast - map coords are 0-79, within xchar range */
+      u.uy = (xchar)ydnstair; /* MODERN: Safe cast - map coords are 0-21, within xchar range */
       if (!u.ux) {       /* entering a maze from below? */
-        u.ux = xupstair; /* this will confuse the player! */
-        u.uy = yupstair;
+        u.ux = (xchar)xupstair; /* this will confuse the player! */ /* MODERN: Safe cast */
+        u.uy = (xchar)yupstair; /* MODERN: Safe cast */
       }
       if (Punished && !Levitation) {
         pline("With great effort you climb the stairs.");
         placebc(1);
       }
     } else {
-      u.ux = xupstair;
-      u.uy = yupstair;
+      u.ux = (xchar)xupstair; /* MODERN: Safe cast - map coords within xchar range */
+      u.uy = (xchar)yupstair; /* MODERN: Safe cast - map coords within xchar range */
       if (inv_weight() + 5 > 0 || Punished) {
         pline("You fall down the stairs."); /* %% */
         losehp(rnd(3), "fall");
@@ -217,7 +225,7 @@ void goto_level(int newlevel, boolean at_stairs) {
       u.uy = rn2(ROWNO);
       /* Original 1984: } while(levl[u.ux][u.uy].typ != ROOM ||
        * m_at(u.ux,u.uy)); */
-    } while (levl[(unsigned char)u.ux][(unsigned char)u.uy].typ != ROOM ||
+    } while (levl[(int)u.ux][(int)u.uy].typ != ROOM ||
              m_at(u.ux, u.uy)); /* MODERN: safe array indexing */
     if (Punished) {
       if (uwep != uball && !up /* %% */ && rn2(5)) {

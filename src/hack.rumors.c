@@ -5,7 +5,7 @@
 #include "hack.h" /* for RUMORFILE and BSD (index) */
 #include <stdio.h>
 #define CHARSZ 8 /* number of bits in a char */
-extern char *index();
+/* MODERN: removed bogus extern for index() - provided by string.h/compat.h */
 
 /* Forward declarations */
 int skipline(FILE *rumf);

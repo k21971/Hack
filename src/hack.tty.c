@@ -206,13 +206,13 @@ void gettty(void) {
 #if 0
 	ospeed = OSPEED(inittyb);
 #endif
-  erase_char = inittyb.erase_sym;
-  kill_char = inittyb.kill_sym;
+  erase_char = (char)inittyb.erase_sym; /* MODERN: explicit cast from cc_t to char */
+  kill_char = (char)inittyb.kill_sym; /* MODERN: explicit cast from cc_t to char */
   getioctls();
 
   /* do not expand tabs - they might be needed inside a cm sequence */
   if (curttyb.tabflgs & EXTABS) {
-    curttyb.tabflgs &= ~EXTABS;
+    curttyb.tabflgs &= (tcflag_t)(~EXTABS); /* MODERN: cast bitwise NOT to tcflag_t */
     setctty();
   }
   settty_needed = TRUE;
@@ -244,7 +244,7 @@ settty(const char *s) {
     printf("Warning: Cannot restore terminal settings (modern terminal)\n");
     return;
   }
-  flags.echo = (inittyb.echoflgs & ECHO) ? ON : OFF;
+  flags.echo = (unsigned char)((inittyb.echoflgs & ECHO) ? ON : OFF); /* MODERN: cast to bitfield type */
   flags.cbreak = (CBRKON(inittyb.cbrkflgs & CBRKMASK)) ? ON : OFF;
   setioctls();
 }
@@ -263,14 +263,14 @@ void setftty(void) {
   /* Should use (ECHO|CRMOD) here instead of ECHO */
   if ((curttyb.echoflgs & ECHO) !=
       (unsigned int)ef) { /* MODERN: Cast to unsigned for flag comparison */
-    curttyb.echoflgs &= ~ECHO;
+    curttyb.echoflgs &= (tcflag_t)(~ECHO); /* MODERN: cast bitwise NOT to tcflag_t */
     /*		curttyb.echoflgs |= ef;					*/
     change++;
   }
   if ((curttyb.cbrkflgs & CBRKMASK) !=
       (unsigned int)cf) { /* MODERN: Cast to unsigned for flag comparison */
-    curttyb.cbrkflgs &= ~CBRKMASK;
-    curttyb.cbrkflgs |= cf;
+    curttyb.cbrkflgs &= (tcflag_t)(~CBRKMASK); /* MODERN: cast bitwise NOT to tcflag_t */
+    curttyb.cbrkflgs |= (tcflag_t)cf; /* MODERN: cast cf to tcflag_t */
 #if defined(USG) || defined(MODERN_TERMIOS)
     /* be satisfied with one character; no timeout */
     curttyb.c_cc[VMIN] = 1;  /* was VEOF */
@@ -293,7 +293,10 @@ error(const char *s, ...) {
   va_start(args, s);
   if (settty_needed)
     settty((char *)0);
-  vprintf(s, args);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+  vprintf(s, args); /* MODERN: pragma suppresses false positive - s comes from error() caller */
+#pragma GCC diagnostic pop
   va_end(args);
   putchar('\n');
   exit(1);
@@ -317,7 +320,7 @@ void getlin(char *bufp) {
       return;
     }
     if (c == '\033') {
-      *obufp = c;
+      *obufp = (char)c; /* MODERN: cast int to char */
       obufp[1] = 0;
       return;
     }
@@ -333,7 +336,7 @@ void getlin(char *bufp) {
     } else if (' ' <= c && c < '\177') {
       /* avoid isprint() - some people don't have it
          ' ' is not always a printing char */
-      *bufp = c;
+      *bufp = (char)c; /* MODERN: cast int to char */
       bufp[1] = 0;
       putstr(bufp);
       if (bufp - obufp < BUFSZ - 1 && bufp - obufp < COLNO)
@@ -380,7 +383,7 @@ xwaitforspace(const char *s) /* chars allowed besides space or return */
       if (c == ' ')
         break;
       if (s && strchr(s, c)) {
-        morc = c;
+        morc = (char)c; /* MODERN: cast int to char */
         break;
       }
       bell();
@@ -403,19 +406,19 @@ char *parse(void) {
     multi--;
     save_cm = inputline;
   }
-  inputline[0] = foo;
+  inputline[0] = (char)foo; /* MODERN: cast int to char */
   inputline[1] = 0;
   if (foo == 'f' || foo == 'F') {
-    inputline[1] = getchar();
+    inputline[1] = (char)getchar(); /* MODERN: cast int to char */
 #ifdef QUEST
     if (inputline[1] == foo)
-      inputline[2] = getchar();
+      inputline[2] = (char)getchar(); /* MODERN: cast int to char */
     else
 #endif /* QUEST */
       inputline[2] = 0;
   }
   if (foo == 'm' || foo == 'M') {
-    inputline[1] = getchar();
+    inputline[1] = (char)getchar(); /* MODERN: cast int to char */
     inputline[2] = 0;
   }
   clrlin();

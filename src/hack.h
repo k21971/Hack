@@ -30,10 +30,8 @@
 #define POINTER_ARITHMETIC_CHECK(ptr) ((void)0)
 #endif
 
-#ifndef BSD
-#define index strchr
-#define rindex strrchr
-#endif /* BSD */
+/* MODERN: index/rindex macros moved to compat.h for cleaner organization */
+#include "compat.h"
 
 #define Null(type) ((struct type *)0)
 
@@ -76,7 +74,8 @@ typedef struct {
 
 extern void *alloc(unsigned lth);
 /* MODERN: CONST-CORRECTNESS: panic message is read-only */
-extern void panic(const char *str, ...);
+/* MODERN: noreturn attribute tells compiler panic() never returns */
+extern void panic(const char *str, ...) __attribute__((noreturn));
 
 /* Critical missing function prototypes */
 extern int carrying(int type);

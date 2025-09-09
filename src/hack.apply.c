@@ -77,7 +77,7 @@ static void use_camera(struct obj *obj) {
   struct monst *mtmp;
   (void)obj;
   if (!getdir(1)) { /* ask: in what direction? */
-    flags.move = multi = 0;
+    flags.move = (unsigned char)(multi = 0); /* MODERN: Cast for bit field assignment */
     return;
   }
   if (u.uswallow) {
@@ -212,7 +212,7 @@ static struct monst *bchit(int ddx, int ddy, int range, char sym) {
       break;
     }
     if (sym)
-      Tmp_at(bchx, bchy);
+      Tmp_at((schar)bchx, (schar)bchy); /* MODERN: Safe cast - coordinates bounded by map size */
   }
   if (sym)
     Tmp_at(-1, -1);
@@ -289,6 +289,7 @@ static int dig(void) {
     const char *digtxt; /* MODERN: const because assigned string literals */
     struct obj *obj;
 
+    if (!isok(dpx, dpy)) return (0); /* MODERN: bounds check prevents OOB access to levl[][] array */
     lev = &levl[dpx][dpy];
     if ((obj = sobj_at(ENORMOUS_ROCK, dpx, dpy))) {
       fracture_rock(obj);
@@ -306,10 +307,10 @@ static int dig(void) {
     pline("%s", digtxt); /* after mnewsym & prl */
     return (0);
   } else {
-    if (IS_WALL(levl[dpx][dpy].typ)) {
+    if (isok(dpx, dpy) && IS_WALL(levl[dpx][dpy].typ)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
       int rno = inroom(dpx, dpy);
 
-      if (rno >= 0 && rooms[rno].rtype >= 8) {
+      if (rno >= 0 && rno < MAXNROFROOMS && rooms[rno].rtype >= 8) { /* MODERN: bounds check prevents OOB access to rooms[] array */
         pline("This wall seems too hard to dig into.");
         return (0);
       }
@@ -374,7 +375,7 @@ static int use_pick_axe(struct obj *obj) {
     ry = u.uy + u.dy;
     if (u.dz > 0 ||
         (u.dz == 0 && isok(rx, ry) &&
-         (IS_ROCK(levl[rx][ry].typ) || sobj_at(ENORMOUS_ROCK, rx, ry))))
+         (IS_ROCK(levl[rx][ry].typ) || sobj_at(ENORMOUS_ROCK, rx, ry)))) /* MODERN: isok() already provides bounds check for levl[][] access */
       *dsp++ = *sdp;
     sdp++;
   }
@@ -397,6 +398,7 @@ static int use_pick_axe(struct obj *obj) {
       pline("Clash!");
       return (1);
     }
+    if (!isok(rx, ry)) return (1); /* MODERN: bounds check prevents OOB access to levl[][] array */
     lev = &levl[rx][ry];
     if (lev->typ == DOOR)
       pline("Your %s against the door.", aobjnam(obj, "clang"));

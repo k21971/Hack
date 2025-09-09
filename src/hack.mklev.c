@@ -206,7 +206,7 @@ int makerooms() {
     hix = lowx + dx;
     hiy = lowy + dy;
 
-    if (maker(lowx, dx, lowy, dy)) {
+    if (maker((schar)lowx, (schar)dx, (schar)lowy, (schar)dy)) { /* MODERN: Safe cast - room coordinates bounded by map */
       if (secret)
         return (1);
       addrs(lowx - 1, lowy - 1, hix + 1, hiy + 1);
@@ -321,6 +321,9 @@ gotit:
 
 /* see whether it is allowable to create a door at [x,y] */
 int okdoor(int x, int y) {
+  /* MODERN: bounds check prevents OOB access to levl[][] array */
+  if (!isok(x-1, y) || !isok(x+1, y) || !isok(x, y-1) || !isok(x, y+1) || !isok(x, y))
+    return (0);
   if (levl[x - 1][y].typ == DOOR || levl[x + 1][y].typ == DOOR ||
       levl[x][y + 1].typ == DOOR || levl[x][y - 1].typ == DOOR ||
       levl[x - 1][y].typ == SDOOR || levl[x + 1][y].typ == SDOOR ||
@@ -355,11 +358,13 @@ void dosdoor(int x, int y, struct mkroom *aroom, int type) {
   if (broom->hx < 0)
     tmp = doorindex;
   else
-    for (tmp = doorindex; tmp > broom->fdoor; tmp--)
+    for (tmp = doorindex; tmp > broom->fdoor && tmp > 0 && tmp < DOORMAX; tmp--) /* MODERN: bounds check prevents OOB access to doors[] array */
       doors[tmp] = doors[tmp - 1];
   doorindex++;
-  doors[tmp].x = x;
-  doors[tmp].y = y;
+  if (tmp >= 0 && tmp < DOORMAX) { /* MODERN: bounds check prevents OOB access to doors[] array */
+    doors[tmp].x = x;
+    doors[tmp].y = y;
+  }
   for (; broom->hx >= 0; broom++)
     broom->fdoor++;
 }
@@ -387,6 +392,7 @@ chk:
   /* check area around room (and make room smaller if necessary) */
   for (x = lowx - xlim; x <= hix + xlim; x++) {
     for (y = lowy - ylim; y <= hiy + ylim; y++) {
+      if (!isok(x, y)) continue; /* MODERN: bounds check prevents OOB access to levl[][] array */
       if (levl[x][y].typ) {
 #ifdef WIZARD
         if (wizard && !secret)
@@ -414,7 +420,8 @@ chk:
   if ((rnd(dlevel) < 10 && rn2(77)) || (ddx == 1 && ddy == 1)) {
     for (x = lowx - 1; x <= hix + 1; x++)
       for (y = lowy - 1; y <= hiy + 1; y++)
-        levl[x][y].lit = 1;
+        if (isok(x, y)) /* MODERN: bounds check prevents OOB access to levl[][] array */
+          levl[x][y].lit = 1;
     croom->rlit = 1;
   } else
     croom->rlit = 0;
@@ -426,18 +433,24 @@ chk:
 
   for (x = lowx - 1; x <= hix + 1; x++)
     for (y = lowy - 1; y <= hiy + 1; y += (hiy - lowy + 2)) {
-      levl[x][y].scrsym = '-';
-      levl[x][y].typ = HWALL;
+      if (isok(x, y)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
+        levl[x][y].scrsym = '-';
+        levl[x][y].typ = HWALL;
+      }
     }
   for (x = lowx - 1; x <= hix + 1; x += (hix - lowx + 2))
     for (y = lowy; y <= hiy; y++) {
-      levl[x][y].scrsym = '|';
-      levl[x][y].typ = VWALL;
+      if (isok(x, y)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
+        levl[x][y].scrsym = '|';
+        levl[x][y].typ = VWALL;
+      }
     }
   for (x = lowx; x <= hix; x++)
     for (y = lowy; y <= hiy; y++) {
-      levl[x][y].scrsym = '.';
-      levl[x][y].typ = ROOM;
+      if (isok(x, y)) { /* MODERN: bounds check prevents OOB access to levl[][] array */
+        levl[x][y].scrsym = '.';
+        levl[x][y].typ = ROOM;
+      }
     }
 
   smeq[nroom] = nroom;
@@ -518,7 +531,7 @@ void join(int a, int b) {
   yy = cc.y;
   tx = tt.x - dx;
   ty = tt.y - dy;
-  if (nxcor && levl[xx + dx][yy + dy].typ)
+  if (nxcor && (!isok(xx + dx, yy + dy) || levl[xx + dx][yy + dy].typ)) /* MODERN: bounds check prevents OOB access to levl[][] array */
     return;
   dodoor(xx, yy, croom);
 
@@ -558,6 +571,7 @@ void join(int a, int b) {
     if (dy && dix > diy) {
       int ddx = (xx > tx) ? -1 : 1;
 
+      if (!isok(xx + ddx, yy)) continue; /* MODERN: bounds check prevents OOB access to levl[][] array */
       crm = &levl[xx + ddx][yy];
       if (!crm->typ || crm->typ == CORR || crm->typ == SCORR) {
         dx = ddx;
@@ -567,6 +581,7 @@ void join(int a, int b) {
     } else if (dx && diy > dix) {
       int ddy = (yy > ty) ? -1 : 1;
 
+      if (!isok(xx, yy + ddy)) continue; /* MODERN: bounds check prevents OOB access to levl[][] array */
       crm = &levl[xx][yy + ddy];
       if (!crm->typ || crm->typ == CORR || crm->typ == SCORR) {
         dy = ddy;
@@ -576,6 +591,7 @@ void join(int a, int b) {
     }
 
     /* continue straight on? */
+    if (!isok(xx + dx, yy + dy)) return; /* MODERN: bounds check prevents OOB access to levl[][] array */
     crm = &levl[xx + dx][yy + dy];
     if (!crm->typ || crm->typ == CORR || crm->typ == SCORR)
       continue;
@@ -584,6 +600,7 @@ void join(int a, int b) {
     if (dx) {
       dx = 0;
       dy = (ty < yy) ? -1 : 1;
+      if (!isok(xx + dx, yy + dy)) return; /* MODERN: bounds check prevents OOB access to levl[][] array */
       crm = &levl[xx + dx][yy + dy];
       if (!crm->typ || crm->typ == CORR || crm->typ == SCORR)
         continue;
@@ -592,6 +609,7 @@ void join(int a, int b) {
     } else {
       dy = 0;
       dx = (tx < xx) ? -1 : 1;
+      if (!isok(xx + dx, yy + dy)) return; /* MODERN: bounds check prevents OOB access to levl[][] array */
       crm = &levl[xx + dx][yy + dy];
       if (!crm->typ || crm->typ == CORR || crm->typ == SCORR)
         continue;
@@ -641,7 +659,7 @@ void makeniche(boolean with_trap) {
       }
       xx = dd.x;
       yy = dd.y;
-      if ((rm = &levl[xx][yy + dy])->typ)
+      if (!isok(xx, yy + dy) || (rm = &levl[xx][yy + dy])->typ) /* MODERN: bounds check prevents OOB access to levl[][] array */
         continue;
       if (with_trap || !rn2(4)) {
         rm->typ = SCORR;
@@ -720,7 +738,7 @@ void mktrap(int num, int mazeflag, struct mkroom *croom) {
         mx = somex();
         my = somey();
       }
-    } while (m_at(mx, my) || levl[mx][my].typ == STAIRS);
+    } while (m_at(mx, my) || !isok(mx, my) || levl[mx][my].typ == STAIRS); /* MODERN: bounds check prevents OOB access to levl[][] array */
     if ((mtmp = makemon(PM_MIMIC, mx, my))) {
       mtmp->mimic = 1;
       mtmp->mappearance = fakegold               ? '$'
@@ -744,7 +762,7 @@ void mktrap(int num, int mazeflag, struct mkroom *croom) {
       mx = somex();
       my = somey();
     }
-  } while (t_at(mx, my) || levl[mx][my].typ == STAIRS);
+  } while (t_at(mx, my) || !isok(mx, my) || levl[mx][my].typ == STAIRS); /* MODERN: bounds check prevents OOB access to levl[][] array */
   ttmp = maketrap(mx, my, kind);
   if (mazeflag && !rn2(10) && ttmp->ttyp < PIERC)
     ttmp->tseen = 1;

@@ -12,36 +12,6 @@
 
 #define RND(x) (random() % x)
 
-#if 0
-/* ORIGINAL 1984 CODE - preserved for reference */
-rn1(x,y)
-int x,y;
-{
-	return(RND(x)+y);
-}
-
-rn2(x)
-int x;
-{
-	return(RND(x));
-}
-
-rnd(x)
-int x;
-{
-	return(RND(x)+1);
-}
-
-d(n,x)
-int n,x;
-{
-	int tmp = n;
-
-	while(n--) tmp += RND(x);
-	return(tmp);
-}
-#endif
-
 /* MODERN: K&R to ANSI C conversion - function signatures only */
 int rn1(int x, int y) { return (RND(x) + y); }
 

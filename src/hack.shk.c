@@ -502,7 +502,7 @@ void addtobill(struct obj *obj) {
       onbill(obj) /* perhaps we threw it away earlier */
   )
     return;
-  if (ESHK(shopkeeper)->billct == BILLSZ) {
+  if (ESHK(shopkeeper)->billct >= BILLSZ) { /* MODERN: bounds check prevents bill array overflow */
     pline("You got that for free!");
     return;
   }
@@ -533,7 +533,7 @@ void splitbill(struct obj *obj, struct obj *otmp) {
   bp->bquan -= otmp->quan;
 
   /* addtobill(otmp); */
-  if (ESHK(shopkeeper)->billct == BILLSZ)
+  if (ESHK(shopkeeper)->billct >= BILLSZ) /* MODERN: bounds check prevents bill array overflow */
     otmp->unpaid = 0;
   else {
     tmp = bp->price;
@@ -582,7 +582,7 @@ void subfrombill(struct obj *obj) {
   if (shopkeeper->msleep || shopkeeper->mfroz ||
       inroom(shopkeeper->mx, shopkeeper->my) != ESHK(shopkeeper)->shoproom)
     return;
-  if (ESHK(shopkeeper)->billct == BILLSZ ||
+  if (ESHK(shopkeeper)->billct >= BILLSZ || /* MODERN: bounds check prevents bill array overflow */
       ((tmp = shtypes[rooms[(unsigned char)ESHK(shopkeeper)->shoproom].rtype -
                       8]) &&
        tmp != obj->olet) ||
@@ -744,7 +744,7 @@ static int realhunger(void) { /* not completely foolproof */
   int tmp = u.uhunger;
   struct obj *otmp = invent;
   while (otmp) {
-    if (otmp->olet == FOOD_SYM && !otmp->unpaid)
+    if (otmp->olet == FOOD_SYM && !otmp->unpaid && otmp->otyp < NROFOBJECTS) /* MODERN: bounds check prevents OOB access to objects[] array */
       tmp += objects[otmp->otyp].nutrition;
     otmp = otmp->nobj;
   }
@@ -868,19 +868,17 @@ int shk_move(struct monst *shkp) {
   cnt = mfndpos(shkp, poss, info, ALLOW_SSM);
   if (avoid && uondoor) { /* perhaps we cannot avoid him */
     for (i = 0; i < cnt; i++)
-      if (!(info[(unsigned char)i] & NOTONL))
-        goto notonl_ok; /* MODERN: Cast to unsigned char for safe array indexing
-                         */
+      if (i >= 0 && i < 9 && !(info[(int)i] & NOTONL)) /* MODERN: bounds check prevents OOB access to info[] array */
+        goto notonl_ok;
     avoid = FALSE;
   notonl_ok:;
   }
   chi = -1;
   chcnt = 0;
   for (i = 0; i < cnt; i++) {
-    nx = poss[(unsigned char)i]
-             .x; /* MODERN: Cast to unsigned char for safe array indexing */
-    ny = poss[(unsigned char)i]
-             .y; /* MODERN: Cast to unsigned char for safe array indexing */
+    if (i < 0 || i >= 9) continue; /* MODERN: bounds check prevents OOB access to poss[] array */
+    nx = poss[(int)i].x;
+    ny = poss[(int)i].y;
     if (levl[(unsigned char)nx][(unsigned char)ny].typ == ROOM ||
         shkroom != ESHK(shkp)->shoproom || ESHK(shkp)->following) {
 #ifdef STUPID
@@ -893,9 +891,7 @@ int shk_move(struct monst *shkp) {
         chi = i;
         break;
       }
-      if (avoid &&
-          (info[(unsigned char)i] &
-           NOTONL)) /* MODERN: Cast to unsigned char for safe array indexing */
+      if (avoid && (info[(int)i] & NOTONL))
         continue;
       if ((!appr && !rn2(++chcnt)) ||
 #ifdef STUPID
@@ -911,15 +907,12 @@ int shk_move(struct monst *shkp) {
     }
   }
   if (nix != omx || niy != omy) {
-    if (info[(unsigned char)chi] &
-        ALLOW_M) { /* MODERN: Cast to unsigned char for safe array indexing */
+    if (chi >= 0 && chi < 9 && (info[(int)chi] & ALLOW_M)) { /* MODERN: bounds check prevents OOB access to info[] array */
       mtmp = m_at(nix, niy);
       if (hitmm(shkp, mtmp) == 1 && rn2(3) && hitmm(mtmp, shkp) == 2)
         return (2);
       return (0);
-    } else if (info[(unsigned char)chi] &
-               ALLOW_U) { /* MODERN: Cast to unsigned char for safe array
-                             indexing */
+    } else if (chi >= 0 && chi < 9 && (info[(int)chi] & ALLOW_U)) { /* MODERN: bounds check prevents OOB access to info[] array */
       (void)hitu(shkp, d(mdat->damn, mdat->damd) + 1);
       return (0);
     }

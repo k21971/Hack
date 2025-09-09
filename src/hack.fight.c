@@ -68,8 +68,8 @@ int hitmm(struct monst *magr, struct monst *mdef) {
             "You have a peculiarly sad feeling for a moment, then it passes.");
       monstone(mdef);
       hit = 2;
-    } else if ((mdef->mhp -= d(pa->damn, pa->damd)) < 1) {
-      magr->mhpmax += 1 + rn2(pd->mlevel + 1);
+    } else if ((mdef->mhp -= (schar)d(pa->damn, pa->damd)) < 1) { /* MODERN: Safe cast - damage capped by dice */
+      magr->mhpmax += (schar)(1 + rn2(pd->mlevel + 1)); /* MODERN: Safe cast - level-based increment */
       if (magr->mtame && magr->mhpmax > 8 * pa->mlevel) {
         if (pa == &li_dog)
           magr->data = pa = &dog;
@@ -166,13 +166,21 @@ boolean hmon(struct monst *mon, struct obj *obj,
       tmp = rnd(2);
     else {
       if (index(mlarge, mon->data->mlet)) {
-        tmp = rnd(objects[obj->otyp].wldam);
+        if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+          tmp = rnd(objects[obj->otyp].wldam);
+        } else {
+          tmp = rnd(6); /* fallback damage for invalid object type */
+        }
         if (obj->otyp == TWO_HANDED_SWORD)
           tmp += d(2, 6);
         else if (obj->otyp == FLAIL)
           tmp += rnd(4);
       } else {
-        tmp = rnd(objects[obj->otyp].wsdam);
+        if (obj->otyp < NROFOBJECTS) { /* MODERN: bounds check prevents OOB access */
+          tmp = rnd(objects[obj->otyp].wsdam);
+        } else {
+          tmp = rnd(4); /* fallback damage for invalid object type */
+        }
       }
       tmp += obj->spe;
       if (!thrown && obj == uwep && obj->otyp == BOOMERANG && !rn2(3)) {
@@ -185,7 +193,7 @@ boolean hmon(struct monst *mon, struct obj *obj,
       }
     }
     if (mon->data->mlet == 'O' && obj->otyp == TWO_HANDED_SWORD &&
-        !strcmp(ONAME(obj), "Orcrist"))
+        obj->onamelth && !strcmp(ONAME(obj), "Orcrist")) /* MODERN: check onamelth instead of array address */
       tmp += rnd(10);
   } else
     switch (obj->otyp) {
@@ -237,14 +245,19 @@ boolean hmon(struct monst *mon, struct obj *obj,
   }
   if (tmp < 1)
     tmp = 1;
-  mon->mhp -= tmp;
+  mon->mhp -= (schar)tmp; /* MODERN: Safe cast - tmp bounded above by weapon damage */
   if (mon->mhp < 1) {
     killed(mon);
     return (FALSE);
   }
   if (mon->mtame && (!mon->mflee || mon->mfleetim)) {
     mon->mflee = 1; /* Rick Richardson */
-    mon->mfleetim += 10 * rnd(tmp);
+    int flee_add = 10 * rnd(tmp);
+    /* MODERN: Cap flee time to 7-bit field max (127) */
+    if (mon->mfleetim + flee_add > 127)
+      mon->mfleetim = 127;
+    else
+      mon->mfleetim += flee_add;
   }
 
   if (!hittxt) {
@@ -288,15 +301,19 @@ int attack(struct monst *mtmp) {
   if (mtmp->mimic) {
     if (!u.ustuck && !mtmp->mflee)
       u.ustuck = mtmp;
-    switch (levl[u.ux + u.dx][u.uy + u.dy].scrsym) {
+    if (isok(u.ux + u.dx, u.uy + u.dy)) { /* MODERN: bounds check prevents OOB access */
+      switch (levl[u.ux + u.dx][u.uy + u.dy].scrsym) {
     case '+':
       pline("The door actually was a Mimic.");
       break;
-    case '$':
-      pline("The chest was a Mimic!");
-      break;
-    default:
-      pline("Wait! That's a Mimic!");
+      case '$':
+        pline("The chest was a Mimic!");
+        break;
+      default:
+        pline("Wait! That's a Mimic!");
+      }
+    } else {
+      pline("Wait! That's a Mimic!"); /* fallback if coordinates invalid */
     }
     wakeup(mtmp); /* clears mtmp->mimic */
     return (TRUE);

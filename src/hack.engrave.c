@@ -116,7 +116,8 @@ void read_engr_at(int x, int y) {
     default:
       impossible("Something is written in a very strange way.", 0, 0);
     }
-    /* MODERN: Safe format string - prevent format string attacks from save files */
+    /* MODERN: Safe format string - prevent format string attacks from save
+     * files */
     pline("You read: \"%.*s\".", (int)strlen(ep->engr_txt), ep->engr_txt);
   }
 }
@@ -250,7 +251,7 @@ int doengrave(void) {
       otmp->spe = -3;
       nomovemsg = "You cannot engrave more.";
     } else {
-      otmp->spe -= len / 2;
+      otmp->spe -= (schar)(len / 2); /* MODERN: Safe cast - engraving length bounded */
       nomovemsg = "You finished engraving.";
     }
     multi = -len;
@@ -362,12 +363,7 @@ void del_engr(struct engr *ep) {
 }
 
 /**
- * MODERN ADDITION (2025): Memory cleanup for sanitizers
- * WHY: LeakSanitizer detects allocated engravings as memory leaks when game
- * exits HOW: Free all engravings in the linked list starting from head_engr
- * PRESERVES: Original 1984 behavior (no cleanup during normal gameplay)
- * ADDS: Modern memory hygiene for development tools
- */
+ * MODERN: Memory cleanup for sanitizers */
 void cleanup_all_engravings(void) {
   struct engr *ep, *next;
 

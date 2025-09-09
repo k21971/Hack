@@ -39,6 +39,8 @@ boolean panicking;
 
 void
 /* MODERN: CONST-CORRECTNESS: panic message is read-only */
+/* MODERN: noreturn attribute tells compiler this function never returns */
+__attribute__((noreturn))
 panic(const char *str, ...) {
   if (panicking++)
     exit(1); /* avoid loops - this should never happen*/
@@ -47,7 +49,10 @@ panic(const char *str, ...) {
   fputs(" ERROR:  ", stdout);
   va_list args;
   va_start(args, str);
-  vprintf(str, args);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+  vprintf(str, args); /* MODERN: pragma suppresses false positive - str comes from panic() caller */
+#pragma GCC diagnostic pop
   va_end(args);
 #ifdef DEBUG
 #ifdef UNIX
@@ -57,6 +62,7 @@ panic(const char *str, ...) {
 #endif       /* DEBUG */
   more();    /* contains a fflush() */
   done("panicked");
+  exit(1); /* MODERN: Ensure panic never returns, satisfying noreturn attribute */
 }
 
 void atl(int x, int y, int ch) {
@@ -116,7 +122,7 @@ void tmp_at(schar x, schar y) {
     delay_output(50);
     prl(prevx, prevy); /* in case there was a monster */
     at(prevx, prevy,
-       levl[(unsigned char)prevx][(unsigned char)prevy]
+       levl[(int)prevx][(int)prevy]
            .scrsym); /* MODERN: Cast to unsigned char for safe array indexing */
   }
   if (x >= 0) { /* normal call */
@@ -145,13 +151,13 @@ void Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2
     }
     /* close call (do not distinguish y==0 and y==-1) */
     while (cnt--) {
-      xx = tc[(unsigned char)cnt]
+      xx = tc[(int)cnt]
                .x; /* MODERN: Cast to unsigned char for safe array indexing */
-      yy = tc[(unsigned char)cnt]
+      yy = tc[(int)cnt]
                .y; /* MODERN: Cast to unsigned char for safe array indexing */
       prl(xx, yy);
       at(xx, yy,
-         levl[(unsigned char)xx][(unsigned char)yy]
+         levl[(int)xx][(int)yy]
              .scrsym); /* MODERN: Cast to unsigned char for safe array indexing
                         */
     }
@@ -167,15 +173,15 @@ void Tmp_at(schar x, schar y) { /* MODERN: Keep original schar to preserve -1,-2
     if (cnt)
       delay_output(50);
     at(x, y, let);
-    tc[(unsigned char)cnt].x =
+    tc[(int)cnt].x =
         x; /* MODERN: Cast to unsigned char for safe array indexing */
-    tc[(unsigned char)cnt].y =
+    tc[(int)cnt].y =
         y; /* MODERN: Cast to unsigned char for safe array indexing */
     if (++cnt >= COLNO)
       panic("Tmp_at overflow?");
-    levl[(unsigned char)x][(unsigned char)y].new = 0;
-        /* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char
-                                                for safe array indexing */
+    levl[(int)x][(int)y].new = 0;
+    /* prevent pline-nscr erasing --- */ /* MODERN: Cast to unsigned char
+                                            for safe array indexing */
   }
 }
 
@@ -225,19 +231,12 @@ void docrt(void) {
   /* Some ridiculous code to get display of @ and monsters (almost) right */
   if (!Invisible) {
     /**
-     * MODERN ADDITION (2025): Bounds check before array access
-     * WHY: u.ux/u.uy can exceed array bounds causing buffer overflow
-     * HOW: Validate coordinates before accessing levl array
-     * PRESERVES: Original 1984 display logic
-     * ADDS: Memory safety by preventing buffer overflow
-     */
+     * MODERN ADDITION (2025): Bounds check before array access */
     if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
       /* Original 1984: levl[(u.udisx = u.ux)][(u.udisy = u.uy)].scrsym =
        * u.usym; levl[u.udisx][u.udisy].seen = 1; */
-      levl[(unsigned char)(u.udisx = u.ux)][(unsigned char)(u.udisy = u.uy)]
-          .scrsym = u.usym;
-      levl[(unsigned char)u.udisx][(unsigned char)u.udisy].seen =
-          1; /* Bounds already validated */
+      levl[(int)(u.udisx = u.ux)][(int)(u.udisy = u.uy)].scrsym = u.usym;
+      levl[(int)u.udisx][(int)u.udisy].seen = 1; /* Bounds already validated */
     }
     u.udispl = 1;
   } else
@@ -321,15 +320,9 @@ void pru(void) {
   }
   /* Original 1984: levl[u.ux][u.uy].seen = 1; */
   /**
-   * MODERN ADDITION (2025): Bounds check before array access
-   * WHY: u.ux/u.uy can exceed array bounds (e.g. u.ux=82 > 79)
-   * HOW: Validate coordinates before accessing levl array
-   * PRESERVES: Original 1984 visibility logic
-   * ADDS: Memory safety by preventing buffer overflow
-   */
+   * MODERN: Bounds check before array access*/
   if (u.ux >= 1 && u.ux <= COLNO - 1 && u.uy >= 0 && u.uy <= ROWNO - 1) {
-    levl[(unsigned char)u.ux][(unsigned char)u.uy].seen =
-        1; /* Bounds already validated */
+    levl[(int)u.ux][(int)u.uy].seen = 1; /* Bounds already validated */
   }
 }
 
@@ -354,9 +347,9 @@ void prl(int x, int y) {
   room = &levl[x][y];
   /* Original 1984: if((!room->typ) || (IS_ROCK(room->typ) &&
    * levl[u.ux][u.uy].typ == CORR)) */
-  if ((!room->typ) || (IS_ROCK(room->typ) &&
-                       levl[(unsigned char)u.ux][(unsigned char)u.uy].typ ==
-                           CORR)) /* MODERN: safe array indexing */
+  if ((!room->typ) ||
+      (IS_ROCK(room->typ) && levl[(int)u.ux][(int)u.uy].typ ==
+                                 CORR)) /* MODERN: safe array indexing */
     return;
   if ((mtmp = m_at(x, y)) && !mtmp->mhide && (!mtmp->minvis || See_invisible)) {
 #ifndef NOWORM
@@ -573,10 +566,7 @@ void seemons(void) {
   for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
     if (mtmp->data->mlet == ';')
       mtmp->minvis =
-          (u.ustuck != mtmp &&
-           levl[(unsigned char)mtmp->mx][(unsigned char)mtmp->my].typ ==
-               POOL); /* MODERN: Cast to unsigned char for safe array indexing
-                       */
+          (u.ustuck != mtmp && levl[(int)mtmp->mx][(int)mtmp->my].typ == POOL);
     pmon(mtmp);
 #ifndef NOWORM
     if (mtmp->wormno)

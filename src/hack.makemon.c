@@ -11,7 +11,7 @@
 
 #include "hack.h"
 extern char fut_geno[];
-extern char *index(const char *s, int c);
+/* MODERN: removed bogus extern for index() - provided by string.h/compat.h */
 extern struct obj *mkobj_at(int let, int x, int y);
 
 /* Function prototypes for missing functions */
@@ -48,7 +48,7 @@ struct monst *makemon(struct permonst *ptr, int x, int y) {
     if (index(fut_geno, ptr->mlet))
       return ((struct monst *)0);
   } else {
-    ct = CMNUM - strlen(fut_geno);
+    ct = CMNUM - (int)strlen(fut_geno); /* MODERN: cast strlen to int */
     if (index(fut_geno, 'm'))
       ct++; /* make only 1 minotaur */
     if (index(fut_geno, '@'))
@@ -61,6 +61,8 @@ struct monst *makemon(struct permonst *ptr, int x, int y) {
     if (tmp >= ct)
       tmp = rn1(ct - ct / 2, ct / 2);
     for (ct = 0; ct < CMNUM; ct++) {
+      if (ct >= CMNUM)
+        break; /* MODERN: bounds check prevents OOB access to mons[] array */
       ptr = &mons[ct];
       if (index(fut_geno, ptr->mlet))
         continue;
@@ -83,11 +85,11 @@ gotmon:
   if (ptr->mlet == 'D')
     mtmp->mhpmax = mtmp->mhp = 80;
   else if (!ptr->mlevel)
-    mtmp->mhpmax = mtmp->mhp = rnd(4);
+    mtmp->mhpmax = mtmp->mhp = (schar)rnd(4); /* MODERN: cast to schar */
   else
-    mtmp->mhpmax = mtmp->mhp = d(ptr->mlevel, 8);
-  mtmp->mx = x;
-  mtmp->my = y;
+    mtmp->mhpmax = mtmp->mhp = (schar)d(ptr->mlevel, 8); /* MODERN: cast to schar */
+  mtmp->mx = (xchar)x; /* MODERN: cast to xchar */
+  mtmp->my = (xchar)y; /* MODERN: cast to xchar */
   mtmp->mcansee = 1;
   if (ptr->mlet == 'M') {
     mtmp->mimic = 1;
@@ -107,7 +109,14 @@ gotmon:
   }
   if (ptr->mlet == ':') {
     mtmp->cham = 1;
-    (void)newcham(mtmp, &mons[dlevel + 14 + rn2(CMNUM - 14 - dlevel)]);
+    {
+      int idx = dlevel + 14 + rn2(CMNUM - 14 - dlevel);
+      if (idx >= 0 && idx < CMNUM) /* MODERN: bounds check prevents OOB access
+                                      to mons[] array */
+        (void)newcham(mtmp, &mons[idx]);
+      else
+        (void)newcham(mtmp, &mons[rn2(CMNUM)]); /* safe fallback */
+    }
   }
   if (ptr->mlet == 'I' || ptr->mlet == ';')
     mtmp->minvis = 1;
@@ -124,10 +133,10 @@ gotmon:
     if (ptr->mlet == 'O' || ptr->mlet == 'k') {
       coord mm;
       int cnt = rnd(10);
-      mm.x = x;
-      mm.y = y;
+      mm.x = (unsigned char)x; /* MODERN: cast to coord field type */
+      mm.y = (unsigned char)y; /* MODERN: cast to coord field type */
       while (cnt--) {
-        mm = enexto(mm.x, mm.y);
+        mm = enexto((xchar)mm.x, (xchar)mm.y); /* MODERN: cast to xchar for function */
         (void)makemon(ptr, mm.x, mm.y);
       }
     }
@@ -143,38 +152,38 @@ coord enexto(xchar xx, xchar yy) {
   tfoo = foo;
   range = 1;
   do { /* full kludge action. */
-    for (x = xx - range; x <= xx + range; x++)
+    for (x = (xchar)(xx - range); x <= xx + range; x++) /* MODERN: cast to xchar */
       if (goodpos(x, yy - range)) {
-        tfoo->x = x;
-        tfoo++->y = yy - range;
+        tfoo->x = (unsigned char)x; /* MODERN: cast to coord field type */
+        tfoo++->y = (unsigned char)(yy - range); /* MODERN: cast to coord field type */
         if (tfoo == &foo[15])
           goto foofull;
       }
-    for (x = xx - range; x <= xx + range; x++)
+    for (x = (xchar)(xx - range); x <= xx + range; x++) /* MODERN: cast to xchar */
       if (goodpos(x, yy + range)) {
-        tfoo->x = x;
-        tfoo++->y = yy + range;
+        tfoo->x = (unsigned char)x; /* MODERN: cast to coord field type */
+        tfoo++->y = (unsigned char)(yy + range); /* MODERN: cast to coord field type */
         if (tfoo == &foo[15])
           goto foofull;
       }
-    for (y = yy + 1 - range; y < yy + range; y++)
+    for (y = (xchar)(yy + 1 - range); y < yy + range; y++) /* MODERN: cast to xchar */
       if (goodpos(xx - range, y)) {
-        tfoo->x = xx - range;
-        tfoo++->y = y;
+        tfoo->x = (unsigned char)(xx - range); /* MODERN: cast to coord field type */
+        tfoo++->y = (unsigned char)y; /* MODERN: cast to coord field type */
         if (tfoo == &foo[15])
           goto foofull;
       }
-    for (y = yy + 1 - range; y < yy + range; y++)
+    for (y = (xchar)(yy + 1 - range); y < yy + range; y++) /* MODERN: cast to xchar */
       if (goodpos(xx + range, y)) {
-        tfoo->x = xx + range;
-        tfoo++->y = y;
+        tfoo->x = (unsigned char)(xx + range); /* MODERN: cast to coord field type */
+        tfoo++->y = (unsigned char)y; /* MODERN: cast to coord field type */
         if (tfoo == &foo[15])
           goto foofull;
       }
     range++;
   } while (tfoo == foo);
 foofull:
-  return (foo[rn2(tfoo - foo)]);
+  return (foo[rn2((int)(tfoo - foo))]); /* MODERN: cast pointer diff to int */
 }
 
 int goodpos(int x, int y) /* used only in mnexto and rloc */
@@ -196,12 +205,12 @@ void rloc(struct monst *mtmp) {
     tx = rn1(COLNO - 3, 2);
     ty = rn2(ROWNO);
   } while (!goodpos(tx, ty));
-  mtmp->mx = tx;
-  mtmp->my = ty;
+  mtmp->mx = (xchar)tx; /* MODERN: cast to xchar */
+  mtmp->my = (xchar)ty; /* MODERN: cast to xchar */
   if (u.ustuck == mtmp) {
     if (u.uswallow) {
-      u.ux = tx;
-      u.uy = ty;
+      u.ux = (xchar)tx; /* MODERN: cast to xchar */
+      u.uy = (xchar)ty; /* MODERN: cast to xchar */
       docrt();
     } else
       u.ustuck = 0;
@@ -214,6 +223,8 @@ struct monst *mkmon_at(char let, int x, int y) {
   struct permonst *ptr;
 
   for (ct = 0; ct < CMNUM; ct++) {
+    if (ct >= CMNUM)
+      break; /* MODERN: bounds check prevents OOB access to mons[] array */
     ptr = &mons[ct];
     if (ptr->mlet == let)
       return (makemon(ptr, x, y));

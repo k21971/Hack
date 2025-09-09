@@ -18,8 +18,8 @@ struct obj *mkobj_at(let, x, y)
 int let, x, y;
 {
   struct obj *otmp = mkobj(let);
-  otmp->ox = x;
-  otmp->oy = y;
+  otmp->ox = (xchar)x; /* MODERN: explicit cast to xchar for coordinate */
+  otmp->oy = (xchar)y; /* MODERN: explicit cast to xchar for coordinate */
   otmp->nobj = fobj;
   fobj = otmp;
   return (otmp);
@@ -29,8 +29,8 @@ struct obj *mksobj_at(otyp, x, y)
 int otyp, x, y;
 {
   struct obj *otmp = mksobj(otyp);
-  otmp->ox = x;
-  otmp->oy = y;
+  otmp->ox = (xchar)x; /* MODERN: explicit cast to xchar for coordinate */
+  otmp->oy = (xchar)y; /* MODERN: explicit cast to xchar for coordinate */
   otmp->nobj = fobj;
   fobj = otmp;
   return (otmp);
@@ -58,7 +58,7 @@ int otyp;
     impossible("mksobj called with invalid otyp %d", otyp, 0);
     otyp = STRANGE_OBJECT; /* Safe fallback */
   }
-  unsigned char let =
+  unsigned char let = (unsigned char)
       objects[otyp].oc_olet; /* MODERN: Use unsigned char to prevent negative
                                 values in switch */
 
@@ -67,17 +67,17 @@ int otyp;
   otmp->age = moves;
   otmp->o_id = flags.ident++;
   otmp->quan = 1;
-  otmp->olet = let;
-  otmp->otyp = otyp;
+  otmp->olet = (char)let; /* MODERN: explicit cast from unsigned char to char */
+  otmp->otyp = (uchar)otyp; /* MODERN: explicit cast to uchar */
   otmp->dknown = index("/=!?*", let) ? 0 : 1;
   switch (let) {
   case WEAPON_SYM:
-    otmp->quan = (otmp->otyp <= ROCK) ? rn1(6, 6) : 1;
+    otmp->quan = (uchar)((otmp->otyp <= ROCK) ? rn1(6, 6) : 1); /* MODERN: cast to uchar */
     if (!rn2(11))
-      otmp->spe = rnd(3);
+      otmp->spe = (schar)rnd(3); /* MODERN: cast to schar */
     else if (!rn2(10)) {
       otmp->cursed = 1;
-      otmp->spe = -rnd(3);
+      otmp->spe = (schar)(-rnd(3)); /* MODERN: cast to schar */
     }
     break;
   case FOOD_SYM:
@@ -88,9 +88,10 @@ int otyp;
     if (otmp->otyp == TIN)
       otmp->spe = rnd(...);
 #endif /* NOT_YET_IMPLEMENTED */
-       /* fallthrough */
+       /* FALLTHROUGH */
   case GEM_SYM:
     otmp->quan = rn2(6) ? 1 : 2;
+    /* FALLTHROUGH */
   case TOOL_SYM:
   case CHAIN_SYM:
   case BALL_SYM:
@@ -103,9 +104,9 @@ int otyp;
     if (!rn2(8))
       otmp->cursed = 1;
     if (!rn2(10))
-      otmp->spe = rnd(3);
+      otmp->spe = (schar)rnd(3); /* MODERN: cast to schar */
     else if (!rn2(9)) {
-      otmp->spe = -rnd(3);
+      otmp->spe = (schar)(-rnd(3)); /* MODERN: cast to schar */
       otmp->cursed = 1;
     }
     break;
@@ -113,15 +114,15 @@ int otyp;
     if (otmp->otyp == WAN_WISHING)
       otmp->spe = 3;
     else
-      otmp->spe = rn1(5, (objects[otmp->otyp].bits & NODIR) ? 11 : 4);
+      otmp->spe = (schar)rn1(5, (objects[otmp->otyp].bits & NODIR) ? 11 : 4); /* MODERN: cast to schar */
     break;
   case RING_SYM:
     if (objects[otmp->otyp].bits & SPEC) {
       if (!rn2(3)) {
         otmp->cursed = 1;
-        otmp->spe = -rnd(2);
+        otmp->spe = (schar)(-rnd(2)); /* MODERN: cast to schar */
       } else
-        otmp->spe = rnd(2);
+        otmp->spe = (schar)rnd(2); /* MODERN: cast to schar */
     } else if (otmp->otyp == RIN_TELEPORTATION ||
                otmp->otyp == RIN_AGGRAVATE_MONSTER ||
                otmp->otyp == RIN_HUNGER || !rn2(9))
@@ -132,7 +133,7 @@ int otyp;
           (let >= 32 && let < 127) ? let : '?', let,
           otyp); /* MODERN: Better error reporting */
   }
-  otmp->owt = weight(otmp);
+  otmp->owt = (uchar)weight(otmp); /* MODERN: cast weight() result to uchar */
   return (otmp);
 }
 
@@ -165,8 +166,8 @@ int x, y;
   else {
     gold = newgold();
     gold->ngold = fgold;
-    gold->gx = x;
-    gold->gy = y;
+    gold->gx = (xchar)x; /* MODERN: explicit cast to xchar for coordinate */
+    gold->gy = (xchar)y; /* MODERN: explicit cast to xchar for coordinate */
     gold->amount = amount;
     fgold = gold;
     /* do sth with display? */

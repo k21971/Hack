@@ -84,7 +84,7 @@ void savelev(
 
 void bwrite(int fd, char *loc, unsigned num) {
   /* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
-  if (write(fd, loc, (int)num) != num)
+  if (write(fd, loc, (size_t)num) != (ssize_t)num) /* MODERN: proper POSIX types */
     panic("cannot write %u bytes to file #%d", num, fd);
 }
 
@@ -204,7 +204,7 @@ void getlev(int fd, int pid, xchar lev) {
       if (newhp > mtmp->mhpmax)
         mtmp->mhp = mtmp->mhpmax;
       else
-        mtmp->mhp = newhp;
+        mtmp->mhp = (schar)newhp; /* MODERN: cast to schar */
     }
   }
 
@@ -255,7 +255,8 @@ void mread(int fd, char *buf, unsigned len) {
   int rlen;
   extern boolean restoring;
 
-  rlen = read(fd, buf, (int)len);
+  ssize_t read_result = read(fd, buf, (size_t)len); /* MODERN: proper POSIX types */
+  rlen = (int)read_result; /* MODERN: cast ssize_t to int for compatibility */
   if (rlen !=
       (int)len) { /* MODERN: Cast to int to match rlen type from read() */
     pline("Read %d instead of %u bytes.\n", rlen, len);

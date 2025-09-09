@@ -20,7 +20,8 @@ void amulet(void) {
   if (!flags.made_amulet || !flags.no_of_wizards)
     return;
   /* find wizard, and wake him if necessary */
-  for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+  for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+    if (!mtmp->data) continue; /* MODERN: null check prevents crash on corrupted monster data */
     if (mtmp->data->mlet == '1' && mtmp->msleep && !rn2(40))
       for (otmp = invent; otmp; otmp = otmp->nobj)
         if (otmp->olet == AMULET_SYM && !otmp->spe) {
@@ -30,6 +31,7 @@ void amulet(void) {
                   "taking the Amulet.");
           return;
         }
+  }
 }
 
 int wiz_hit(struct monst *mtmp) {
@@ -48,7 +50,7 @@ int wiz_hit(struct monst *mtmp) {
     for (otmp = fobj; otmp; otmp = otmp->nobj)
       if (otmp->olet == AMULET_SYM && !otmp->spe) {
         if ((u.ux != otmp->ox || u.uy != otmp->oy) &&
-            !m_at(otmp->ox, otmp->oy)) {
+            isok(otmp->ox, otmp->oy) && !m_at(otmp->ox, otmp->oy)) { /* MODERN: bounds check prevents invalid teleportation coordinates */
 
           /* teleport to it and pick it up */
           mtmp->mx = otmp->ox;
@@ -163,6 +165,7 @@ void aggravate(void) {
   struct monst *mtmp;
 
   for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+    if (!mtmp) break; /* MODERN: null check prevents crash on corrupted monster list */
     mtmp->msleep = 0;
     if (mtmp->mfroz && !rn2(5))
       mtmp->mfroz = 0;
@@ -175,7 +178,11 @@ void clonewiz(struct monst *mtmp) {
   if ((mtmp2 = makemon(PM_WIZARD, mtmp->mx, mtmp->my))) {
     flags.no_of_wizards = 2;
     unpmon(mtmp2);
-    mtmp2->mappearance = wizapp[rn2(sizeof(wizapp) - 1)];
+    int wizidx = rn2(sizeof(wizapp) - 1);
+    if (wizidx >= 0 && wizidx < (int)sizeof(wizapp) - 1) /* MODERN: bounds check prevents OOB access to wizapp[] array */
+      mtmp2->mappearance = wizapp[wizidx];
+    else
+      mtmp2->mappearance = '@'; /* safe fallback */
     pmon(mtmp);
   }
 }

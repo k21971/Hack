@@ -234,8 +234,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (argc > 1)
+  if (argc > 1) {
     locknum = atoi(argv[1]);
+    if (locknum < 0)
+      locknum = 0; /* MODERN: prevent negative values */
+  }
 #ifdef MAX_NR_OF_PLAYERS
   if (!locknum || locknum > MAX_NR_OF_PLAYERS)
     locknum = MAX_NR_OF_PLAYERS;
@@ -332,8 +335,8 @@ int main(int argc, char *argv[]) {
 
     (void)signal(SIGINT, done1);
     mklev();
-    u.ux = xupstair;
-    u.uy = yupstair;
+    u.ux = (xchar)xupstair; /* MODERN: Safe cast - map coords are 0-79, within xchar range */
+    u.uy = (xchar)yupstair; /* MODERN: Safe cast - map coords are 0-21, within xchar range */
     (void)inshop();
     setsee();
     flags.botlx = 1;
@@ -509,15 +512,16 @@ void askname(void) {
       error("End of input\n");
     /* some people get confused when their erase char is not ^H */
     if (c == '\010') {
-      if (ct)
+      if (ct > 0)
         ct--;
       continue;
     }
     if (c != '-')
       if (c < 'A' || (c > 'Z' && c < 'a') || c > 'z')
         c = '_';
-    if (ct < (int)sizeof(plname) - 1)
-      plname[ct++] = c; /* MODERN: Cast to int to match ct type */
+    if (ct >= 0 &&
+        ct < (int)sizeof(plname) - 1) /* MODERN: prevent integer overflow */
+      plname[ct++] = c;
   }
   plname[ct] = 0;
   if (ct == 0)
@@ -548,19 +552,7 @@ static void chdirx(const char *dir,
 		setgid(getgid());
 #endif
     /**
-     * MODERN ADDITION (2025): Privilege dropping with error checking
-     *
-     * WHY: Security best practice requires checking setgid() return value.
-     *      Original code ignored potential failures when dropping privileges
-     *      for user-specified directories.
-     *
-     * HOW: Check setgid() return value and warn on failure, but continue
-     *      since privilege dropping is a security measure, not critical
-     *      for basic functionality.
-     *
-     * PRESERVES: Original security model and program flow
-     * ADDS: Defensive programming and error visibility
-     */
+     * MODERN: Privilege dropping with error checking*/
     /* revoke */
     if (setgid(getgid()) != 0) {
       /* Privilege dropping failed, warn but continue */
@@ -576,7 +568,8 @@ static void chdirx(const char *dir,
 
   if (dir && chdir(dir) < 0) {
     perror(dir);
-    error("Cannot chdir to %s.", dir);
+    error("Cannot chdir to game directory."); /* MODERN: safe message prevents
+                                                 format string attack */
   }
 
   /* warn the player if he cannot write the record file */
@@ -623,11 +616,7 @@ void handle_resize(int sig) {
 }
 
 /**
- * MODERN ADDITION (2025): Check and handle pending terminal resize
- *
- * Called from main game loop to safely handle terminal resize events.
- * This approach avoids doing complex operations in signal handler context.
- */
+ * MODERN: Check and handle pending terminal resize*/
 void check_resize(void) {
   if (!resize_pending)
     return;

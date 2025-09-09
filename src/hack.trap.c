@@ -44,8 +44,13 @@ void dotrap(struct trap *trap) {
   int ttype = trap->ttyp;
 
   nomul(0);
-  if (trap->tseen && !rn2(5) && ttype != PIT)
-    pline("You escape a%s.", traps[ttype]);
+  if (trap->tseen && !rn2(5) && ttype != PIT) {
+    if (ttype >= 0 && ttype < TRAPNUM) { /* MODERN: bounds check prevents OOB access */
+      pline("You escape a%s.", traps[ttype]);
+    } else {
+      pline("You escape a trap."); /* safe fallback for invalid trap type */
+    }
+  }
   else {
     trap->tseen = 1;
     switch (ttype) {
@@ -324,7 +329,7 @@ void teleds(int nux, int nuy) {
     docrt();
   }
   nomul(0);
-  if (levl[(unsigned char)nux][(unsigned char)nuy].typ == POOL && !Levitation)
+  if (levl[(int)nux][(int)nuy].typ == POOL && !Levitation)
     drown();
   (void)inshop();
   pickup(1);
@@ -334,7 +339,7 @@ void teleds(int nux, int nuy) {
 
 int teleok(int x, int y) { /* might throw him into a POOL */
   return (isok(x, y) &&
-          !IS_ROCK(levl[(unsigned char)x][(unsigned char)y].typ) &&
+          !IS_ROCK(levl[(int)x][(int)y].typ) &&
           !m_at(x, y) && !sobj_at(ENORMOUS_ROCK, x, y) && !t_at(x, y));
   /* Note: gold is permitted (because of vaults) */
 }
@@ -450,7 +455,7 @@ void drown(void) {
 
     pline("You attempt a teleport spell."); /* utcsri!carroll */
     (void)dotele();
-    if (levl[(unsigned char)u.ux][(unsigned char)u.uy].typ != POOL)
+    if (levl[(int)u.ux][(int)u.uy].typ != POOL)
       return;
   }
   pline("You drown ...");

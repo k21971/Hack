@@ -89,7 +89,7 @@ int chwepon(struct obj *otmp, int amount) {
     amount *= 2;
   time = (amount * amount == 1) ? "moment" : "while";
   pline("Your %s %s for a %s.", aobjnam(uwep, "glow"), color, time);
-  uwep->spe += amount;
+  uwep->spe += (schar)amount; /* MODERN: Safe cast - enchantment limited by game mechanics */
   if (amount > 0)
     uwep->cursed = 0;
   return (1);

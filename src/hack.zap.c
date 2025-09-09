@@ -48,7 +48,9 @@ int bhitm(struct monst *mtmp, struct obj *otmp) {
     }
     break;
   case WAN_POLYMORPH:
-    if (newcham(mtmp, &mons[rn2(CMNUM)]))
+    if (newcham(mtmp, &mons[rn2(CMNUM)]) &&
+        otmp->otyp < NROFOBJECTS) /* MODERN: bounds check prevents OOB access to
+                                     objects[] array */
       objects[otmp->otyp].oc_name_known = 1;
     break;
   case WAN_CANCELLATION:
@@ -136,10 +138,15 @@ int dozap(void) {
   }
   if (obj->spe == 0)
     pline("You wrest one more spell from the worn-out wand.");
-  if (!(objects[obj->otyp].bits & NODIR) && !getdir(1))
+  if (obj->otyp < NROFOBJECTS && !(objects[obj->otyp].bits & NODIR) &&
+      !getdir(
+          1)) /* MODERN: bounds check prevents OOB access to objects[] array */
     return (1); /* make him pay for knowing !NODIR */
   obj->spe--;
-  if (objects[obj->otyp].bits & IMMEDIATE) {
+  if (obj->otyp < NROFOBJECTS &&
+      (objects[obj->otyp].bits &
+       IMMEDIATE)) { /* MODERN: bounds check prevents OOB access to objects[]
+                        array */
     if (u.uswallow)
       bhitm(u.ustuck, obj);
     else if (u.dz) {
@@ -225,9 +232,8 @@ int dozap(void) {
         while (--digdepth >= 0) {
           if (!isok(zx, zy))
             break;
-          room = &levl[(unsigned char)zx]
-                      [(unsigned char)zy]; /* MODERN: Cast to unsigned char for
-                                              safe array indexing */
+          room = &levl[(int)zx][(int)zy]; /* MODERN: Cast to int for
+                                                       safe array indexing */
           Tmp_at(zx, zy);
           if (!xdnstair) {
             if (zx < 3 || zx > COLNO - 3 || zy < 3 || zy > ROWNO - 3)
@@ -256,7 +262,9 @@ int dozap(void) {
       buzz((int)obj->otyp - WAN_MAGIC_MISSILE, u.ux, u.uy, u.dx, u.dy);
       break;
     }
-    if (!objects[obj->otyp].oc_name_known) {
+    if (obj->otyp < NROFOBJECTS &&
+        !objects[obj->otyp].oc_name_known) { /* MODERN: bounds check prevents
+                                                OOB access to objects[] array */
       objects[obj->otyp].oc_name_known = 1;
       more_experienced(0, 10);
     }
@@ -265,14 +273,7 @@ int dozap(void) {
 }
 
 /**
- * MODERN ADDITION (2025): const-qualified return type
- *
- * WHY: Function returns string literals which are const char*
- * HOW: Changed return type from char* to const char* for const-correctness
- *
- * PRESERVES: All original punctuation functionality for combat messages
- * ADDS: Type safety preventing modification of string literals
- */
+ * MODERN: const-qualified return type */
 const char *exclam(int force) {
   /* force == 0 occurs e.g. with sleep ray */
   /* note that large force is usual with wands so that !! would
@@ -281,14 +282,7 @@ const char *exclam(int force) {
 }
 
 /**
- * MODERN ADDITION (2025): const-qualified parameters
- *
- * WHY: Function receives read-only string parameters
- * HOW: Changed char* to const char* for str and force parameters
- *
- * PRESERVES: All original hit message functionality
- * ADDS: Type safety for string literal arguments
- */
+ * MODERN ADDITION (2025): const-qualified parameters */
 void hit(const char *str, struct monst *mtmp,
          const char *force) /* usually either "." or "!" */
 {
@@ -416,10 +410,12 @@ char dirlet(int dx, int dy) {
 /* called with dx = dy = 0 with vertical bolts */
 void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
   int abstype = abs(type);
-  const char *fltxt = (type == -1)
-                          ? "blaze of fire"
-                          : fl[abstype]; /* MODERN: const because reads from
-                                            fl[] array or string literal */
+  const char *fltxt =
+      (type == -1)
+          ? "blaze of fire"
+          : (abstype < SIZE(fl) ? fl[abstype]
+                                : "energy"); /* MODERN: bounds check prevents
+                                                OOB access to fl[] array */
   struct rm *lev;
   xchar range;
   struct monst *mon;
@@ -440,20 +436,19 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
   while (range-- > 0) {
     sx += dx;
     sy += dy;
-    if ((lev = &levl[(unsigned char)sx][(unsigned char)sy])->typ)
+    if ((lev = &levl[(int)sx][(int)sy])->typ)
       Tmp_at(sx,
              sy); /* MODERN: Cast to unsigned char for safe array indexing */
     else {
       int bounce = 0;
       if (cansee(sx - dx, sy - dy))
         pline("The %s bounces!", fltxt);
-      if (ZAP_POS(levl[(unsigned char)sx][(unsigned char)(sy - dy)]
-                      .typ)) /* MODERN: Cast to unsigned char for safe array
-                                indexing */
+      if (ZAP_POS(levl[(int)sx][(int)(sy - dy)].typ)) /* MODERN: Cast to int for
+                                                         safe array indexing */
         bounce = 1;
-      if (ZAP_POS(levl[(unsigned char)(sx - dx)][(unsigned char)sy]
-                      .typ)) { /* MODERN: Cast to unsigned char for safe array
-                                  indexing */
+      if (ZAP_POS(
+              levl[(int)(sx - dx)][(int)sy].typ)) { /* MODERN: Cast to int for
+                                                       safe array indexing */
         if (!bounce || rn2(2))
           bounce = 2;
       }
@@ -543,21 +538,19 @@ void buzz(int type, xchar sx, xchar sy, int dx, int dy) {
         dx = -dx;
         dy = -dy;
       } else {
-        if (ZAP_POS(rmn = levl[(unsigned char)sx][(unsigned char)(sy - dy)]
-                              .typ) && /* MODERN: Cast to unsigned char for safe
+        if (ZAP_POS(rmn = levl[(int)sx][(int)(sy - dy)]
+                              .typ) && /* MODERN: Cast to int for safe
                                           array indexing */
-            (IS_ROOM(rmn) ||
-             ZAP_POS(levl[(unsigned char)(sx + dx)][(unsigned char)(sy - dy)]
-                         .typ))) /* MODERN: Cast to unsigned char for safe array
-                                    indexing */
+            (IS_ROOM(rmn) || ZAP_POS(levl[(int)(sx + dx)][(int)(sy - dy)]
+                                         .typ))) /* MODERN: Cast to int for safe
+                                                    array indexing */
           bounce = 1;
-        if (ZAP_POS(rmn = levl[(unsigned char)(sx - dx)][(unsigned char)sy]
-                              .typ) && /* MODERN: Cast to unsigned char for safe
+        if (ZAP_POS(rmn = levl[(int)(sx - dx)][(int)sy]
+                              .typ) && /* MODERN: Cast to int for safe
                                           array indexing */
-            (IS_ROOM(rmn) ||
-             ZAP_POS(levl[(unsigned char)(sx - dx)][(unsigned char)(sy + dy)]
-                         .typ))) /* MODERN: Cast to unsigned char for safe array
-                                    indexing */
+            (IS_ROOM(rmn) || ZAP_POS(levl[(int)(sx - dx)][(int)(sy + dy)]
+                                         .typ))) /* MODERN: Cast to int for safe
+                                                    array indexing */
           if (!bounce || rn2(2))
             bounce = 2;
 
