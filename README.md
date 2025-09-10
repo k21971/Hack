@@ -35,7 +35,6 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 * **Complete K\&R Modernization** – Entire codebase converted to ANSI C (\~250 functions updated).
 * **Unix/Linux Fixes** – No more hardcoded BSD paths or FS quirks.
 * **Cross-Platform Verified** – Works on Linux (glibc/musl) & FreeBSD; CI-tested.
-* **Tiny Executable** – 479KB of pure roguelike, with save/load intact.
 
 > **Tested on:** Arch, Alpine, FreeBSD 14.2.
 > macOS support pending. Arch users can install via the AUR.
