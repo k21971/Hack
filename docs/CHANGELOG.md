@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2025-01-10
+
+### Fixed
+
+- **CRITICAL**: Fixed "Cannot get status of hack" error on Ubuntu systems
+  - Bug prevented game from running when invoked with path (./hack, /usr/bin/hack)
+  - Caused by security validation modifying argv[0] used for PATH resolution
+  - Affected Ubuntu 22.04/24.04 but not Arch Linux due to invocation differences
+  - Fix preserves original argv[0] for PATH search while validating basename separately
+
 ## [1.1.2] - 2025-01-05
 
 ### Changed
@@ -72,14 +82,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added proper return statements to all void functions
 - Implemented fallthrough annotations for intentional switch cases
 - Configured MSan with non-aborting mode for uninstrumented library compatibility
-
-### Technical
-
-- **Battle-tested**: 1,260+ automated tests passed (ASan, UBSan, MSan, TSan)
-- **Deployment-ready**: Zero critical warnings under hardened build flags
-- **Memory-safe**: All buffer security vulnerabilities eliminated
-- **Server-grade**: Ready for production deployment on HardFought.org
-- Enhanced gauntlet testing with signal chaos, stress testing, and performance profiling
 
 ## [1.0.6] - 2025-08-14
 
