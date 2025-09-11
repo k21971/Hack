@@ -168,10 +168,14 @@ void gethdate(char *name) {
     return;
   }
   
-  /* MODERN: Extract basename only - no directory traversal allowed */
-  const char *basename = strrchr(name, '/');
-  if (basename) {
-    name = (char *)(basename + 1);  /* Use only the executable name */
+  /* MODERN: Extract basename for validation only - DO NOT modify name */
+  const char *slash = strrchr(name, '/');
+  const char *namecheck = slash ? slash + 1 : name;
+  
+  /* MODERN: Reject empty basename */
+  if (!namecheck || *namecheck == '\0') {
+    error("Invalid executable name provided.");
+    return;
   }
 
 #if 0
@@ -189,8 +193,8 @@ void gethdate(char *name) {
  */
 #define MAXPATHLEN 1024
 
-  /* MODERN: Additional name validation after basename extraction */
-  if (strlen(name) > 64) {  /* Reasonable executable name limit */
+  /* MODERN: Validate basename length */
+  if (strlen(namecheck) > 64) {  /* Reasonable executable name limit */
     error("Executable name too long.");
     return;
   }
