@@ -515,6 +515,9 @@ struct obj *restobjchn(int fd) {
   struct obj *otmp, *otmp2;
   struct obj *first = 0;
   int xl;
+#ifndef MAXONAMELTH
+#define MAXONAMELTH 63 /* Max for 6-bit onamelth field */
+#endif
 #ifdef lint
   /* suppress "used before set" warning from lint */
   otmp2 = 0;
@@ -523,12 +526,22 @@ struct obj *restobjchn(int fd) {
     mread(fd, (char *)&xl, sizeof(xl));
     if (xl == -1)
       break;
-    otmp = newobj(xl);
+    /* MODERN: Sanity check object name length */
+    if (xl < 0 || xl > MAXONAMELTH) {
+      panic("Bad object name length in save: %d", xl);
+    }
+    /* MODERN: Allocate extra byte for NUL terminator */
+    otmp = newobj(xl > 0 ? xl + 1 : xl);
     if (!first)
       first = otmp;
     else
       otmp2->nobj = otmp;
     mread(fd, (char *)otmp, (unsigned)xl + sizeof(struct obj));
+    /* MODERN: Normalize onamelth to match allocation and ensure null-terminated */
+    otmp->onamelth = (xl > 0) ? xl : 0;
+    if (xl > 0) {
+      ONAME(otmp)[xl] = '\0';
+    }
     if (!otmp->o_id)
       otmp->o_id = flags.ident++;
     otmp2 = otmp;
