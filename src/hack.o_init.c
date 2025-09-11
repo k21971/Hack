@@ -178,8 +178,22 @@ void savenames(int fd) {
 void restnames(int fd) {
   int i;
   unsigned len;
+  
+  /* MODERN: Save static oc_name pointers before overwriting objects array */
+  const char *saved_names[SIZE(objects)];
+  for (i = 0; i < SIZE(objects); i++) {
+    saved_names[i] = objects[i].oc_name;
+  }
+  
   mread(fd, (char *)bases, sizeof bases);
   mread(fd, (char *)objects, sizeof objects);
+  
+  /* MODERN: Restore oc_name pointers (point to static strings in binary)
+     Keep oc_descr from save file (preserves shuffle state) */
+  for (i = 0; i < SIZE(objects); i++) {
+    objects[i].oc_name = saved_names[i];
+  }
+  
   for (i = 0; i < SIZE(objects); i++)
     if (objects[i].oc_uname) {
       mread(fd, (char *)&len, sizeof len);
