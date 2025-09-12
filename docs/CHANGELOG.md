@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2025-09-11
+
+### Fixed
+
+- **CRITICAL**: Fixed save/restore crash when accessing inventory after restore
+  - Object tail strings (scroll labels, etc.) weren't NUL-terminated after restore
+  - Class table pointers (oc_name, oc_descr) became stale after restore, pointing to old process addresses
+  - Now properly allocates extra byte for NUL termination on restore
+  - Preserves static string pointers from binary while maintaining shuffled descriptions
+  - Added range checks for object name length and NULL guards for string operations
+
+### Changed
+
+- Updated README features section
+
 ## [1.1.3] - 2025-01-10
 
 ### Fixed
