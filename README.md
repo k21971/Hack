@@ -49,20 +49,7 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 yay -S restohack
 ```
 
-### Download Pre-built Binary
-
-Download the static binary from [Releases](https://github.com/Critlist/restoHack/releases):
-
-```bash
-mkdir -p ~/Games/restohack
-cd ~/Games/restohack
-tar -xzf restoHack-*-linux-x86_64-static.tar.gz
-./hack
-```
-
-*Note: As of v1.1.1, we provide separate binary and source tarballs instead of hybrid packages.*
-
-## Install & Build
+## Build from Source (Pre-release)
 
 **Requirements:** `git`, `cmake`, a C compiler, `ncurses`
 
@@ -82,13 +69,18 @@ cmake --preset=release && cmake --build build
 
 ---
 
-## Quick Demo (Linux)
+### Download Pre-built Binary (Linux)
 
-If you just want to try it immediately without building from source:
+Download the static binary from [Releases](https://github.com/Critlist/restoHack/releases):
 
 ```bash
+mkdir -p ~/Games/restohack
+cd ~/Games/restohack
+tar -xzf restoHack-*-linux-x86_64-static.tar.gz
 ./run-hack.sh
 ```
+
+*Note: As of v1.1.1, we provide separate binary and source tarballs instead of hybrid packages.*
 
 *(static binary, no dependencies required)*
 
@@ -98,15 +90,16 @@ If you just want to try it immediately without building from source:
 
 ## Current Status
 
-v1.1.1 - The original 1984 code now builds cleanly with modern compilers and runs without crashing. Memory safety fixes, bounds checking, and other boring but necessary work.
+v1.1.3 - Stable Release. Original 1984 gameplay preserved, modern safety added, runs everywhere it should.
 
 ---
 
 ## Recent Fixes
 
-* **Modern Locking** – Replaced `link()` locks with `flock()` for clean recovery.
-* **NetBSD/pkgsrc Builds** – Fixed curses detection and RNG seeding via CMake feature checks.
-* **Tombstone Crash** – Fixed segfault in RIP screen by patching buffer overflow in name centering.
+* **Ubuntu Fix** – Resolved PATH resolution bug preventing game launch on Ubuntu 22.04/24.04
+* **Security Audit** – Fixed 150+ vulnerabilities: buffer overflows, null pointers, format strings  
+* **Terminal Resize** – Added SIGWINCH handler to prevent display corruption on window resize
+* **40-Year Bug** – Fixed strength overflow that could instantly kill players (spinach/potions)
 
 ---
 
@@ -118,7 +111,7 @@ Fix what breaks, preserve what works.
 
 ## Source Code
 
-Built from Hack 1.0.3 (1985) preserved in FreeBSD's games collection. Original source in [`docs/historical/original-source/`](docs/historical/original-source/)
+Built from Andries Brouwer's Hack 1.0.3 (1985) preserved in FreeBSD's games collection. Original source in [`docs/historical/original-source/`](docs/historical/original-source/)
 
 See [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) for how changes are documented.
 

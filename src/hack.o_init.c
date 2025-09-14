@@ -178,8 +178,26 @@ void savenames(int fd) {
 void restnames(int fd) {
   int i;
   unsigned len;
+  
+  /* MODERN: Save static pointers before overwriting objects array
+     Assumes objects[] static pointers are valid at this point.
+     If init_objects() ever moves, ensure snapshot happens after it. */
+  const char *saved_names[SIZE(objects)];
+  const char *saved_descr[SIZE(objects)];
+  for (i = 0; i < SIZE(objects); i++) {
+    saved_names[i] = objects[i].oc_name;
+    saved_descr[i] = objects[i].oc_descr;
+  }
+  
   mread(fd, (char *)bases, sizeof bases);
   mread(fd, (char *)objects, sizeof objects);
+  
+  /* MODERN: Restore static pointers (point to static strings in binary) */
+  for (i = 0; i < SIZE(objects); i++) {
+    objects[i].oc_name = saved_names[i];
+    objects[i].oc_descr = saved_descr[i];
+  }
+  
   for (i = 0; i < SIZE(objects); i++)
     if (objects[i].oc_uname) {
       mread(fd, (char *)&len, sizeof len);

@@ -284,10 +284,12 @@ struct obj *obj;
       Strcat(buf, an);
     } else if (un) {
       Strcat(buf, " called ");
-      Strcat(buf, un);
+      /* MODERN: Guard against NULL oc_uname */
+      Strcat(buf, un ? un : "something");
     } else {
       Strcat(buf, " labeled ");
-      Strcat(buf, dn);
+      /* MODERN: Guard against NULL oc_descr */
+      Strcat(buf, dn ? dn : "???");
     }
     break;
   case WAND_SYM:
