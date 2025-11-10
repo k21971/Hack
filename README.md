@@ -41,6 +41,14 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 
 ---
 
+ **Recognition:**  
+RestoHack was recognized by **GitHub** as a *For the Love of Code* category winner (2025).  
+Featured in the official GitHub Blog:  
+[From Karaoke Terminals to AI Resumes — The Winners of GitHub’s For the Love of Code Challenge](https://github.blog/open-source/from-karaoke-terminals-to-ai-resumes-the-winners-of-githubs-for-the-love-of-code-challenge/)
+
+---
+
+
 ## Installation
 
 ### Arch Linux (AUR)
