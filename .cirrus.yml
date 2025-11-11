@@ -3,7 +3,7 @@
 freebsd_build_task:
   name: FreeBSD build (curses sanity)
   freebsd_instance:
-    image_family: freebsd-14-2
+    image_family: freebsd-14-3
   env:
     CIRRUS_CLONE_DEPTH: "1"
   install_script: |
@@ -31,7 +31,7 @@ source_tarball_test_task:
   name: Test source tarball build
   only_if: $CIRRUS_TAG =~ '^v[0-9].+'
   freebsd_instance:
-    image_family: freebsd-14-2
+    image_family: freebsd-14-3
   env:
     CIRRUS_CLONE_DEPTH: "1"
   depends_on:
