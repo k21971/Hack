@@ -36,7 +36,7 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 * **Unix/Linux Fixes** – No more hardcoded BSD paths or FS quirks.
 * **Cross-Platform Verified** – Works on Linux (glibc/musl) & FreeBSD; CI-tested.
 
-> **Tested on:** Arch, Alpine, FreeBSD 14.2.
+> **Tested on:** Arch, Alpine, FreeBSD 14.3 and WSL.
 > macOS support pending. Arch users can install via the AUR.
 
 ---
