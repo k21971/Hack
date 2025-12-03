@@ -48,6 +48,12 @@ Featured in the official GitHub Blog:
 
 ---
 
+**Development Status:**  
+After a brief pause, active development is gearing back up. The upcoming work will focus heavily on strengthening safety guards throughout the codebase and continuing the long-term mission of cleaning up undefined behavior while keeping the original 1984 
+spirit intact.
+Development Status:
+
+
 
 ## Installation
 
