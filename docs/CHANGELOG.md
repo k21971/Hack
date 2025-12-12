@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **SAVE FORMAT**: Save version incremented from 1 to 2 for safe pointer serialization
+  - Pointers in `struct you` now serialized as semantic IDs instead of raw memory addresses
+  - `usick_cause` (sickness cause string) saved as object type index or special marker
+  - `uprops[].p_tofn` (timeout function pointers) saved as function IDs
+  - Struct dump now zeroes all pointer fields before writing
+  - Version 1 saves automatically migrate to Version 2 on load
+  - Pre-versioned saves (no magic number) now rejected with clear error message
+  - Fixes segfault risk in multi-user server environments (ASLR, process address space changes)
+
+### Fixed
+
+- **SECURITY**: Pointer serialization vulnerabilities in save/restore system
+  - `usick_cause` pointer became invalid after restore, causing segfaults on timeout
+  - Function pointers in `uprops[]` saved as raw addresses, invalid on restore
+  - Raw pointers in struct dump could cause undefined behavior across process invocations
+  - Added post-restore validation for state consistency (Sick flag vs usick_cause)
+  - Graceful handling of corrupted save data (fallback to safe defaults, no crashes)
+
 ## [1.1.4] - 2025-09-11
 
 ### Fixed

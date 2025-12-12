@@ -109,8 +109,9 @@ v1.1.3 - Stable Release. Original 1984 gameplay preserved, modern safety added, 
 
 ## Recent Fixes
 
+* **Save System Safety** – Version 2 save format with pointer serialization
 * **Ubuntu Fix** – Resolved PATH resolution bug preventing game launch on Ubuntu 22.04/24.04
-* **Security Audit** – Fixed 150+ vulnerabilities: buffer overflows, null pointers, format strings  
+* **Security Audit** – Fixed 150+ vulnerabilities: buffer overflows, null pointers, format strings
 * **Terminal Resize** – Added SIGWINCH handler to prevent display corruption on window resize
 * **40-Year Bug** – Fixed strength overflow that could instantly kill players (spinach/potions)
 
