@@ -33,8 +33,17 @@ typedef struct {
   uint32_t reserved;  /* For future use */
 } rh_hdr_t;
 
+/* Save format version history:
+ * Version 1 (2025): Initial versioned format with magic number, endianness
+ *                   - Serialized: flags, dlevel, moves, ustuck (by m_id)
+ *                   - NOT serialized: usick_cause, p_tofn (raw pointers!)
+ * Version 2 (2025): Safe pointer serialization for multi-user deployment
+ *                   - Added: usick_cause as object type index
+ *                   - Added: p_tofn as function ID
+ *                   - Struct dump now has pointers zeroed before save
+ */
 #define RH_MAGIC "RHCK"
-#define RH_VERSION 1
+#define RH_VERSION 2
 #define RH_ENDIANTAG 0x01020304
 
 /* Fixed-width type definitions for save format */
@@ -229,12 +238,53 @@ static int check_save_header(int fd, rh_hdr_t *hdr) {
     return 0; /* Different endianness not supported yet */
   }
 
-  /* Check version */
-  if (hdr->version != RH_VERSION) {
-    return 0; /* Different version not supported yet */
+  /* Accept versions 1 through RH_VERSION (currently 2) */
+  if (hdr->version < 1 || hdr->version > RH_VERSION) {
+    return 0; /* Unsupported version */
   }
 
   return 1;
+}
+
+/* Function pointer serialization for property timeouts
+ * EXHAUSTIVE SEARCH RESULT: Only float_down is assigned in codebase
+ * (see src/hack.potion.c:184) */
+extern int float_down(void);
+
+typedef int (*timeout_fn_t)(void);
+
+/* Timeout function ID table - add new functions here if code changes */
+static const struct {
+  timeout_fn_t fn;
+  const char *name; /* For debugging */
+} timeout_fn_table[] = {
+    {NULL, "none"},              /* ID 0 */
+    {float_down, "float_down"}, /* ID 1 */
+};
+#define NUM_TIMEOUT_FNS                                                        \
+  (sizeof(timeout_fn_table) / sizeof(timeout_fn_table[0]))
+
+/* Save timeout function pointer as ID */
+static rh_u32_t save_timeout_fn(int (*fn)(void)) {
+  if (fn == NULL)
+    return 0;
+  for (rh_u32_t i = 1; i < NUM_TIMEOUT_FNS; i++) {
+    if (fn == timeout_fn_table[i].fn) {
+      return i;
+    }
+  }
+  /* CRITICAL: Unknown function pointer detected! */
+  impossible("Unknown timeout function - treating as NULL", 0, 0);
+  return 0;
+}
+
+/* Restore timeout function pointer from ID */
+static int (*restore_timeout_fn(rh_u32_t id))(void) {
+  if (id >= NUM_TIMEOUT_FNS) {
+    impossible("Invalid timeout function ID - using NULL", id, 0);
+    return NULL;
+  }
+  return timeout_fn_table[id].fn;
 }
 
 extern char SAVEF[], nul[];
@@ -316,16 +366,68 @@ int dosave0(int hu) {
   sw_i32(fd, maxdlevel);
   sw_u32(fd, (rh_u32_t)moves);
 
-  /* For now, serialize struct you as raw data - this could be improved later */
-  /* TODO: Implement proper field-wise serialization for struct you */
+  /* Zero out pointer fields before dumping struct (they're serialized separately)
+   * This prevents bogus pointer values from being written to the save file */
+  struct you save_u = u;
+  save_u.usick_cause = NULL;
+  save_u.ustuck = NULL;
+  {
+    int num_uprops = sizeof(save_u.uprops) / sizeof(save_u.uprops[0]);
+    for (int i = 0; i < num_uprops; i++) {
+      save_u.uprops[i].p_tofn = NULL;
+    }
+  }
+
   sw_u32(fd, (rh_u32_t)sizeof(struct you));
-  sw_bytes(fd, &u, sizeof(struct you));
+  sw_bytes(fd, &save_u, sizeof(struct you));
 
   if (u.ustuck) {
     sw_u32(fd, 1); /* has ustuck */
     sw_u32(fd, (rh_u32_t)(u.ustuck->m_id));
   } else {
     sw_u32(fd, 0); /* no ustuck */
+  }
+
+  /* Serialize usick_cause as object type index (not string!)
+   *
+   * INVARIANT: usick_cause only ever points to:
+   *   1. NULL (not poisoned)
+   *   2. objects[i].oc_name (poisoned by specific object)
+   *   3. "something strange" literal (fallback)
+   *
+   * Any deviation from this invariant is treated as corruption.
+   */
+  {
+    rh_u32_t sick_idx;
+    if (u.usick_cause == NULL) {
+      sick_idx = 0xFFFFFFFF; /* Special: NULL */
+    } else {
+      /* Search objects table for matching oc_name pointer */
+      sick_idx = 0xFFFFFFFE; /* Default: "something strange" */
+      for (int i = 0; i < NROFOBJECTS; i++) {
+        if (u.usick_cause == objects[i].oc_name) {
+          sick_idx = (rh_u32_t)i;
+          break;
+        }
+      }
+      /* If not found in table, log warning and use "something strange" */
+      if (sick_idx == 0xFFFFFFFE &&
+          strcmp(u.usick_cause, "something strange") != 0) {
+        impossible("usick_cause points to unknown string - treating as generic",
+                   0, 0);
+      }
+    }
+    sw_u32(fd, sick_idx);
+  }
+
+  /* Serialize uprops function pointers
+   * Use derived bound to avoid breakage if constants change */
+  {
+    int num_uprops = sizeof(u.uprops) / sizeof(u.uprops[0]);
+    for (int i = 0; i < num_uprops; i++) {
+      rh_u32_t fn_id = save_timeout_fn(u.uprops[i].p_tofn);
+      sw_u32(fd, fn_id);
+    }
   }
 
   sw_bytes(fd, pl_character, sizeof pl_character);
@@ -404,10 +506,11 @@ int dorecover(int fd) {
   long save_pos = lseek(fd, 0, SEEK_CUR); /* Save current position */
 
   if (check_save_header(fd, &hdr)) {
-    /* New versioned format */
+    /* Versioned format detected */
+
+    /* Read common fields (all versions) */
     tmp = (int)sr_u32(fd);
-    if (tmp !=
-        (int)getuid()) { /* MODERN: Cast to int to match tmp variable type */
+    if (tmp != (int)getuid()) {
       (void)close(fd);
       (void)unlink(SAVEF);
       puts("Saved game was not yours.");
@@ -420,7 +523,7 @@ int dorecover(int fd) {
     maxdlevel = sr_i32(fd);
     moves = (long)sr_u32(fd);
 
-    /* Read struct you - for now using size-prefixed format */
+    /* Read struct you */
     rh_u32_t you_size = sr_u32(fd);
     if (you_size != sizeof(struct you)) {
       puts("Save file struct size mismatch.");
@@ -429,38 +532,93 @@ int dorecover(int fd) {
     }
     sr_bytes(fd, &u, sizeof(struct you));
 
-    /* Check if ustuck exists */
+    /* Read ustuck (all versions) */
     rh_u32_t has_ustuck = sr_u32(fd);
     if (has_ustuck) {
       mid = sr_u32(fd);
     }
 
-    sr_bytes(fd, pl_character, sizeof pl_character);
-    sr_bytes(fd, genocided, sizeof genocided);
-    sr_bytes(fd, fut_geno, sizeof fut_geno);
-  } else {
-    /* Legacy format - restore file position and use old code */
-    lseek(fd, save_pos, SEEK_SET);
+    /* VERSION-SPECIFIC FIELDS */
+    if (hdr.version == 1) {
+      /* Version 1: No usick_cause or p_tofn serialization
+       * Pointers in struct dump are BOGUS - clear them */
 
-    mread(fd, (char *)&tmp, sizeof tmp);
-    if (tmp !=
-        (int)getuid()) { /* MODERN: Cast to int to match tmp variable type */
-      (void)close(fd);
-      (void)unlink(SAVEF);
-      puts("Saved game was not yours.");
+      /* MIGRATION: Clear bogus usick_cause pointer */
+      if (Sick) {
+        pline(
+            "Note: Save upgraded from Version 1 - generic sickness message.");
+        u.usick_cause = "something strange";
+      } else {
+        u.usick_cause = NULL;
+      }
+
+      /* MIGRATION: Reconstruct p_tofn based on property state */
+      {
+        int num_uprops = sizeof(u.uprops) / sizeof(u.uprops[0]);
+        for (int i = 0; i < num_uprops; i++) {
+          /* Only RIN_LEVITATION uses float_down */
+          if (i == PROP(RIN_LEVITATION) && (u.uprops[i].p_flgs & TIMEOUT)) {
+            u.uprops[i].p_tofn = float_down;
+          } else {
+            u.uprops[i].p_tofn = NULL;
+          }
+        }
+      }
+
+    } else if (hdr.version == 2) {
+      /* Version 2: Safe pointer serialization */
+
+      /* Restore usick_cause from object index */
+      {
+        rh_u32_t sick_idx = sr_u32(fd);
+        if (sick_idx == 0xFFFFFFFF) {
+          u.usick_cause = NULL;
+        } else if (sick_idx == 0xFFFFFFFE) {
+          u.usick_cause = "something strange";
+        } else if (sick_idx < NROFOBJECTS) {
+          u.usick_cause = objects[sick_idx].oc_name;
+        } else {
+          pline("Warning: Save file corruption (usick_cause), repaired.");
+          u.usick_cause = "something strange";
+        }
+      }
+
+      /* Restore p_tofn from function IDs */
+      {
+        int num_uprops = sizeof(u.uprops) / sizeof(u.uprops[0]);
+        for (int i = 0; i < num_uprops; i++) {
+          rh_u32_t fn_id = sr_u32(fd);
+          u.uprops[i].p_tofn = restore_timeout_fn(fn_id);
+        }
+      }
+
+    } else {
+      /* Unknown version (shouldn't happen due to check_save_header) */
+      impossible("Unexpected save version", hdr.version, 0);
       restoring = FALSE;
       return (0);
     }
-    mread(fd, (char *)&flags, sizeof(struct flag));
-    mread(fd, (char *)&dlevel, sizeof dlevel);
-    mread(fd, (char *)&maxdlevel, sizeof maxdlevel);
-    mread(fd, (char *)&moves, sizeof moves);
-    mread(fd, (char *)&u, sizeof(struct you));
-    if (u.ustuck)
-      mread(fd, (char *)&mid, sizeof mid);
-    mread(fd, (char *)pl_character, sizeof pl_character);
-    mread(fd, (char *)genocided, sizeof genocided);
-    mread(fd, (char *)fut_geno, sizeof fut_geno);
+
+    /* Read remaining common fields */
+    sr_bytes(fd, pl_character, sizeof pl_character);
+    sr_bytes(fd, genocided, sizeof genocided);
+    sr_bytes(fd, fut_geno, sizeof fut_geno);
+
+  } else {
+    /* Pre-versioned legacy format - REJECT
+     *
+     * POLICY DECISION: Pre-versioned saves are inherently unsafe:
+     * - No magic number or format metadata
+     * - Raw pointer values without any serialization
+     * - No way to validate or repair corruption
+     * - Risk of arbitrary memory access on restore
+     *
+     * For canonical hosting safety, these are intentionally rejected.
+     */
+    lseek(fd, save_pos, SEEK_SET);
+    puts("Save file is too old (pre-Version 1). Cannot load safely.");
+    restoring = FALSE;
+    return (0);
   }
   restnames(fd);
   while (1) {
@@ -493,16 +651,42 @@ int dorecover(int fd) {
       uball = otmp;
     }
   }
+  /* POST-RESTORE VALIDATION: Ensure all pointers satisfy invariants */
+
+  /* Validate Sick flag matches usick_cause state */
+  if (Sick && !u.usick_cause) {
+    pline("Warning: Sick status without cause - adding generic message.");
+    u.usick_cause = "something strange";
+  } else if (!Sick && u.usick_cause) {
+    /* Not sick but has cause - clear it */
+    u.usick_cause = NULL;
+  }
+
+  /* Validate ustuck (gracefully handle missing monster) */
   if (u.ustuck) {
     struct monst *mtmp;
+    int found = 0;
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-      if (mtmp->m_id == mid)
-        goto monfnd;
-    panic("Cannot find the monster ustuck.");
-  monfnd:
-    u.ustuck = mtmp;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+      if (mtmp->m_id == mid) {
+        u.ustuck = mtmp;
+        found = 1;
+        break;
+      }
+    }
+
+    if (!found) {
+      /* Don't panic - just unstick player gracefully */
+      pline("Warning: Save file inconsistency (ustuck) - monster not found.");
+      u.ustuck = NULL;
+    }
   }
+
+  /* Note: No need to validate usick_cause or p_tofn pointer values here -
+   * the restoration code already guarantees they point to static data
+   * (objects[].oc_name, "something strange" literal, or timeout_fn_table).
+   * Only check flag/pointer state consistency. */
+
 #ifndef QUEST
   setsee(); /* only to recompute seelx etc. - these weren't saved */
 #endif      /* QUEST */
