@@ -103,7 +103,8 @@ tar -xzf restoHack-*-linux-x86_64-static.tar.gz
 
 ## Current Status
 
-v1.1.3 - Stable Release. Original 1984 gameplay preserved, modern safety added, runs everywhere it should.
+v1.1.5 — Stable Release
+Introduces a fully overhauled save file system. Inspired by NetHack and EvilHack, the new format improves safety, portability, and long-term compatibility across platforms and builds.
 
 ---
 
