@@ -258,11 +258,10 @@ static const struct {
   timeout_fn_t fn;
   const char *name; /* For debugging */
 } timeout_fn_table[] = {
-    {NULL, "none"},              /* ID 0 */
+    {NULL, "none"},             /* ID 0 */
     {float_down, "float_down"}, /* ID 1 */
 };
-#define NUM_TIMEOUT_FNS                                                        \
-  (sizeof(timeout_fn_table) / sizeof(timeout_fn_table[0]))
+#define NUM_TIMEOUT_FNS (sizeof(timeout_fn_table) / sizeof(timeout_fn_table[0]))
 
 /* Save timeout function pointer as ID */
 static rh_u32_t save_timeout_fn(int (*fn)(void)) {
@@ -366,8 +365,9 @@ int dosave0(int hu) {
   sw_i32(fd, maxdlevel);
   sw_u32(fd, (rh_u32_t)moves);
 
-  /* Zero out pointer fields before dumping struct (they're serialized separately)
-   * This prevents bogus pointer values from being written to the save file */
+  /* Zero out pointer fields before dumping struct (they're serialized
+   * separately) This prevents bogus pointer values from being written to the
+   * save file */
   struct you save_u = u;
   save_u.usick_cause = NULL;
   save_u.ustuck = NULL;
@@ -487,8 +487,10 @@ int dosave0(int hu) {
 
 int dorecover(int fd) {
   int nfd;
-  int tmp;      /* not a ! */
-  unsigned mid; /* idem */
+  int tmp; /* not a ! */
+  unsigned mid =
+      0; /* Modern: Initialize to prevent uninitialized use warning */
+  rh_u32_t has_ustuck = 0; /* Modern: Track if save file contains ustuck data */
   struct obj *otmp;
   extern boolean restoring;
 
@@ -533,7 +535,7 @@ int dorecover(int fd) {
     sr_bytes(fd, &u, sizeof(struct you));
 
     /* Read ustuck (all versions) */
-    rh_u32_t has_ustuck = sr_u32(fd);
+    has_ustuck = sr_u32(fd);
     if (has_ustuck) {
       mid = sr_u32(fd);
     }
@@ -545,8 +547,7 @@ int dorecover(int fd) {
 
       /* MIGRATION: Clear bogus usick_cause pointer */
       if (Sick) {
-        pline(
-            "Note: Save upgraded from Version 1 - generic sickness message.");
+        pline("Note: Save upgraded from Version 1 - generic sickness message.");
         u.usick_cause = "something strange";
       } else {
         u.usick_cause = NULL;
@@ -662,8 +663,11 @@ int dorecover(int fd) {
     u.usick_cause = NULL;
   }
 
-  /* Validate ustuck (gracefully handle missing monster) */
-  if (u.ustuck) {
+  /* Validate ustuck (gracefully handle missing monster)
+   * Modern: Use has_ustuck flag instead of checking u.ustuck pointer directly,
+   * since u.ustuck from struct dump may contain garbage. */
+  u.ustuck = NULL; /* Clear garbage pointer from struct dump */
+  if (has_ustuck) {
     struct monst *mtmp;
     int found = 0;
 
@@ -721,7 +725,8 @@ struct obj *restobjchn(int fd) {
     else
       otmp2->nobj = otmp;
     mread(fd, (char *)otmp, (unsigned)xl + sizeof(struct obj));
-    /* MODERN: Normalize onamelth to match allocation and ensure null-terminated */
+    /* MODERN: Normalize onamelth to match allocation and ensure null-terminated
+     */
     otmp->onamelth = (xl > 0) ? xl : 0;
     if (xl > 0) {
       ONAME(otmp)[xl] = '\0';
