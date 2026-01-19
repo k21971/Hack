@@ -36,10 +36,23 @@ Think resto-mod: the soul stays vintage, the internals get a precision rebuild.
 * **Unix/Linux Fixes** – No more hardcoded BSD paths or FS quirks.
 * **Cross-Platform Verified** – Works on Linux (glibc/musl) & FreeBSD; CI-tested.
 
-> **Tested on:** Arch, Alpine, FreeBSD 14.2.
+> **Tested on:** Arch, Alpine, FreeBSD 14.3 and WSL.
 > macOS support pending. Arch users can install via the AUR.
 
 ---
+
+ **Recognition:**  
+RestoHack was recognized by **GitHub** as a *For the Love of Code* category winner (2025).  
+Featured in the official GitHub Blog:  
+[From Karaoke Terminals to AI Resumes — The Winners of GitHub’s For the Love of Code Challenge](https://github.blog/open-source/from-karaoke-terminals-to-ai-resumes-the-winners-of-githubs-for-the-love-of-code-challenge/)
+
+---
+
+**Development Status:**  
+After a brief pause, active development is gearing back up. The upcoming work will focus heavily on strengthening safety guards throughout the codebase and continuing the long-term mission of cleaning up undefined behavior while keeping the original 1984 
+spirit intact.
+
+
 
 ## Installation
 
@@ -90,14 +103,16 @@ tar -xzf restoHack-*-linux-x86_64-static.tar.gz
 
 ## Current Status
 
-v1.1.3 - Stable Release. Original 1984 gameplay preserved, modern safety added, runs everywhere it should.
+v1.1.5 — Stable Release
+Introduces a fully overhauled save file system. Inspired by NetHack and EvilHack, the new format improves safety, portability, and long-term compatibility across platforms and builds.
 
 ---
 
 ## Recent Fixes
 
+* **Save System Safety** – Version 2 save format with pointer serialization
 * **Ubuntu Fix** – Resolved PATH resolution bug preventing game launch on Ubuntu 22.04/24.04
-* **Security Audit** – Fixed 150+ vulnerabilities: buffer overflows, null pointers, format strings  
+* **Security Audit** – Fixed 150+ vulnerabilities: buffer overflows, null pointers, format strings
 * **Terminal Resize** – Added SIGWINCH handler to prevent display corruption on window resize
 * **40-Year Bug** – Fixed strength overflow that could instantly kill players (spinach/potions)
 

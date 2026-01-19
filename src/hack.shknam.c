@@ -172,6 +172,15 @@ void findname(char *nampt, char let) {
         (void)strcpy(nampt, "Dirk");
       return;
     }
+  /* MODERN: Bounds check - q[i] may be NULL if we've exhausted the list */
+  if (!q[i]) {
+    /* Not enough names, try general name */
+    if (let)
+      findname(nampt, 0);
+    else
+      (void)strcpy(nampt, "Dirk");
+    return;
+  }
   (void)strncpy(nampt, q[i], PL_NSIZ);
   nampt[PL_NSIZ - 1] = 0;
 }
